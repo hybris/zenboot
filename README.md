@@ -1,5 +1,6 @@
-Zenboot - a way to provision and orchestrate your scripts
-=========================================================
+Zenboot - orchestrate your scripts
+==================================
+[![Build Status](https://travis-ci.org/hybris/zenboot.png?branch=master)](https://travis-ci.org/hybris/zenboot)
 
 ## In a nutshell ##
 * A kind of slim RunDeck with better Environment-support
