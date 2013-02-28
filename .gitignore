@@ -3,4 +3,5 @@ target*
 target-eclipse-*
 h2db*
 *~
-
+zenboot.log
+stacktrace.log

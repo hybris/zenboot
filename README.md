@@ -13,19 +13,13 @@ Zenboot - a way to provision and orchestrate your scripts
 
 `apt-get update`
 
-`apt-get install unzip mercurial wget openjdk-7-jdk`
+`apt-get install unzip git wget openjdk-7-jdk`
 
-`echo "export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/" >> /etc/profile`
+`export JAVA_HOME=/usr/lib/jvm/default-java`
 
-`. /etc/profile`
+`git clone https://github.com/hybris/zenboot.git`
 
-`#wget --http-user=user --http-passwd=heheThatsASecret  http://somedomain.com/artifactory/infrastructure-local/devop-adminportal/devop-adminportal-source/tip/devop-adminportal-source-tip.zip`
-
-`hg clone ssh://hg@bitbucket.org/hybris/devop-adminportal`
-
-`cd devop-adminportal`
-
-`cp zenboot.properties.example zenboot.properties`
+`cd zenboot`
 
 `./grailsw run-app`
 
