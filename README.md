@@ -12,17 +12,14 @@ Zenboot - orchestrate your scripts
 
 ## Installation on a debian based system in a nutshell ##
 
-`apt-get update`
-
-`apt-get install unzip git wget openjdk-7-jdk`
-
-`export JAVA_HOME=/usr/lib/jvm/default-java`
-
-`git clone https://github.com/hybris/zenboot.git`
-
-`cd zenboot`
-
-`./grailsw run-app`
+``` bash
+apt-get update
+apt-get install unzip git wget openjdk-7-jdk
+export JAVA_HOME=/usr/lib/jvm/default-java
+git clone https://github.com/hybris/zenboot.git
+cd zenboot
+./grailsw run-app
+```
 
 ## License ##
 Copyright 2013 hybris GmbH
