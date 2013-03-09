@@ -21,6 +21,19 @@ cd zenboot
 ./grailsw run-app
 ```
 
+## Usage in a nutshell
+* login at http://localhost:8080/zenboot with admin/zenboot
+* Create a example-execution-zone: Processsing -> ExecutionZone -> Create
+* Check enabled, create
+* choose "helloworld" scriptdir, execute!
+* Click the appeared Process on the left-hand-side
+* Click on the callout in the Process-Output-column to see the output of the script
+* Go again to the execution-zone, choose helloworld again, modify the value of "WHAT_TO_SAY", execute
+* Examine the Output again
+* Go again to the execution-zone, "edit" and add a key-value WHAT_TO_SAY -> "zenboot is cool!", update
+* choose helloworld again, consider how the value has now been changed, execute
+
+
 ## License ##
 Copyright 2013 hybris GmbH
 
