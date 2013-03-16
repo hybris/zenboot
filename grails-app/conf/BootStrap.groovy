@@ -50,9 +50,23 @@ class BootStrap {
         if (!zenbootUser.authorities.contains(userRole)) {
             PersonRole.create zenbootUser, userRole
         }
+
     }
 
     private setupSanityCheckExposedExecutionZoneAction() {
+        
+        // Setup a user capable of calling the Exposed Action afterwards
+        def userRole = Role.findByAuthority(Role.ROLE_SANITYCHECK) ?: new Role(authority: Role.ROLE_SANITYCHECK).save(failOnError: true)
+        def sanitycheckUser = Person.findByUsername('sanitycheck') ?: new Person(
+            username: 'sanitycheck',
+            password: '!sanitycheck!',
+            enabled: true
+        ).save(failOnError: true)
+
+        if (!sanitycheckUser.authorities.contains(userRole)) {
+            PersonRole.create sanitycheckUser, userRole
+        }
+        
         ExecutionZoneType sanityType = ExecutionZoneType.findByName("internal")
 
         ExecutionZone execZoneSanity = ExecutionZone.findByType(sanityType)
