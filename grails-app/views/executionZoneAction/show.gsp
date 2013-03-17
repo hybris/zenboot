@@ -21,6 +21,16 @@
 		</g:if>
 
 		<ol class="property-list executionZoneAction">
+			<g:if test="${executionZoneActionInstance?.id}">
+				<li class="fieldcontain">
+					<g:message code="executionZoneAction.id.label" default="ID" />
+					</span>
+					<span class="property-value" aria-labelledby="id-label">
+						<g:fieldValue bean="${executionZoneActionInstance}" field="id" />
+					</span>
+				</li>
+			</g:if>
+			
 			<g:if test="${executionZoneActionInstance?.scriptDir}">
 				<li class="fieldcontain">
 					<g:message code="executionZoneAction.scriptDir.label" default="Script Dir" />

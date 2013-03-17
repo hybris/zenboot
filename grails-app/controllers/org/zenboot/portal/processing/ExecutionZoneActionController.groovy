@@ -27,7 +27,7 @@ class ExecutionZoneActionController extends AbstractRestController {
                 render (contentType:"text/xml"){
                     status {
                         startDate batch.startDate
-                        endDate batch.startDate
+                        endDate batch.endDate
                         description batch.description
                         scriptletBatch(state:batch.state, progress:batch.progress, errorClass:batch.exceptionClass, errorMessage:batch.exceptionMessage, size:batch.countProcessables()) {
                             batch.processables.each {
@@ -44,7 +44,7 @@ class ExecutionZoneActionController extends AbstractRestController {
                             processable(description:it.description, state:it.state.name(), processTime:it.processTime)
                         }
                     }]
-                    status startDate:batch.startDate, endDate:batch.startDate,  description:batch.description,  scriptletBatch: scriptletBatch
+                    status startDate:batch.startDate, endDate:batch.endDate,  description:batch.description,  scriptletBatch: scriptletBatch
                 }
             }
         }
