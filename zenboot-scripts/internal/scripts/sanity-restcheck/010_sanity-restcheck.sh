@@ -18,7 +18,7 @@ CALLBACK=$(xml_parse referral $TMPFILE )
 echo "# CALLBACK is $CALLBACK"
 sleep 1
 assert_http_response $CALLBACK "RUNNING" "-H 'Content-Type:text/xml' --user sanitycheck:sanitycheck"
-sleep 3
+sleep 7
 assert_http_response $CALLBACK "SUCCESS" "-H 'Content-Type:text/xml' --user sanitycheck:sanitycheck "
 
 
