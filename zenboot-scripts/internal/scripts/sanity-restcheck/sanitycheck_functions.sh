@@ -92,10 +92,11 @@ function assert_http_ok() {
 function assert_http_response() {
   local URL="$1"
   local EXPECTED=$2
+  local OPTIONS=$3
 
-  debug "curl -s $URL"
+  debug "curl $OPTIONS -sL $URL"
 
-  local OUTPUT=`curl -sL $URL`
+  local OUTPUT=$(curl $OPTIONS -sL $URL)
   echo $OUTPUT | grep -q "$EXPECTED"
   local res=$?
   $_RESULT $res "Assert response of $URL" "Output does not contain '$EXPECTED'"
@@ -150,4 +151,17 @@ function test_teardown() {
   printf "%s tests executed: %s OK, %s FAILED.\n" `expr $TEST_OK + $TEST_FAILURE` $TEST_OK $TEST_FAILURE
   echo "Test result: $RESULT"
   exit $EXIT_CODE
+}
+
+# might be usefull sometimes
+# Function taken from http://www.threadstates.com/articles/parsing_xml_in_bash.html
+function xml_parse () {
+    local tag=$1
+    local xml=$2
+
+    # Find tag in the xml, convert tabs to spaces, remove leading spaces, remove the tag.
+    grep $tag $xml | \
+        tr '\011' '\040' | \
+        sed -e 's/^[ ]*//' \
+            -e 's/^<.*>\([^<].*\)<.*>$/\1/'
 }

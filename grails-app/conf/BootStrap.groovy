@@ -59,7 +59,7 @@ class BootStrap {
         def userRole = Role.findByAuthority(Role.ROLE_SANITYCHECK) ?: new Role(authority: Role.ROLE_SANITYCHECK).save(failOnError: true)
         def sanitycheckUser = Person.findByUsername('sanitycheck') ?: new Person(
             username: 'sanitycheck',
-            password: '!sanitycheck!',
+            password: 'sanitycheck',
             enabled: true
         ).save(failOnError: true)
 
