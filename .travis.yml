@@ -10,4 +10,6 @@ before_install:
  - sudo apt-get install -qq xmlindent
 script: 
     - ./grailsw test-app
-    - echo "n" | ./grailsw run-app && cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh 
+    - echo "n" | ./grailsw run-app &
+    - sleep 120
+    - cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh 
