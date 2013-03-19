@@ -187,9 +187,11 @@
 				<g:link class="btn btn-primary" action="edit" id="${executionZoneInstance?.id}">
 					<g:message code="default.button.edit.label" default="Edit" />
 				</g:link>
-				<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" disabled="${!executionZoneInstance?.enabled}" />
-				<span style="margin-left: 20px;">&nbsp;</span>
 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Zone')}" disabled="${!executionZoneInstance?.enabled}" />
+				<span style="margin-left: 20px;">&nbsp;</span>
+				<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" disabled="${!executionZoneInstance?.enabled}" />
+				
+				
 				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 					<g:actionSubmit class="btn btn-inverse" action="createExposedAction" value="${message(code: 'executionZone.button.createExposedAction.label', default: 'Expose Action')}" disabled="${!executionZoneInstance?.enabled}" />
 				</sec:ifAllGranted>
