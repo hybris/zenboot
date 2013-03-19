@@ -34,6 +34,9 @@ class HieraRestController {
             json {
                 render map as JSON
             }
+            properties {
+                render(template:   "parametersAsProperties", model: [map: map])
+            }
         }
         
         response.flushBuffer()

@@ -45,6 +45,9 @@ grails.mime.types = [ html: [
         'text/x-yaml',
         'application/x-yaml'
     ],
+    properties: [
+        'text/x-java-properties'
+    ],
     form: 'application/x-www-form-urlencoded',
     multipartForm: 'multipart/form-data'
 ]
