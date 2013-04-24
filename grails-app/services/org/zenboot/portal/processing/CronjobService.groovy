@@ -31,6 +31,7 @@ class CronjobService implements ApplicationEventPublisherAware {
             }
         }
     }
+    
 
 	private List getJobList(CronjobExpression cronExpression) {
         List jobs = []
@@ -42,14 +43,21 @@ class CronjobService implements ApplicationEventPublisherAware {
 			File cronJob = jobResolver.resolveScriptletBatchPlugin(exposedAction.scriptDir)
 			if (!cronJob) {
 				log.warn("No cronjob found for exposed action ${exposedAction.scriptDir}")
+                log.info("Let's do a nasty shortcut and execute immediately")
+                ExecutionZoneAction action = executionZoneService.createExecutionZoneAction(exposedAction)
+                this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
+			} else {
+			    jobs << this.getJob(cronJob, exposedAction)
 			}
-			jobs << this.getJob(cronJob, exposedAction)
 		}
 
 		return jobs
 	}
 
     private def getJob(File jobClass, def exposedAction) {
+        if (jobClass == null) {
+            return null; 
+        }
         GroovyClassLoader gcl = new GroovyClassLoader(this.class.classLoader)
         Class clazz = gcl.parseClass(jobClass)
 
