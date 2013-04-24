@@ -90,4 +90,4 @@ mvn deploy:deploy-file -DgroupId=$MAVEN_GROUPID -Dversion=$MAVEN_VERSION -Dartif
 
 # Just to be sure, revert the formerly modified application.properties (Let's keep the orig for the reference)
 
-hg revert application.properties
+#hg revert application.properties
