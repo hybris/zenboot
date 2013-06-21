@@ -105,6 +105,16 @@
                     </li>
                 </g:if>
 
+                <li class="fieldcontain">
+                    <span id="qualityStage" class="property-label">
+                        <g:message code="executionZone.qualityStage.label" default="Quality-Stage" />
+                    </span>
+                    <span class="property-value" aria-labelledby="qualityStage-label">
+                        <g:fieldValue bean="${executionZoneInstance}" field="qualityStage" />
+                    </span>
+                </li>
+                    
+
 				<g:if test="${executionZoneInstance?.description}">
 					<li class="fieldcontain">
 						<span id="description-label" class="property-label">

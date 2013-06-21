@@ -7,6 +7,7 @@ class ExecutionZone {
     ExecutionZoneType type
     String description
     String puppetEnvironment
+    String qualityStage
     Set processingParameters = []
     Set actions = []
     boolean enabled = true

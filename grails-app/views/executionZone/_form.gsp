@@ -42,6 +42,17 @@
     </div>
 </div>
 
+<div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'qualityStage', 'error')} ">
+    <label class="control-label" for="qualityStage">
+        <g:message code="executionZone.qualityStage.label" default="Quality-Stage" />
+    </label>
+    <div class="controls">
+        <g:textField name="qualityStage" value="${executionZoneInstance?.qualityStage}" />
+        <br/>
+        <small><g:message code="executionZone.qualityStage.comment" default="Will become part of the Hiera REST-url" /></small>
+    </div>
+</div>
+
 <div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'description', 'error')} ">
     <label class="control-label" for="description">
         <g:message code="executionZone.description.label" default="Description" />

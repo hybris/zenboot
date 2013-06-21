@@ -16,7 +16,7 @@ class HieraRestController {
             return
         }
 
-        ExecutionZone execZone = ExecutionZone.findByPuppetEnvironment(params.puppetEnvironment)
+        ExecutionZone execZone = ExecutionZone.findByPuppetEnvironmentAndQualityStage(params.puppetEnvironment, params.qualityStage)
         if (!execZone) {
             this.sendError(HttpStatus.NOT_FOUND, "No ${ExecutionZone.class.simpleName} found for environment '${params.puppetEnvironment}'")
             return
