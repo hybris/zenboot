@@ -6,3 +6,4 @@ h2db*
 zenboot.log
 zenboot.log.*
 stacktrace.log
+zenboot-scripts/internal/scripts/sanity-restcheck/temp

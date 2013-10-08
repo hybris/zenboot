@@ -50,7 +50,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
         this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
 
-        URI referral = new URI(this.grailsLinkGenerator.link(absolute:true, controller:'executionZoneAction', action:'rest', params:[execId:action.id]))
+        URI referral = new URI(this.grailsLinkGenerator.link(absolute:true, controller:'executionZoneAction', action:'rest', params:[id:action.id]))
         this.renderRestResult(HttpStatus.CREATED, null, referral)
     }
 
