@@ -24,40 +24,30 @@
 			<i class="icon-list"></i>
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
-
-		<ol class="property-list customer">
+		
+		<dl class="dl-horizontal">
 			<g:if test="${customerInstance?.email}">
-				<li class="fieldcontain">
-					<span id="email-label" class="property-label">
-						<g:message code="customer.email.label" default="Email" />
-					</span>
-
-					<span class="property-value" aria-labelledby="email-label">
-						<g:fieldValue bean="${customerInstance}" field="email" />
-					</span>
-
-				</li>
+				<dt>
+					<g:message code="customer.email.label" default="Email" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${customerInstance}" field="email" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${customerInstance?.creationDate}">
-				<li class="fieldcontain">
-					<span id="creationDate-label" class="property-label">
-						<g:message code="customer.creationDate.label" default="Creation Date" />
-					</span>
-
-					<span class="property-value" aria-labelledby="creationDate-label">
-						<g:formatDate date="${customerInstance?.creationDate}" />
-					</span>
-
-				</li>
+				<dt>
+					<g:message code="customer.creationDate.label" default="Creation Date" />
+				</dt>
+				<dd>
+					<g:formatDate date="${customerInstance?.creationDate}" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${customerInstance?.hosts}">
-				<li class="fieldcontain">
-					<span id="hosts-label" class="property-label">
-						<g:message code="customer.hosts.label" default="Hosts" />
-					</span>
-
+				<dt>
+					<g:message code="customer.hosts.label" default="Hosts" />
+				</dt>
 					<g:each in="${customerInstance.hosts}" var="h">
 						<span class="property-value" aria-labelledby="hosts-label">
 							<g:link controller="host" action="show" id="${h.id}">
@@ -65,11 +55,9 @@
 							</g:link>
 						</span>
 					</g:each>
-
-				</li>
 			</g:if>
-
-		</ol>
+			
+		</dl>
 
 		<g:form>
 			<fieldset class="spacer buttons">

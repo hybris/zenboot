@@ -21,17 +21,18 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
     def springSecurityService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
+    
     def execute = { ExecuteExecutionZoneCommand cmd ->
+        cmd.setParameters(params.parameters)
         if (cmd.hasErrors()) {
-            chain(action:"show", id:cmd.id, model:[cmd:cmd])
+            chain(action:"show", id:cmd.execId, model:[cmd:cmd])
             return
         } else {
             ExecutionZoneAction action = cmd.getExecutionZoneAction()
             this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
-        redirect(action:"show", id:cmd.id)
+        redirect(action:"show", id:cmd.execId)
     }
 
     def ajaxGetParameters = { GetExecutionZoneParametersCommand cmd ->
@@ -96,8 +97,9 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
     }
 
     def createExposedAction = { ExposeExecutionZoneCommand cmd ->
+        cmd.setParameters(params.parameters)
         if (cmd.hasErrors()) {
-            chain(action:"show", id:cmd.id, model:[cmd:cmd])
+            chain(action:"show", id:cmd.execId, model:[cmd:cmd])
             return
         }
         chain(controller:'exposedExecutionZoneAction', action:'create', model:['exposedExecutionZoneActionInstance':cmd.executionZoneAction])
@@ -225,7 +227,7 @@ class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
 
     @Override
     ExecutionZoneAction getExecutionZoneAction() {
-        return executionZoneService.createExecutionZoneAction(ExecutionZone.get(this.id), this.scriptDir, this.execZoneParameters)
+        return executionZoneService.createExecutionZoneAction(ExecutionZone.get(this.execId), this.scriptDir, this.execZoneParameters)
     }
 
 }
@@ -234,7 +236,7 @@ class ExposeExecutionZoneCommand extends AbstractExecutionZoneCommand {
 
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {
-        ExposedExecutionZoneAction expAction = new ExposedExecutionZoneAction(executionZone: ExecutionZone.get(this.id), scriptDir: this.scriptDir)
+        ExposedExecutionZoneAction expAction = new ExposedExecutionZoneAction(executionZone: ExecutionZone.get(this.execId), scriptDir: this.scriptDir)
         ControllerUtils.synchronizeProcessingParameterValues(this.execZoneParameters, expAction)
         return expAction
     }
@@ -245,11 +247,11 @@ class GetExecutionZoneParametersCommand {
 
     def executionZoneService
 
-    Long id
+    Long execId
     File scriptDir
 
     static constraints = {
-        id nullable:false
+        execId nullable:false
         scriptDir nullable:false, validator: { value, commandObj ->
             if (!value.exists()) {
                 return "executionZone.failure.scriptDirNotExist"
@@ -258,7 +260,7 @@ class GetExecutionZoneParametersCommand {
     }
 
     def getExecutionZoneParameters() {
-        def execZnParams = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.id), this.scriptDir).asType(ParameterMetadata[])
+        def execZnParams = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.execId), this.scriptDir).asType(ParameterMetadata[])
         execZnParams.sort(true, new MetadataParameterComparator())
     }
 

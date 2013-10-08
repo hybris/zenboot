@@ -24,39 +24,34 @@
 			<i class="icon-list"></i>
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
-
-		<ol class="property-list executionZoneType">
-			<li class="fieldcontain">
-				<span id="enabled-label" class="property-label">
-					<g:message code="executionZoneType.enabled.label" default="Enabled" />
-				</span>
-				<span class="property-value" aria-labelledby="enabled-label">
-					<g:fieldValue bean="${executionZoneTypeInstance}" field="enabled" />
-				</span>
-			</li>
-
+		
+		<dl class="dl-horizontal">
+			<dt>
+				<g:message code="executionZoneType.enabled.label" default="Enabled" />
+			</dt>
+			<dd>
+				<g:fieldValue bean="${executionZoneTypeInstance}" field="enabled" />
+			</dd>
+			
 			<g:if test="${executionZoneTypeInstance?.name}">
-				<li class="fieldcontain">
-					<span id="name-label" class="property-label">
-						<g:message code="executionZoneType.name.label" default="Name" />
-					</span>
-					<span class="property-value" aria-labelledby="name-label">
-						<g:fieldValue bean="${executionZoneTypeInstance}" field="name" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="executionZoneType.name.label" default="Name" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${executionZoneTypeInstance}" field="name" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${executionZoneTypeInstance?.description}">
-				<li class="fieldcontain">
-					<span id="description-label" class="property-label">
-						<g:message code="executionZoneType.description.label" default="Description" />
-					</span>
-					<span class="property-value" aria-labelledby="description-label">
-						<g:fieldValue bean="${executionZoneTypeInstance}" field="description" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="executionZoneType.description.label" default="Description" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${executionZoneTypeInstance}" field="description" />
+				</dd>
 			</g:if>
-		</ol>
+		</dl>
+
 
 		<g:form>
 			<fieldset class="spacer buttons">

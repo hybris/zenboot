@@ -8,6 +8,8 @@ grails.project.source.level = 1.6
 
 grails.tomcat.nio = false
 
+grails.project.dependency.resolver = "maven"
+
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
@@ -32,9 +34,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ":hibernate:$grailsVersion"
+        runtime ':hibernate:3.6.10.M3' 
         runtime ":jquery:1.7.1"
-        runtime ":resources:1.1.6"
         //runtime ":zipped-resources:1.0"
         //runtime ":cached-resources:1.0"
         //runtime ":yui-minify-resources:0.1.5"
@@ -43,9 +44,10 @@ grails.project.dependency.resolution = {
         runtime ":mail:1.0"
         runtime ":navigation:1.3.2"
         runtime ":quartz2:0.2.3"
+        runtime ":resources:1.2.1"
         runtime ":spring-security-core:1.2.7.3"
-        runtime ":svn:1.0.2"
-        runtime ":twitter-bootstrap:2.1.1"
+        compile ":webxml:1.4.1"
+        runtime ':twitter-bootstrap:2.3.2'
 
         //spring security ui specific
         runtime ":spring-security-ui:0.2"
@@ -53,9 +55,9 @@ grails.project.dependency.resolution = {
         runtime ":jquery-ui:1.8.15"
 
         //DB console
-        runtime ":dbconsole:1.1"
+        //runtime ":dbconsole:1.1"
 
-        build ":tomcat:$grailsVersion"
+        build ':tomcat:7.0.40.1'
     }
 }
 

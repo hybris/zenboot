@@ -25,141 +25,118 @@
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
 
-		<ol class="property-list dnsEntry">
+		<dl class="dl-horizontal">
 			<g:if test="${dnsEntryInstance?.creationDate}">
-				<li class="fieldcontain">
-					<span id="creationDate-label" class="property-label">
-						<g:message code="dnsEntry.creationDate.label" default="Creation Date" />
-					</span>
-					<span class="property-value" aria-labelledby="creationDate-label">
-						<g:formatDate date="${dnsEntryInstance?.creationDate}" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.creationDate.label" default="Creation Date" />
+				</dt>
+				<dd>
+					<g:formatDate date="${dnsEntryInstance?.creationDate}" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('dnsId') && dnsEntryInstance.dnsId}">
-				<li class="fieldcontain">
-					<span id="dnsId-label" class="property-label">
-						<g:message code="dnsEntry.dnsId.label" default="Dns Id" />
-					</span>
-					<span class="property-value" aria-labelledby="dnsId-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="dnsId" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.dnsId.label" default="Dns Id" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="dnsId" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.fqdn}">
-				<li class="fieldcontain">
-					<span id="fqdn-label" class="property-label">
-						<g:message code="dnsEntry.fqdn.label" default="Fqdn" />
-					</span>
-					<span class="property-value" aria-labelledby="fqdn-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="fqdn" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.fqdn.label" default="Fqdn" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="fqdn" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hostType}">
-				<li class="fieldcontain">
-					<span id="hostType-label" class="property-label">
-						<g:message code="dnsEntry.hostType.label" default="Host Type" />
-					</span>
-					<span class="property-value" aria-labelledby="hostType-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="hostType" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.hostType.label" default="Host Type" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="hostType" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('notes') && dnsEntryInstance.notes}">
-				<li class="fieldcontain">
-					<span id="notes-label" class="property-label">
-						<g:message code="dnsEntry.notes.label" default="Notes" />
-					</span>
-					<span class="property-value" aria-labelledby="notes-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="notes" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.notes.label" default="Notes" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="notes" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.owner}">
-				<li class="fieldcontain">
-					<span id="owner-label" class="property-label">
-						<g:message code="dnsEntry.owner.label" default="Owner" />
-					</span>
-					<span class="property-value" aria-labelledby="owner-label">
-						<g:link controller="host" action="show" id="${dnsEntryInstance?.owner?.id}">
+				<dt>
+					<g:message code="dnsEntry.owner.label" default="Owner" />
+				</dt>
+				<dd>
+					<g:link controller="host" action="show" id="${dnsEntryInstance?.owner?.id}">
 							${dnsEntryInstance?.owner?.encodeAsHTML()}
 						</g:link>
-					</span>
-				</li>
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('priority') && dnsEntryInstance.priority}">
-				<li class="fieldcontain">
-					<span id="priority-label" class="property-label">
-						<g:message code="dnsEntry.priority.label" default="Priority" />
-					</span>
-					<span class="property-value" aria-labelledby="priority-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="priority" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.priority.label" default="Priority" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="priority" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('publicIp') && dnsEntryInstance.publicIp}">
-				<li class="fieldcontain">
-					<span id="publicIp-label" class="property-label">
-						<g:message code="dnsEntry.publicIp.label" default="Public Ip" />
-					</span>
-					<span class="property-value" aria-labelledby="publicIp-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="publicIp" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.publicIp.label" default="Public Ip" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="publicIp" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('state') && dnsEntryInstance.state}">
-				<li class="fieldcontain">
-					<span id="state-label" class="property-label">
-						<g:message code="dnsEntry.state.label" default="State" />
-					</span>
-					<span class="property-value" aria-labelledby="state-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="state" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.state.label" default="State" />
+				</dt>	
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="state" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('ttl') && dnsEntryInstance.ttl}">
-				<li class="fieldcontain">
-					<span id="ttl-label" class="property-label">
-						<g:message code="dnsEntry.ttl.label" default="Ttl" />
-					</span>
-					<span class="property-value" aria-labelledby="ttl-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="ttl" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.ttl.label" default="Ttl" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="ttl" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('updateDate') && dnsEntryInstance.updateDate}">
-				<li class="fieldcontain">
-					<span id="updateDate-label" class="property-label">
-						<g:message code="dnsEntry.updateDate.label" default="Update Date" />
-					</span>
-					<span class="property-value" aria-labelledby="updateDate-label">
-						<g:formatDate date="${dnsEntryInstance?.updateDate}" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.updateDate.label" default="Update Date" />
+				</dt>
+				<dd>
+					<g:formatDate date="${dnsEntryInstance?.updateDate}" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${dnsEntryInstance?.hasProperty('zoneId') && dnsEntryInstance.zoneId}">
-				<li class="fieldcontain">
-					<span id="zoneId-label" class="property-label">
-						<g:message code="dnsEntry.zoneId.label" default="Zone Id" />
-					</span>
-					<span class="property-value" aria-labelledby="zoneId-label">
-						<g:fieldValue bean="${dnsEntryInstance}" field="zoneId" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="dnsEntry.zoneId.label" default="Zone Id" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${dnsEntryInstance}" field="zoneId" />
+				</dd>
 			</g:if>
-		</ol>
+		</dl>
+
 
 		<g:form>
 			<fieldset class="buttons">

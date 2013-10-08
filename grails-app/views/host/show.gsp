@@ -25,87 +25,74 @@
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
 
-		<ol class="property-list host">
-			<li class="fieldcontain">
-				<span id="type-label" class="property-label">
-					<g:message code="host.type.label" default="Type" />
-				</span>
-				<span class="property-value" aria-labelledby="type-label">
-					${hostInstance?.class.getSimpleName()}
-				</span>
-			</li>
-
+		
+		<dl class="dl-horizontal">
+			<dt>
+				<g:message code="host.type.label" default="Type" />
+			</dt>
+			<dd>
+				${hostInstance?.class.getSimpleName()}
+			</dd>
+			
 			<g:if test="${hostInstance?.ipAddress}">
-				<li class="fieldcontain">
-					<span id="ipAddress-label" class="property-label">
-						<g:message code="host.ipAddress.label" default="Ip Address" />
-					</span>
-					<span class="property-value" aria-labelledby="ipAddress-label">
-						<g:fieldValue bean="${hostInstance}" field="ipAddress" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="host.ipAddress.label" default="Ip Address" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="ipAddress" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.macAddress}">
-				<li class="fieldcontain">
-					<span id="macAddress-label" class="property-label">
-						<g:message code="host.macAddress.label" default="Mac Address" />
-					</span>
-					<span class="property-value" aria-labelledby="macAddress-label">
-						<g:fieldValue bean="${hostInstance}" field="macAddress" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="host.macAddress.label" default="Mac Address" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="macAddress" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.hostname}">
-				<li class="fieldcontain">
-					<span id="hostname-label" class="property-label">
-						<g:message code="host.hostname.label" default="Hostname" />
-					</span>
-					<span class="property-value" aria-labelledby="hostname-label">
-						${hostInstance?.hostname?.encodeAsHTML()}
-					</span>
-				</li>
+				<dt>
+					<g:message code="host.hostname.label" default="Hostname" />
+				</dt>
+				<dd>
+					${hostInstance?.hostname?.encodeAsHTML()}
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.instanceId}">
-				<li class="fieldcontain">
-					<span id="instanceId-label" class="property-label">
-						<g:message code="host.instanceId.label" default="Instance Id" />
-					</span>
-					<span class="property-value" aria-labelledby="instanceId-label">
-						<g:fieldValue bean="${hostInstance}" field="instanceId" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="host.instanceId.label" default="Instance Id" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="instanceId" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.state}">
-				<li class="fieldcontain">
-					<span id="state-label" class="property-label">
-						<g:message code="host.state.label" default="State" />
-					</span>
-					<span class="property-value" aria-labelledby="state-label">
-						<g:fieldValue bean="${hostInstance}" field="state" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="host.state.label" default="State" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="state" />
+				</dd>			
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.creationDate}">
-				<li class="fieldcontain">
-					<span id="creationDate-label" class="property-label">
-						<g:message code="host.creationDate.label" default="Creation Date" />
-					</span>
-					<span class="property-value" aria-labelledby="creationDate-label">
-						<g:formatDate date="${hostInstance?.creationDate}" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="host.creationDate.label" default="Creation Date" />
+				</dt>
+				<dd>
+					<g:formatDate date="${hostInstance?.creationDate}" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.dnsEntries}">
-				<li class="fieldcontain">
-					<span id="dnsEntries-label" class="property-label">
-						<g:message code="host.dnsEntries.label" default="Dns Entries" />
-					</span>
+				<dt>
+					<g:message code="host.dnsEntries.label" default="Dns Entries" />
+				</dt>
+				<dd>
 					<g:each in="${hostInstance.dnsEntries}" var="d">
 						<span class="property-value" aria-labelledby="dnsEntries-label">
 							<g:link controller="dnsEntry" action="show" id="${d?.id}">
@@ -113,33 +100,30 @@
 							</g:link>
 						</span>
 					</g:each>
-				</li>
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.expiryDate}">
-				<li class="fieldcontain">
-					<span id="expiryDate-label" class="property-label">
-						<g:message code="host.expiryDate.label" default="Expiry Date" />
-					</span>
-					<span class="property-value" aria-labelledby="expiryDate-label">
-						<g:formatDate date="${hostInstance?.expiryDate}" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="host.expiryDate.label" default="Expiry Date" />
+				</dt>
+				<dd>
+					<g:formatDate date="${hostInstance?.expiryDate}" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${hostInstance?.owner}">
-				<li class="fieldcontain">
-					<span id="owner-label" class="property-label">
-						<g:message code="host.owner.label" default="Owner" />
-					</span>
-					<span class="property-value" aria-labelledby="owner-label">
-						<g:link controller="customer" action="show" id="${hostInstance?.owner?.id}">
+				<dt>
+					<g:message code="host.owner.label" default="Owner" />
+				</dt>
+				<dd>
+					<g:link controller="customer" action="show" id="${hostInstance?.owner?.id}">
 							${hostInstance?.owner?.encodeAsHTML()}
 						</g:link>
-					</span>
-				</li>
+				</dd>
 			</g:if>
-		</ol>
+		</dl>
+
 
 		<g:form name="hostForm">
 			<fieldset class="buttons">

@@ -50,7 +50,7 @@
 			</fieldset>
 			<fieldset class="buttons spacer">
 				<g:if test="${exposedExecutionZoneActionInstance.executionZone}">
-					<g:link class="btn" action="show" controller="executionZone" params="[id:exposedExecutionZoneActionInstance.executionZone.id]">
+					<g:link class="btn" action="show" controller="executionZone" params="[execId:exposedExecutionZoneActionInstance.executionZone.id]">
 						${message(code: 'default.button.cancel.label', default: 'Cancel')}
 					</g:link>
 				</g:if>

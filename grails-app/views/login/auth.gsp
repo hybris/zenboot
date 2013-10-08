@@ -16,35 +16,37 @@
 		</div>
 	</g:if>
 
-	<g:form url='${postUrl}' method='POST' id='loginForm' class="well inline-form" autocomplete='off'>
-		<ol class="property-list executionZone">
-			<li class="fieldcontain">
-				<span class="property-label">
-					<g:message code="springSecurity.login.username.label" default="Username" />
-				</span>
-				<span class="property-value" aria-labelledby="username-label">
-					<g:textField name="j_username" id="username" />
-				</span>
-			</li>
+	<g:form url='${postUrl}' method='POST' id='loginForm' class="well form-horizontal" autocomplete='off'>
+    <div class="control-group">
+      <!-- Username -->
+      <label class="control-label"  for="username">
+      	<g:message code="springSecurity.login.username.label" default="Username" />
+      </label>
+      <div class="controls">
+        <g:textField name="j_username" id="username" />
+      </div>
+    </div>
 
-			<li class="fieldcontain">
-				<span class="property-label">
-					<g:message code="springSecurity.login.password.label" default="Password" />
-				</span>
-				<span class="property-value" aria-labelledby="password-label">
-					<g:passwordField name="j_password" id="password" />
-				</span>
-			</li>
+    <div class="control-group">
+      <!-- Password-->
+      <label class="control-label" for="password">
+      	<g:message code="springSecurity.login.password.label" default="Password" />
+      </label>
+      <div class="controls">
+        <g:passwordField name="j_password" id="password" />
+      </div>
+    </div>
+    
+    <div class="control-group">
+    	<label class="control-label" for="remember_me">
+    		<g:message code="springSecurity.login.remember.me.label" default="Remember Me" />
+    	</label>
+    	<div class="controls">
+    		<g:checkBox name="${rememberMeParameter}" id="remember_me" checked="${hasCookie}" />
+    	</div>
+    </div>		
 
-			<li class="fieldcontain">
-				<span class="property-label">
-					<g:message code="springSecurity.login.remember.me.label" default="Remember Me" />
-				</span>
-				<span class="property-value" aria-labelledby="rememberme-label">
-					<g:checkBox name="${rememberMeParameter}" id="remember_me" checked="${hasCookie}" />
-				</span>
-			</li>
-		</ol>
+
 		<g:submitButton name="submit" class="btn btn-primary" value="${message(code: "springSecurity.login.button")}" />
 	</g:form>
 

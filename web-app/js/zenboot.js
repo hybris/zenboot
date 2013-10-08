@@ -130,7 +130,7 @@ zenboot.toggleParameterCheckbox = function(type) {
 }
 
 zenboot.enableTooltip = function() {
-	$('.tooltip').tooltip({
+	$('.tooltip, .zb-tooltip').tooltip({
 		delay : 800
 	})
 }

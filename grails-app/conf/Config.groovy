@@ -92,6 +92,9 @@ grails.gorm.default.constraints = {'*'(nullable: true)}
 // enable query caching by default
 grails.hibernate.cache.queries = true
 
+// Use spring binder (http://grails.org/doc/2.3.x/guide/upgradingFromPreviousVersionsOfGrails.html)
+grails.databinding.useSpringBinder = true
+
 // email configuration
 grails.mail.default.from="zenboot-noreply@yourdomain.com"
 
@@ -152,3 +155,27 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
 
 //fix pagination bug in bootstrap
 grails.plugins.twitterbootstrap.fixtaglib = true
+
+// Uncomment and edit the following lines to start using Grails encoding & escaping improvements
+
+/* remove this line 
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside null
+                scriptlet = 'none' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        filteringCodecForContentType {
+            //'text/html' = 'html'
+        }
+    }
+}
+remove this line */

@@ -37,84 +37,73 @@
 		</g:link>
 
 		<g:form>
-			<ol class="property-list exposedExecutionZoneAction">
-
+		
+			<dl class="dl-horizontal">
 				<g:if test="${exposedExecutionZoneActionInstance?.scriptDir}">
-					<li class="fieldcontain">
-						<span id="scriptDir-label" class="property-label">
-							<g:message code="exposedExecutionZoneAction.scriptDir.label" default="Script Dir" />
-						</span>
-						<span class="property-value" aria-labelledby="scriptDir-label">
-							<g:fieldValue bean="${exposedExecutionZoneActionInstance}" field="scriptDir" />
-						</span>
-					</li>
+					<dt>
+						<g:message code="exposedExecutionZoneAction.scriptDir.label" default="Script Dir" />
+					</dt>
+					<dd>
+						<g:fieldValue bean="${exposedExecutionZoneActionInstance}" field="scriptDir" />
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${exposedExecutionZoneActionInstance?.cronExpression}">
-					<li class="fieldcontain">
-						<span id="cronExpression-label" class="property-label">
-							<g:message code="exposedExecutionZoneAction.cronExpression.label" default="Cron Expression" />
-						</span>
-						<span class="property-value" aria-labelledby="cronExpression-label">
-							<g:fieldValue bean="${exposedExecutionZoneActionInstance}" field="cronExpression" />
-						</span>
-					</li>
+					<dt>
+						<g:message code="exposedExecutionZoneAction.cronExpression.label" default="Cron Expression" />
+					</dt>
+					<dd>
+						<g:fieldValue bean="${exposedExecutionZoneActionInstance}" field="cronExpression" />
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${exposedExecutionZoneActionInstance?.creationDate}">
-					<li class="fieldcontain">
-						<span id="creationDate-label" class="property-label">
-							<g:message code="exposedExecutionZoneAction.creationDate.label" default="Creation Date" />
-						</span>
-						<span class="property-value" aria-labelledby="creationDate-label">
-							<g:formatDate date="${exposedExecutionZoneActionInstance?.creationDate}" />
-						</span>
-					</li>
+					<dt>
+						<g:message code="exposedExecutionZoneAction.creationDate.label" default="Creation Date" />
+					</dt>
+					<dd>
+						<g:formatDate date="${exposedExecutionZoneActionInstance?.creationDate}" />
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${exposedExecutionZoneActionInstance?.executionZone}">
-					<li class="fieldcontain">
-						<span id="executionZone-label" class="property-label">
-							<g:message code="exposedExecutionZoneAction.executionZone.label" default="Execution Zone" />
-						</span>
-						<span class="property-value" aria-labelledby="executionZone-label">
-							<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+					<dt>
+						<g:message code="exposedExecutionZoneAction.executionZone.label" default="Execution Zone" />
+					</dt>
+					<dd>
+						<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 								<g:link controller="executionZone" action="show" id="${exposedExecutionZoneActionInstance?.executionZone?.id}">
 									${exposedExecutionZoneActionInstance?.executionZone?.encodeAsHTML()}
 								</g:link>
-							</sec:ifAllGranted>
-							<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-								${exposedExecutionZoneActionInstance?.executionZone?.encodeAsHTML()}
-							</sec:ifNotGranted>
-							<g:if test="${exposedExecutionZoneActionInstance?.executionZone?.description}">
-						(${exposedExecutionZoneActionInstance?.executionZone?.description})
+						</sec:ifAllGranted>
+						<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+							${exposedExecutionZoneActionInstance?.executionZone?.encodeAsHTML()}
+						</sec:ifNotGranted>
+						<g:if test="${exposedExecutionZoneActionInstance?.executionZone?.description}">
+							(${exposedExecutionZoneActionInstance?.executionZone?.description})
 						</g:if>
-						</span>
-					</li>
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${!exposedExecutionZoneActionParameters?.empty}">
-					<li class="fieldcontain">
-						<span id="parameters-label" class="property-label">
-							<g:message code="exposedExecutionZoneAction.parameters.label" default="Parameters" />
-						</span>
-						<span class="property-value" aria-labelledby="parameters-label">
-							<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+					<dt>
+						<g:message code="exposedExecutionZoneAction.parameters.label" default="Parameters" />
+					</dt>
+					<dd>
+						<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 								<g:render template="showParametersAdmin" model="[parameters:exposedExecutionZoneActionParameters]" />
 							</sec:ifAllGranted>
 							<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
 								<g:render template="showParameters" model="[parameters:exposedExecutionZoneActionParameters]" />
 							</sec:ifNotGranted>
-
-						</span>
-					</li>
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${exposedExecutionZoneActionInstance?.roles}">
-					<li class="fieldcontain">
-						<span id="roles-label" class="property-label">
-							<g:message code="exposedExecutionZoneAction.roles.label" default="Roles" />
-						</span>
+					<dt>
+						<g:message code="exposedExecutionZoneAction.roles.label" default="Roles" />
+					</dt>
+					<dd>
 						<ol class="property-value unstyled" aria-labelledby="roles-label">
 							<g:each in="${exposedExecutionZoneActionInstance.roles}" var="r">
 								<li>
@@ -122,20 +111,19 @@
 								</li>
 							</g:each>
 						</ol>
-					</li>
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${exposedExecutionZoneActionInstance?.url}">
-					<li class="fieldcontain">
-						<span id="url-label" class="property-label">
-							<g:message code="exposedExecutionZoneAction.url.label" default="Url" />
-						</span>
-						<span class="property-value" aria-labelledby="url-label">
-							<g:createLink controller="exposedExecutionZoneAction" action="rest" absolute="true" />/<g:fieldValue bean="${exposedExecutionZoneActionInstance}" field="url" />
-						</span>
-					</li>
+					<dt>
+						<g:message code="exposedExecutionZoneAction.url.label" default="Url" />
+					</dt>
+					<dd>
+						<g:createLink controller="exposedExecutionZoneAction" action="rest" absolute="true" />/<g:fieldValue bean="${exposedExecutionZoneActionInstance}" field="url" />
+					</dd>
 				</g:if>
-			</ol>
+			</dl>
+
 
 			<fieldset class="spacer buttons">
 				<g:hiddenField name="id" value="${exposedExecutionZoneActionInstance?.id}" />

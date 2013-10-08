@@ -39,30 +39,30 @@
 				</td>
 				<td>
 					<g:if test="${q?.logged}">
-						<i class="icon-bullhorn">
-							<a class="tooltip" onclick="javascript:$('#${itemId}_logged').slideToggle()" title="${message(code:'scriptletBatch.button.showLog', default:'Show Log')}">&nbsp;</a>
-						</i>
+						<a class="zb-tooltip" onclick="javascript:$('#${itemId}_logged').slideToggle()" title="${message(code:'scriptletBatch.button.showLog', default:'Show Log')}">
+							<i class="icon-bullhorn"></i>
+						</a>
 					</g:if>
 				</td>
 				<td>
 					<g:if test="${q?.output}">
-						<i class="icon-comment">
-							<a class="tooltip" onclick="javascript:$('#${itemId}_output').slideToggle()" title="${message(code:'scriptletBatch.button.showOutput', default:'Show Output')}">&nbsp;</a>
-						</i>
+						<a class="zb-tooltip" data-toggle="tooltip" data-placement="top" onclick="javascript:$('#${itemId}_output').slideToggle()" title="${message(code:'scriptletBatch.button.showOutput', default:'Show Output')}">
+							<i class="icon-comment"></i>
+						</a>
 					</g:if>
 				</td>
 				<td>
 					<g:if test="${q?.error}">
-						<i class="icon-exclamation-sign">
-							<a class="tooltip" onclick="javascript:$('#${itemId}_error').slideToggle()" title="${message(code:'scriptletBatch.button.showError', default:'Show Error')}">&nbsp;</a>
-						</i>
+						<a class="zb-tooltip" onclick="javascript:$('#${itemId}_error').slideToggle()" title="${message(code:'scriptletBatch.button.showError', default:'Show Error')}">
+							<i class="icon-exclamation-sign"></i>
+						</a>
 					</g:if>
 				</td>
 				<td>
 					<g:if test="${q?.exceptionMessage}">
-						<i class="icon-fire">
-							<a class="tooltip" onclick="javascript:$('#${itemId}_exception').slideToggle()" title="${message(code:'scriptletBatch.button.showException', default:'Show Exception')}">&nbsp;</a>
-						</i>
+						<a class="zb-tooltip" onclick="javascript:$('#${itemId}_exception').slideToggle()" title="${message(code:'scriptletBatch.button.showException', default:'Show Exception')}">
+							<i class="icon-fire"></i>
+						</a>
 					</g:if>
 				</td>
 			</tr>

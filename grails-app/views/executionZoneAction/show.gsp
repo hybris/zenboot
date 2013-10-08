@@ -19,62 +19,55 @@
 				${flash.message}
 			</div>
 		</g:if>
-
-		<ol class="property-list executionZoneAction">
+		
+		<dl class="dl-horizontal">
 			<g:if test="${executionZoneActionInstance?.id}">
-				<li class="fieldcontain">
+				<dt>
 					<g:message code="executionZoneAction.id.label" default="ID" />
-					</span>
-					<span class="property-value" aria-labelledby="id-label">
-						<g:fieldValue bean="${executionZoneActionInstance}" field="id" />
-					</span>
-				</li>
+				</dt>
+				<dd>
+					<g:fieldValue bean="${executionZoneActionInstance}" field="id" />
+				</dd>
 			</g:if>
 			
 			<g:if test="${executionZoneActionInstance?.scriptDir}">
-				<li class="fieldcontain">
+				<dt>
 					<g:message code="executionZoneAction.scriptDir.label" default="Script Dir" />
-					</span>
-					<span class="property-value" aria-labelledby="scriptDir-label">
-						<g:fieldValue bean="${executionZoneActionInstance}" field="scriptDir" />
-					</span>
-				</li>
+				</dt>
+				<dd>
+					<g:fieldValue bean="${executionZoneActionInstance}" field="scriptDir" />
+				</dd>
 			</g:if>
-
 			<g:if test="${executionZoneActionInstance?.creationDate}">
-				<li class="fieldcontain">
-					<span id="creationDate-label" class="property-label">
-						<g:message code="executionZoneAction.creationDate.label" default="Creation Date" />
-					</span>
-					<span class="property-value" aria-labelledby="creationDate-label">
-						<g:formatDate date="${executionZoneActionInstance?.creationDate}" />
-					</span>
-				</li>
+				<dt>
+					<g:message code="executionZoneAction.creationDate.label" default="Creation Date" />
+				</dt>
+				<dd>
+					<g:formatDate date="${executionZoneActionInstance?.creationDate}" />
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${executionZoneActionInstance?.executionZone}">
-				<li class="fieldcontain">
-					<span id="executionZone-label" class="property-label">
-						<g:message code="executionZoneAction.executionZone.label" default="Execution Zone" />
-					</span>
-					<span class="property-value" aria-labelledby="executionZone-label">
-						<g:link controller="executionZone" action="show" id="${executionZoneActionInstance?.executionZone?.id}">
+				<dt>
+					<g:message code="executionZoneAction.executionZone.label" default="Execution Zone" />
+				</dt>
+				<dd>
+					<g:link controller="executionZone" action="show" id="${executionZoneActionInstance?.executionZone?.id}">
 							${executionZoneActionInstance?.executionZone?.type.name}
 							<g:if test="${executionZoneActionInstance?.executionZone?.description}">
 							(${executionZoneActionInstance?.executionZone?.description})
 							</g:if>
 						</g:link>
-					</span>
-				</li>
+				</dd>
 			</g:if>
-
+			
+			
 			<g:if test="${executionZoneActionInstance?.scriptletBatches}">
-				<li class="fieldcontain">
-					<span id="executionZone-label" class="property-label">
-						<g:message code="executionZoneAction.scriptletBatches.label" default="Scriptlet Batches" />
-					</span>
-					<div class="property-value collapsable-list" aria-labelledby="actions-label">
-						<a class="collapsed" style="cursor: pointer">
+				<dt>
+					<g:message code="executionZoneAction.scriptletBatches.label" default="Scriptlet Batches" />
+				</dt>
+				<dd class="collapsable-list">
+					<a class="collapsed" style="cursor: pointer">
 							<g:message code="executionZoneAction.scriptletBatches.size" default="{0} batches defined" args="[executionZoneActionInstance.scriptletBatches.size()]" />
 							<i class="icon-resize-full"></i>
 						</a>
@@ -87,17 +80,15 @@
 								</li>
 							</g:each>
 						</ul>
-					</div>
-				</li>
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${executionZoneActionInstance?.processingParameters}">
-				<li class="fieldcontain">
-					<span id="parameters-label" class="property-label">
-						<g:message code="executionZoneAction.parameters.label" default="Parameters" />
-					</span>
-					<div class="property-value">
-						<table class="table table-striped parameters-table" aria-labelledby="parameters-label">
+				<dt>
+					<g:message code="executionZoneAction.parameters.label" default="Parameters" />
+				</dt>
+				<dd>
+					<table class="table table-striped parameters-table" aria-labelledby="parameters-label">
 							<thead>
 								<tr>
 									<th style="width: 45%">Key</th>
@@ -117,26 +108,25 @@
 								</g:each>
 							</tbody>
 						</table>
-					</div>
-				</li>
+				</dd>
 			</g:if>
-
+			
 			<g:if test="${!executionZoneActionInstance?.runtimeAttributes.empty}">
-				<li class="fieldcontain">
-					<span id="runtimeAttributes-label" class="property-label">
-						<g:message code="executionZoneAction.runtimeAttributes.label" default="RuntimeAttributes" />
-					</span>
-					<span class="property-value">
-						${executionZoneActionInstance.runtimeAttributes.join(", ")}
-					</span>
-				</li>
+				<dt>
+					<g:message code="executionZoneAction.runtimeAttributes.label" default="RuntimeAttributes" />
+				</dt>
+				<dd>
+					${executionZoneActionInstance.runtimeAttributes.join(", ")}
+				</dd>
+			
 			</g:if>
-		</ol>
+			
+		</dl>
 
 		<g:form>
 			<fieldset class="spacer buttons">
 				<g:hiddenField name="id" value="${executionZoneActionInstance?.id}" />
-				<g:link class="btn" action="show" controller="executionZone" params="[id:executionZoneActionInstance.executionZone.id]">
+				<g:link class="btn" action="show" controller="executionZone" params="[execId:executionZoneActionInstance.executionZone.id]">
 					${message(code: 'default.button.cancel.label', default: 'Cancel')}
 				</g:link>
 				<%-- TODO: check for referential integrity before delete is allowed --%>

@@ -4,29 +4,32 @@ import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.processing.meta.ParameterMetadata
 
 
+
 abstract class AbstractExecutionZoneCommand {
 
     def executionZoneService
 
-    Long id
+    Long execId
     File scriptDir
     boolean containsInvisibleParameters
     Map execZoneParameters
+    Map parameters
+    
 
     static constraints = {
-        id nullable:false
+        execId nullable:false
         scriptDir nullable:false, validator: { value, commandObj ->
             if (!value.exists()) {
                 return "executionZone.failure.scriptDirNotExist"
             }
         }
     }
+    
 
-    boolean validate() {
-        this.execZoneParameters = ControllerUtils.getParameterMap(params)
-
+    boolean setParameters(Map parameters) {
+        this.execZoneParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value")
         if (this.containsInvisibleParameters) {
-            def paramMetadatas = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.id), this.scriptDir)
+            def paramMetadatas = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.execId), this.scriptDir)
             paramMetadatas.findAll { ParameterMetadata paramMetadata ->
                 if (!paramMetadata.visible && !this.execZoneParameters[paramMetadata.name]) {
                     this.execZoneParameters[paramMetadata.name] = paramMetadata.value
@@ -39,7 +42,7 @@ abstract class AbstractExecutionZoneCommand {
                 this.errors.reject('executionZone.parameters.emptyValue', [key].asType(Object[]), 'Mandatory parameter is empty')
             }
         }
-
+        
         return this.errors.hasErrors()
     }
 

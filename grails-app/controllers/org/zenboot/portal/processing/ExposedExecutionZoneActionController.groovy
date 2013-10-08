@@ -50,7 +50,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
         this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
 
-        URI referral = new URI(this.grailsLinkGenerator.link(absolute:true, controller:'executionZoneAction', action:'rest', params:[id:action.id]))
+        URI referral = new URI(this.grailsLinkGenerator.link(absolute:true, controller:'executionZoneAction', action:'rest', params:[execId:action.id]))
         this.renderRestResult(HttpStatus.CREATED, null, referral)
     }
 
@@ -96,6 +96,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     }
 
     def save = { SaveExposedExecutionZoneActionCommand cmd ->
+        cmd.setParameters(params.parameters)
         if (cmd.hasErrors()) {
             render(view:"create", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.executionZoneAction])
             return
@@ -142,6 +143,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     }
 
     def update = { UpdateExposedExecutionZoneActionCommand cmd ->
+        cmd.setParameters(params.parameters)
         if (cmd.hasErrors()) {
             render(view:"edit", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.executionZoneAction])
             return
@@ -209,9 +211,8 @@ class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand
     String cronExpression
     Set roles = []
 
-    @Override
     boolean validate() {
-        boolean result = super.validate()
+        boolean result = true
         if (roles.empty) {
             this.errors.reject('exposedExecutionZoneAction.create.rolesMissing', 'Roles missing')
             result = false
@@ -253,7 +254,7 @@ class UpdateExposedExecutionZoneActionCommand extends SaveExposedExecutionZoneAc
 
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {
-        ExposedExecutionZoneAction exposedExcZnActn = ExposedExecutionZoneAction.get(this.id)
+        ExposedExecutionZoneAction exposedExcZnActn = ExposedExecutionZoneAction.get(this.execId)
         exposedExcZnActn.url = this.url
         exposedExcZnActn.cronExpression = this.cronExpression
         //set params

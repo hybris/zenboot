@@ -41,124 +41,106 @@
 		</g:link>
 
 		<g:form method="post">
-			<ol class="property-list executionZone">
+			<dl class="dl-horizontal">
 				<g:if test="${executionZoneInstance?.type}">
-					<li class="fieldcontain">
-						<span id="type-label" class="property-label">
-							<g:message code="executionZone.type.label" default="Type" />
-						</span>
-						<span class="property-value" aria-labelledby="type-label">
+					<dt>
+						<g:message code="executionZone.type.label" default="Type" />
+					</dt>
+					<dd>
 							<g:link controller="executionZoneType" action="show" id="${executionZoneInstance?.type?.id}">
 								${executionZoneInstance?.type}
 							</g:link>
-						</span>
-					</li>
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${executionZoneInstance?.actions}">
-					<li class="fieldcontain">
-						<span id="actions-label" class="property-label">
-							<g:message code="executionZone.actions.label" default="Actions" />
-						</span>
-						<div class="property-value collapsable-list" aria-labelledby="actions-label">
-							<a class="collapsed" style="cursor: pointer">
-								<g:message code="executionZone.actions.size" default="{0} actions defined" args="[executionZoneInstance.actions.size()]" />
-								<i class="icon-resize-full"></i>
-							</a>
-							<ul class="unstyled hide">
-								<g:each in="${executionZoneInstance.actions}" var="a" status="status">
-									<li>
-										<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-											<g:link controller="executionZoneAction" action="show" id="${a.id}">
-												${a.scriptDir.name} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
-											</g:link>
-										</sec:ifAllGranted>
-										<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+					<dt>
+						<g:message code="executionZone.actions.label" default="Actions" />
+					</dt>
+					<dd class="collapsable-list">
+						<a class="collapsed" style="cursor: pointer">
+							<g:message code="executionZone.actions.size" default="{0} actions defined" args="[executionZoneInstance.actions.size()]" />
+							<i class="icon-resize-full"></i>
+						</a>
+						<ul class="unstyled hide">
+							<g:each in="${executionZoneInstance.actions}" var="a" status="status">
+								<li>
+									<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+										<g:link controller="executionZoneAction" action="show" id="${a.id}">
 											${a.scriptDir.name} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
-										</sec:ifNotGranted>
-									</li>
-								</g:each>
-							</ul>
-						</div>
-					</li>
+										</g:link>
+									</sec:ifAllGranted>
+									<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+										${a.scriptDir.name} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
+									</sec:ifNotGranted>
+								</li>
+							</g:each>
+						</ul>
+					</dd>
 				</g:if>
-
+				
 				<g:if test="${executionZoneInstance?.creationDate}">
-					<li class="fieldcontain">
-						<span id="creationDate-label" class="property-label">
-							<g:message code="executionZone.creationDate.label" default="Creation Date" />
-						</span>
-						<span class="property-value" aria-labelledby="creationDate-label">
-							<g:formatDate date="${executionZoneInstance?.creationDate}" />
-						</span>
-					</li>
+					<dt>
+						<g:message code="executionZone.creationDate.label" default="Creation Date" />
+					</dt>
+					<dd>
+						<g:formatDate date="${executionZoneInstance?.creationDate}" />
+					</dd>
 				</g:if>
-
-                <g:if test="${executionZoneInstance?.puppetEnvironment}">
-                    <li class="fieldcontain">
-                        <span id="puppetEnvironment-label" class="property-label">
-                            <g:message code="executionZone.puppetEnvironment.label" default="Puppet-Environment" />
-                        </span>
-                        <span class="property-value" aria-labelledby="puppetEnvironment-label">
-                            <g:fieldValue bean="${executionZoneInstance}" field="puppetEnvironment" />
-                        </span>
-                    </li>
-                </g:if>
-
-                <li class="fieldcontain">
-                    <span id="qualityStage" class="property-label">
-                        <g:message code="executionZone.qualityStage.label" default="Quality-Stage" />
-                    </span>
-                    <span class="property-value" aria-labelledby="qualityStage-label">
-                        <g:fieldValue bean="${executionZoneInstance}" field="qualityStage" />
-                    </span>
-                </li>
-                    
-
-				<g:if test="${executionZoneInstance?.description}">
-					<li class="fieldcontain">
-						<span id="description-label" class="property-label">
-							<g:message code="executionZone.description.label" default="Description" />
-						</span>
-						<span class="property-value" aria-labelledby="description-label">
-							<g:fieldValue bean="${executionZoneInstance}" field="description" />
-						</span>
-					</li>
-				</g:if>
-
-				<li class="fieldcontain">
-					<span id="enabled-label" class="property-label">
-						<g:message code="executionZone.enabled.label" default="Enabled" />
-					</span>
-					<span class="property-value" aria-labelledby="enabled-label">
-						<g:checkBox name="enabled" checked="${executionZoneInstance.enabled}" disabled="true" />
-					</span>
-				</li>
-
+				
+        <g:if test="${executionZoneInstance?.puppetEnvironment}">
+        	<dt>
+        		<g:message code="executionZone.puppetEnvironment.label" default="Puppet-Environment" />
+        	</dt>
+        	<dd>
+        		 <g:fieldValue bean="${executionZoneInstance}" field="puppetEnvironment" />
+        	</dd>
+        	<dt>
+        		<g:message code="executionZone.qualityStage.label" default="Quality-Stage" />
+        	</dt>
+        	<dd>
+        		<g:fieldValue bean="${executionZoneInstance}" field="qualityStage" />
+        	</dd>
+        </g:if>
+        
+        <g:if test="${executionZoneInstance?.description}">
+        	<dt>
+        		<g:message code="executionZone.description.label" default="Description" />
+        	</dt>
+        	<dd>
+        		<g:fieldValue bean="${executionZoneInstance}" field="description" />
+        	</dd>
+        </g:if>
+        
+        <dt>
+        	<g:message code="executionZone.enabled.label" default="Enabled" />
+        </dt>
+				<dd>
+					<g:checkBox name="enabled" checked="${executionZoneInstance.enabled}" disabled="true" />
+				</dd>
+				
 				<g:if test="${executionZoneInstance?.enableExposedProcessingParameters}">
-                    <li class="fieldcontain">
-                        <span id="description-label" class="property-label">
-                            <g:message code="executionZone.enableExposedProcessingParameters.label" default="Support exposed parameters" />
-                        </span>
-                        <span class="property-value" aria-labelledby="enableExposedProcessingParameters-label">
-                            <g:checkBox name="enableExposedProcessingParameters" checked="${executionZoneInstance.enableExposedProcessingParameters}" disabled="true" />
-                        </span>
-                    </li>
-                </g:if>
-
+					<dt>
+						<g:message code="executionZone.enableExposedProcessingParameters.label" default="Support exposed parameters" />
+					</dt>
+					<dd>
+						<g:checkBox name="enableExposedProcessingParameters" checked="${executionZoneInstance.enableExposedProcessingParameters}" disabled="true" />
+					</dd>
+					
+				</g:if>
+				
 				<g:if test="${cmd}">
 					<g:set value="${cmd.scriptDir}" var="selectedScriptDir" />
 				</g:if>
 				<g:elseif test="${!scriptDirs.empty}">
 					<g:set value="${scriptDirs.iterator().next()}" var="selectedScriptDir" />
 				</g:elseif>
-
-				<li class="fieldcontain">
-					<span id="scriptDirs-label" class="property-label">
-						<g:message code="executionZone.scriptDirs.label" default="ScriptDirs" />
-					</span>
-					<div class="property-value" aria-labelledby="scriptDirs-label" id="scriptDirs">
-						<g:each var="scriptDir" in="${scriptDirs}" status="i">
+				
+				<dt>
+					<g:message code="executionZone.scriptDirs.label" default="ScriptDirs" />
+				</dt>
+				<dd id="scriptDirs">
+					<g:each var="scriptDir" in="${scriptDirs}" status="i">
 							<div style="margin-bottom: 10px;">
 								<g:radio name="scriptDir" id="scriptdir-${i}" value="${scriptDir}" checked="${scriptDir == selectedScriptDir}" />
 								${scriptDir.name}
@@ -175,23 +157,23 @@
 								<div id="scriptdir-${i}_flow" class="hide flow-chart"></div>
 							</div>
 						</g:each>
-					</div>
-				</li>
+				</dd>
+			</dl>
+			
+			<h3>
+				<g:message code="executionZone.parameters.label" default="Parameters" />
+			</h3>
+			
+			<span id="parametersSpinner" style="display:none" >
+				<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+			</span>
+			
+			<div class="property-value" aria-labelledby="parameters-label" id="parameters">
+				<g:include action="ajaxGetParameters" params="[scriptDir:selectedScriptDir, execId:executionZoneInstance?.id]" />
+			</div>
 
-				<li class="fieldcontain">
-					<span id="parameters-label" class="property-label">
-						<g:message code="executionZone.parameters.label" default="Parameters" />
-					</span>
-					<span id="parametersSpinner" class="property-value" style="display:none">
-						<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-					</span>
-					<div class="property-value" aria-labelledby="parameters-label" id="parameters">
-						<g:include action="ajaxGetParameters" params="[scriptDir:selectedScriptDir, id:executionZoneInstance?.id]" />
-					</div>
-				</li>
-			</ol>
 
-			<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
+			<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
 
 			<fieldset class="spacer buttons">
 				<g:link class="btn btn-primary" action="edit" id="${executionZoneInstance?.id}">
@@ -212,7 +194,7 @@
 	<g:javascript>
     $('#scriptDirs input:radio').change(function(event) {
         $.ajax({
-            url : '<g:createLink action="ajaxGetParameters" params="[id:executionZoneInstance?.id]" />?scriptDir=' + encodeURI($(this).val()),
+            url : '<g:createLink action="ajaxGetParameters" params="[execId:executionZoneInstance?.id]" />&scriptDir=' + encodeURI($(this).val()),
             beforeSend : function() {
                 $('#scriptDirs input:radio').attr("disabled", "disabled")
                 $('#parameters').slideUp('fast')
