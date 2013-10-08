@@ -1,8 +1,9 @@
 <table class="table table-striped parameters-table">
 	<thead>
 		<tr>
-			<th style="width: 38%">Key</th>
-			<th style="width: 38%">Value</th>
+			<th style="width: 30%">Key</th>
+			<th style="width: 30%">Value</th>
+			<th style="width: 30%">Description</th>
 			<th style="width: 5%">Expose</th>
 			<th style="width: 5">Publish</th>
 			<th></th>
@@ -16,6 +17,9 @@
 				</td>
 				<td>
 					<g:textField name="parameters.value" value="${entry.value}" readonly="${readonly}" />
+				</td>
+				<td>
+					<g:textField name="parameters.description" value="${entry.description}" readonly="${readonly}" />
 				</td>
 				<td>
 					<g:hiddenField name="parameters.exposed" value="${entry.exposed}" />

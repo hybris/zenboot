@@ -28,12 +28,15 @@ zenboot.enableCollapsableList = function() {
 	);
 }
 
-zenboot.addParameter = function(key, value) {
+zenboot.addParameter = function(key, value, description) {
 	if (key === undefined) {
 		key = ''
 	}
 	if (value === undefined) {
 		value = ''
+	}
+	if (description === undefined) {
+		description = ''
 	}
 	$('.parameters-table tbody').append(
 		'<tr>'
@@ -42,6 +45,9 @@ zenboot.addParameter = function(key, value) {
 		+ '</td>'
 		+ '<td>'
 		+ '<input type="text" name="parameters.value" value="'+value+'" />'
+		+ '</td>'
+		+ '<td>'
+		+ '<input type="text" name="parameters.description" value="'+description+'" />'
 		+ '</td>'
 		+ '<td>'
 		+ '<span title="Remove parameter" onclick="zenboot.removeParameter.call(this)" class="btn btn-mini"><i class="icon-minus-sign"></i></span>&nbsp;'
@@ -51,12 +57,15 @@ zenboot.addParameter = function(key, value) {
 	);
 }
 
-zenboot.addProcessingParameter = function(key, value) {
+zenboot.addProcessingParameter = function(key, value, description) {
 	if (key === undefined) {
 		key = ''
 	}
 	if (value === undefined) {
 		value = ''
+	}
+	if (description === undefined) {
+		description = ''
 	}
 	$('.parameters-table tbody').append(
 		'<tr>'
@@ -65,6 +74,9 @@ zenboot.addProcessingParameter = function(key, value) {
 		+ '</td>'
 		+ '<td>'
 		+ '<input type="text" name="parameters.value" value="'+value+'" />'
+		+ '</td>'
+		+ '<td>'
+		+ '<input type="text" name="parameters.description" value="'+description+'" />'
 		+ '</td>'
 		+ '<td>'
 		+ '<input type="hidden" name="parameters.exposed" value="false" /><input type="checkbox" name="exported" onclick="zenboot.toggleParameterCheckbox.apply(this, [\'exposed\'])" />'

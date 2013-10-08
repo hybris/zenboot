@@ -4,23 +4,24 @@ import org.zenboot.portal.processing.ProcessingParameter
 
 class ControllerUtils {
 
-    static Set getProcessingParameters(def params, String paramName="parameters.key", String paramValue="parameters.value", String paramExposed="parameters.exposed", String paramPublished="parameters.published") {
+    static Set getProcessingParameters(def params, String paramName="parameters.key", String paramValue="parameters.value", String paramExposed="parameters.exposed", String paramPublished="parameters.published", String paramDescription="parameters.description") {
         Set procParameters = []
         def keys = params[paramName]
         def values = params[paramValue]
+        def descriptions = params[paramDescription]
         def exposed = params[paramExposed]
         def published = params[paramPublished]
-        if (keys && values && exposed && published) {
-            if (keys.class.isArray() && values.class.isArray() && exposed.class.isArray() && published.class.isArray()) {
-                if (keys.length == values.length && keys.length == exposed.length  && keys.length == published.length) {
+        if (keys && values && descriptions && exposed && published) {
+            if (keys.class.isArray() && values.class.isArray() && descriptions.class.isArray() && exposed.class.isArray() && published.class.isArray()) {
+                if (keys.length == values.length && keys.length == descriptions.length && keys.length == exposed.length  && keys.length == published.length) {
                     keys.eachWithIndex { key, index ->
-                        procParameters << new ProcessingParameter(name:keys[index], value:values[index], exposed:exposed[index], published:published[index])
+                        procParameters << new ProcessingParameter(name:keys[index], value:values[index], description:descriptions[index], exposed:exposed[index], published:published[index])
                     }
                 } else {
                     throw new IllegalArgumentException("Could not convert params to ${ProcessingParameter.class.simpleName} because arrays have different length")
                 }
             } else {
-                procParameters << new ProcessingParameter(name:keys, value:values, exposed:Boolean.valueOf(exposed), published:Boolean.valueOf(published))
+                procParameters << new ProcessingParameter(name:keys, value:values, description:descriptions, exposed:Boolean.valueOf(exposed), published:Boolean.valueOf(published))
             }
         }
         return procParameters
