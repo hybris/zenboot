@@ -58,7 +58,6 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
         cmd.parameters = params.parameters
         def resolvedParams = cmd.executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(params.execId), ControllerUtils.getParameterMap(params))
         cmd.exposedExecutionZoneActionParameters = resolvedParams.resolvedParameters
-        log.error("TEST: " + cmd.exposedExecutionZoneActionParameters)
         resolvedParams.missingParameters.each { paramName ->
            cmd.errors.reject('executionZone.parameters.emptyValue', [paramName].asType(Object[]), 'Mandatory parameter is empty')
         }
