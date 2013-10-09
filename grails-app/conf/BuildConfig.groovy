@@ -34,6 +34,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
+        compile ":audit-logging:0.5.4"
+        
         runtime ':hibernate:3.6.10.M3' 
         runtime ":jquery:1.7.1"
         //runtime ":zipped-resources:1.0"

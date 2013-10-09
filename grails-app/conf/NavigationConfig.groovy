@@ -18,6 +18,11 @@ navigation.menu = [
     [controller:'customer', title:'Customer', action:'edit', path:['data', 'customer'], isVisible:false],
     [controller:'customer', title:'Customer', action:'show', path:['data', 'customer'], isVisible:false],
 
+    [controller:'template', title:'Templates', action:'list', path:['data', 'templates']],
+    [controller:'template', title:'Templates', action:'edit', path:['data', 'templates'], isVisible:false],
+    [controller:'template', title:'Templates', action:'create', path:['data', 'templates'], isVisible:false],
+    [controller:'template', title:'Templates', action:'show', path:['data', 'templates'], isVisible:false],
+
     [controller:'executionZone', title:'Execution Zone', action:'list', path:['processing', 'executionzones']],
     [controller:'executionZone', title:'Execution Zone', action:'show', path:['processing', 'executionzones'], isVisible:false],
     [controller:'executionZone', title:'Execution Zone', action:'create', path:['processing', 'executionzones'], isVisible:false],

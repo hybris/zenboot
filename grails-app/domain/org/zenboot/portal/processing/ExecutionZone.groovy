@@ -2,7 +2,8 @@ package org.zenboot.portal.processing
 
 
 class ExecutionZone {
-
+    static auditable = true
+    
     Date creationDate
     ExecutionZoneType type
     String description
