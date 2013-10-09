@@ -47,13 +47,8 @@
 </span>
 
 <div class="spacer">
-	<span title="Export parameter" class="btn btn-mini copy-button">
+	<span title="Export parameter" class="btn btn-mini export-button">
 		<i class="icon-share"></i>
-		<g:textArea name="parameters-export" escapeHtml="false" class="hide">
-			<g:each in="${parameters}" var="entry">
-				${entry.name + "=" + entry.value + "\n"}
-			</g:each>
-		</g:textArea>
 	</span>
 
 	<span title="Import parameter" class="btn btn-mini import-button">
@@ -80,9 +75,38 @@
 			</a>
 		</div>
 	</div>
+	
+	<div id="parameters-export" class="modal hide fade">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3>Export</h3>
+		</div>
+		<div class="modal-body">
+			<p>
+				<g:message code="executionZone.parameters.importCopy" default="Please copy the parameters." />
+			</p>
+			<g:textArea name="parameters-export" escapeHtml="false" style="width:98%; height:100%;" rows="7">
+{
+"parameters" : [
+	<g:set var="last" value="${ parameters.size() - 1 }" />
+  <g:each in="${parameters}" var="entry" status="i">
+  {
+	   "name": "${ entry.name }",
+	   "value": "${ entry.value }",
+	   "description": "${ entry.description }"
+  } <g:if test="${ i != last }">,</g:if>
+				</g:each>
+]}
+			</g:textArea>
+		</div>
+		<div class="modal-footer">
+			<a class="btn modal-close-button" data-dismiss="modal">
+				<g:message code="default.button.close.label" default="Close" />
+			</a>
+		</div>
+	</div>
 </div>
 
-<r:require module="zclip" />
 
 <g:javascript>
 $(document).ready(function() {
@@ -91,11 +115,9 @@ $(document).ready(function() {
         $(window).trigger("resize");
     });
 
-    zenboot.enableCopyButton(
-        "<g:resource dir="js/zclip" file="ZeroClipboard.swf" />",
-        "<g:message code="executionZone.parameters.exportClipboard" default="Copied content to your clipboard" />",
-        true
-    );
+    $('.export-button').click(function() {
+        $('#parameters-export').modal('toggle')
+    });
 
     $('.import-button').click(function() {
         $('#parameters-import').modal('toggle')
@@ -106,12 +128,12 @@ $(document).ready(function() {
     });
 
     $('.modal-import-button').click(function() {
-        var lines = $('#parameters-import').find('textarea').val().trim().split("\n");
-        if (lines.length > 0) {
-            zenboot.resetParameter();
-	        for (i=0; i<lines.length ; i++) {
-                var entry=lines[i].split("=");
-                zenboot.addProcessingParameter(entry.shift().trim(), entry.join("=").trim());
+    		var parameters = $.parseJSON($('#parameters-import').find('textarea').val())["parameters"];
+        if (parameters.length > 0) {
+          zenboot.resetParameter();
+	        for (i=0; i < parameters.length ; i++) {
+                var entry=parameters[i];
+                zenboot.addProcessingParameter(entry.name, entry.value, entry.description);
 	        }
 	        $(window).trigger("resize");
         }

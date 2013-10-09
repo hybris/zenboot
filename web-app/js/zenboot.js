@@ -147,34 +147,6 @@ zenboot.enableTooltip = function() {
 	})
 }
 
-zenboot.enableCopyButton = function(pathToZeroClipboard, notification, filterWhitespaces) {
-	$(".copy-button").zclip({
-		path: pathToZeroClipboard,
-		copy: function() {
-			if (filterWhitespaces) {
-				var output = new Array()
-				var lines = $(this).find('textarea').val().trim().split(/\r?\n/)
-				for (var i=0; i<lines.length; i++) {
-					line = lines[i].trim()
-					if (line !== "") {
-						output.push(line)
-					}
-				}
-				return output.join("\n")
-			} else {
-				return $(this).find('textarea').val().trim();
-			}
-		},
-		afterCopy: function() {
-			if (notification) {
-				alert(notification)
-			} else {
-				alert("Copy data to your clipboard.")
-			}
-		}
-	});
-}
-
 zenboot.disableCopyButton = function() {
 	$(".copy-button").zclip('remove');
 }
