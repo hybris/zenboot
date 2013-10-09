@@ -1,5 +1,7 @@
 package org.zenboot.portal.processing
 
+import java.io.File;
+
 import grails.test.mixin.*
 import grails.test.mixin.support.GrailsUnitTestMixin
 
@@ -85,7 +87,7 @@ class PluginResolverTests {
 	}
 
     private File getTestScriptDir(String scriptDir) {
-        URL scriptDirUrl = this.class.getClassLoader().getResource("${this.class.getPackage().getName()}/${scriptDir}")
-        return new File(scriptDirUrl.getFile())
+        return new File("test/resources/${this.class.getPackage().getName()}/${scriptDir}")
     }
+
 }
