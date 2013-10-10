@@ -23,21 +23,13 @@
 			<table>
 			<thead>
 					<tr>
-					
 						<g:sortableColumn property="name" title="${message(code: 'template.name.label', default: 'Name')}" />
-					
-						<g:sortableColumn property="template" title="${message(code: 'template.template.label', default: 'Template')}" />
-					
 					</tr>
 				</thead>
 				<tbody>
 				<g:each in="${templateInstanceList}" status="i" var="templateInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-					
 						<td><g:link action="show" id="${templateInstance.id}">${fieldValue(bean: templateInstance, field: "name")}</g:link></td>
-					
-						<td>${fieldValue(bean: templateInstance, field: "template")}</td>
-					
 					</tr>
 				</g:each>
 				</tbody>

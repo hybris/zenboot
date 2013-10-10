@@ -1,6 +1,5 @@
 package org.zenboot.portal
 
-import groovy.text.GStringTemplateEngine
 import groovy.text.SimpleTemplateEngine
 import org.springframework.http.HttpStatus;
 
@@ -27,17 +26,13 @@ class PropertiesRestController {
             return map
         }
         
-        // TODO: read from DB ??!!
-        //def templateData = "" 
-        //def engine = new SimpleTemplateEngine()
-        def templateData = new File("${grailsApplication.config.zenboot.repo.path}/${params.puppetEnvironment}/${params.propertyFile}.properties")
-        if (!templateData.exists()) {
+        Template template = Template.findByExecutionZoneAndName(execZone, params.propertyFile)
+        if (!template.count()) {
             this.sendError(HttpStatus.NOT_FOUND, "No '${params.propertyFile}' property template found for environment '${params.puppetEnvironment}'")
             return
         }
-
-        def engine = new GStringTemplateEngine()
-        def templateOutput = engine.createTemplate(templateData).make(binding)
+        def templateData = template.getContent()
+        def templateOutput = new SimpleTemplateEngine().createTemplate(templateData).make(binding)
         
         response << templateOutput.toString()
         response.flushBuffer()

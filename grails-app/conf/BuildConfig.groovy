@@ -56,7 +56,7 @@ grails.project.dependency.resolution = {
         runtime ":famfamfam:1.0.1"
         runtime ":jquery-ui:1.8.15"
 
-        build ':tomcat:7.0.40.1'
+        build ':tomcat:7.0.42'
     }
 }
 

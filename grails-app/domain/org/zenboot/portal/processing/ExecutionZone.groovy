@@ -1,6 +1,8 @@
 package org.zenboot.portal.processing
 
 
+import org.zenboot.portal.Template;
+
 class ExecutionZone {
     static auditable = true
     
@@ -14,10 +16,19 @@ class ExecutionZone {
     boolean enabled = true
     boolean enableExposedProcessingParameters = true
 
-    static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter]
+    static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter, templates:Template]
 
     static constraints = {
         type nullable:false
+        templates validator: { templates, obj ->
+            Set names = new HashSet()
+            for (Template template in templates) {
+               if (!names.add(template.name)) {
+                 return false
+               }
+            }
+            return true
+        }
     }
 
     static mapping = {

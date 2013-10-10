@@ -1,18 +1,25 @@
 package org.zenboot.portal
 
-import java.util.Date;
+import java.sql.Timestamp
+import org.zenboot.portal.processing.ExecutionZone;
 
 class Template {
     static auditable = true
     
     String name
-    String template
-
+    String content
+    Date dateCreated
+    Date lastUpdated
+    
+    static belongsTo = [executionZone: ExecutionZone]
+    static hasMany = [templateVersions: TemplateVersion]
+    
     static mapping = {
-        template type: "text"
+        content type: "text"
+        templateVersions cascade: "all-delete-orphan"
     }
     
     static constraints = {
-        name(blank: false, unique:true)
+        name(blank: false)
     }
 }

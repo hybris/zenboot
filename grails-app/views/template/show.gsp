@@ -30,11 +30,11 @@
 				</li>
 				</g:if>
 			
-				<g:if test="${templateInstance?.template}">
+				<g:if test="${templateInstance?.content}">
 				<li class="fieldcontain">
-					<span id="template-label" class="property-label"><g:message code="template.template.label" default="Template" /></span>
+					<span id="content-label" class="property-label"><g:message code="template.content.label" default="Content" /></span>
 					
-						<span class="property-value" aria-labelledby="template-label"><g:fieldValue bean="${templateInstance}" field="template"/></span>
+						<span class="property-value" aria-labelledby="content-label"><g:fieldValue bean="${templateInstance}" field="content"/></span>
 					
 				</li>
 				</g:if>
