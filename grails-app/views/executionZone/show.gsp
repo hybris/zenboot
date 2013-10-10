@@ -250,7 +250,7 @@
             },
             error: function(jqHXR, status, error) {
 		        	$('#parametersSpinner').hide();
-		        	$("#parameters").html('<div class="alert alert-error">' + error + '</div>');
+		        	$("#parameters").html('<div class="alert alert-error">Some ERROR occured: ' + error + '</div>').slideDown('slow');
 		        	$('#scriptDirs input:radio').removeAttr('disabled');
             }
         });
