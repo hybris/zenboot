@@ -36,7 +36,7 @@ grails.project.dependency.resolution = {
     plugins {
         compile ":audit-logging:0.5.4"
         
-        runtime ':hibernate:3.6.10.M3' 
+        compile ":hibernate:3.6.10.1"
         runtime ":jquery:1.7.1"
         //runtime ":zipped-resources:1.0"
         //runtime ":cached-resources:1.0"
@@ -55,9 +55,6 @@ grails.project.dependency.resolution = {
         runtime ":spring-security-ui:0.2"
         runtime ":famfamfam:1.0.1"
         runtime ":jquery-ui:1.8.15"
-
-        //DB console
-        //runtime ":dbconsole:1.1"
 
         build ':tomcat:7.0.40.1'
     }

@@ -43,8 +43,3 @@
 
 <g:field type="hidden" value="${containsInvisibleParameters}" name="containsInvisibleParameters" />
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        zenboot.enableParameterList();
-    })
-</script>

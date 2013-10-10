@@ -46,6 +46,7 @@ class ExecutionZone {
         if (existingParam) {
             existingParam.value = param.value
             existingParam.published = param.published
+            existingParam.description = param.description
             existingParam.exposed = param.exposed
             existingParam.save()
         } else {

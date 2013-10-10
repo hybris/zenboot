@@ -28,14 +28,17 @@ zenboot.enableCollapsableList = function() {
 	);
 }
 
-zenboot.addParameter = function(key, value) {
+zenboot.addParameter = function(key, value, description) {
 	if (key === undefined) {
 		key = ''
 	}
 	if (value === undefined) {
 		value = ''
 	}
-	$('.parameters-table tbody').append(
+	if (description === undefined) {
+		description = ''
+	}
+	$('.exec-parameters-table tbody').append(
 		'<tr>'
 		+ '<td>'
 		+ '<input type="text" name="parameters.key" value="'+key+'" />'
@@ -51,12 +54,15 @@ zenboot.addParameter = function(key, value) {
 	);
 }
 
-zenboot.addProcessingParameter = function(key, value) {
+zenboot.addProcessingParameter = function(key, value, description) {
 	if (key === undefined) {
 		key = ''
 	}
 	if (value === undefined) {
 		value = ''
+	}
+	if (description === undefined) {
+		description = ''
 	}
 	$('.parameters-table tbody').append(
 		'<tr>'
@@ -65,6 +71,9 @@ zenboot.addProcessingParameter = function(key, value) {
 		+ '</td>'
 		+ '<td>'
 		+ '<input type="text" name="parameters.value" value="'+value+'" />'
+		+ '</td>'
+		+ '<td>'
+		+ '<input type="text" name="parameters.description" value="'+description+'" />'
 		+ '</td>'
 		+ '<td>'
 		+ '<input type="hidden" name="parameters.exposed" value="false" /><input type="checkbox" name="exported" onclick="zenboot.toggleParameterCheckbox.apply(this, [\'exposed\'])" />'
@@ -135,34 +144,6 @@ zenboot.enableTooltip = function() {
 	})
 }
 
-zenboot.enableCopyButton = function(pathToZeroClipboard, notification, filterWhitespaces) {
-	$(".copy-button").zclip({
-		path: pathToZeroClipboard,
-		copy: function() {
-			if (filterWhitespaces) {
-				var output = new Array()
-				var lines = $(this).find('textarea').val().trim().split(/\r?\n/)
-				for (var i=0; i<lines.length; i++) {
-					line = lines[i].trim()
-					if (line !== "") {
-						output.push(line)
-					}
-				}
-				return output.join("\n")
-			} else {
-				return $(this).find('textarea').val().trim();
-			}
-		},
-		afterCopy: function() {
-			if (notification) {
-				alert(notification)
-			} else {
-				alert("Copy data to your clipboard.")
-			}
-		}
-	});
-}
-
 zenboot.disableCopyButton = function() {
 	$(".copy-button").zclip('remove');
 }
@@ -174,7 +155,7 @@ zenboot.enableParameterList = function() {
         $(this).parents('tr').next().find('.scriptlet-metadata').fadeToggle('fast')
     });
 
-    $('.add-parameter-button').click(function() {
+    $('.add-exec-parameter-button').click(function() {
         zenboot.addParameter()
     });
 
