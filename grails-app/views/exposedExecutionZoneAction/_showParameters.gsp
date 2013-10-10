@@ -1,4 +1,4 @@
-<table class="table parameters-table">
+<table class="table exec-parameters-table">
     <thead>
         <tr>
             <th style="width: 45%">Key</th>

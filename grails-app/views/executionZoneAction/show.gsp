@@ -88,7 +88,7 @@
 					<g:message code="executionZoneAction.parameters.label" default="Parameters" />
 				</dt>
 				<dd>
-					<table class="table table-striped parameters-table" aria-labelledby="parameters-label">
+					<table class="table table-striped exec-parameters-table" aria-labelledby="parameters-label">
 							<thead>
 								<tr>
 									<th style="width: 45%">Key</th>
