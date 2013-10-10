@@ -38,16 +38,13 @@ zenboot.addParameter = function(key, value, description) {
 	if (description === undefined) {
 		description = ''
 	}
-	$('.parameters-table tbody').append(
+	$('.exec-parameters-table tbody').append(
 		'<tr>'
 		+ '<td>'
 		+ '<input type="text" name="parameters.key" value="'+key+'" />'
 		+ '</td>'
 		+ '<td>'
 		+ '<input type="text" name="parameters.value" value="'+value+'" />'
-		+ '</td>'
-		+ '<td>'
-		+ '<input type="text" name="parameters.description" value="'+description+'" />'
 		+ '</td>'
 		+ '<td>'
 		+ '<span title="Remove parameter" onclick="zenboot.removeParameter.call(this)" class="btn btn-mini"><i class="icon-minus-sign"></i></span>&nbsp;'
@@ -158,7 +155,7 @@ zenboot.enableParameterList = function() {
         $(this).parents('tr').next().find('.scriptlet-metadata').fadeToggle('fast')
     });
 
-    $('.add-parameter-button').click(function() {
+    $('.add-exec-parameter-button').click(function() {
         zenboot.addParameter()
     });
 
