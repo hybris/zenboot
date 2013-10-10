@@ -230,6 +230,18 @@
 				 	</div>
 				 </div>
 			</div>
+			<div class="accordion-group">
+				<div class="accordion-heading">
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#manageTemplates">
+        		<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
+      		</a>
+				</div>
+				 <div id="manageTemplates" class="accordion-body collapse">
+				 	<div class="accordion-inner">
+						Manage Templates
+				 	</div>
+				 </div>
+			</div>
 		</div>
 	</div>
 
