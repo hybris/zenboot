@@ -26,11 +26,33 @@ class TemplateController {
             return
         }
 
-        templateInstance.addToTemplateVersions(new TemplateVersion(params)).save(flush: true)
-        
-
 		flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(action: "show", id: templateInstance.id)
+        redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
+    }
+    
+    def ajaxGetTemplateParameters() {
+        def templateInstance = Template.get(params.id)
+        
+        if (!templateInstance) {
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, "Not Template exists for this id")
+            return
+        }
+        render (contentType:"text/json"){
+            template name:templateInstance.name, templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.id),  dateCreated:templateInstance.dateCreated, updateUrl:createLink(action:'update', id:templateInstance.id)
+        }
+        return
+    }
+    
+    def ajaxGetTemplate() {
+        def templateInstance = Template.get(params.id)
+        
+        if (!templateInstance) {
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, "Not Template exists for this id")
+            return
+        }
+        
+        render(text: templateInstance.template)
+        return
     }
 
     def show() {

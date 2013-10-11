@@ -20,15 +20,6 @@ class ExecutionZone {
 
     static constraints = {
         type nullable:false
-        templates validator: { templates, obj ->
-            Set names = new HashSet()
-            for (Template template in templates) {
-               if (!names.add(template.name)) {
-                 return false
-               }
-            }
-            return true
-        }
     }
 
     static mapping = {

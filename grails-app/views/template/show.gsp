@@ -30,16 +30,39 @@
 				</li>
 				</g:if>
 			
-				<g:if test="${templateInstance?.content}">
+				<g:if test="${templateInstance?.template}">
 				<li class="fieldcontain">
-					<span id="content-label" class="property-label"><g:message code="template.content.label" default="Content" /></span>
+					<span id="template-label" class="property-label"><g:message code="template.template.label" default="Template" /></span>
 					
-						<span class="property-value" aria-labelledby="content-label"><g:fieldValue bean="${templateInstance}" field="content"/></span>
+						<span class="property-value" aria-labelledby="template-label"><g:fieldValue bean="${templateInstance}" field="template"/></span>
 					
 				</li>
 				</g:if>
 			
 		</ol>
+		
+						<g:each in="${templateInstanceList}" status="i" var="templateInstance">
+					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+						<td><g:link action="show" id="${templateInstance.id}">${fieldValue(bean: templateInstance, field: "name")}</g:link></td>
+					</tr>
+				</g:each>
+		<g:if test="${templateInstance?.templateVersions}">
+			<table>
+				<tbody>
+					<g:each in="${templateInstance?.templateVersions}" status="i" var="templateVersion">
+						<tr>
+							<td>
+								${ templateVersion.dateCreated }
+							</td>
+							<td>
+								${ templateVersion.content }
+							</td>
+						</tr>
+					</g:each>
+				</tbody>
+			</table>
+		</g:if>
+		
 		<g:form>
 			<fieldset class="spacer buttons">
 				<g:hiddenField name="id" value="${templateInstance?.id}" />

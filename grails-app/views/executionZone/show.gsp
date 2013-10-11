@@ -47,7 +47,7 @@
         		<g:message code="default.show.label" args="[entityName]" />
       		</a>
     		</div>
-    		<div id="showZone" class="accordion-body collapse in">
+    		<div id="showZone" class="accordion-body collapse">
     			<div class="accordion-inner">
 						<g:form method="post">
 							<dl class="dl-horizontal">
@@ -236,9 +236,9 @@
         		<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
       		</a>
 				</div>
-				 <div id="manageTemplates" class="accordion-body collapse">
+				 <div id="manageTemplates" class="accordion-body collapse in">
 				 	<div class="accordion-inner">
-						Manage Templates
+						<g:render template="templateView"></g:render>
 				 	</div>
 				 </div>
 			</div>
