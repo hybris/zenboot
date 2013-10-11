@@ -26,15 +26,22 @@ class PropertiesRestController {
             return map
         }
         
-        Template template = Template.findByExecutionZoneAndName(execZone, params.propertyFile)
-        if (!template.count()) {
+        Template templateInstance = Template.findByExecutionZoneAndNameIlike(execZone, params.propertyFile)
+        if (!templateInstance) {
             this.sendError(HttpStatus.NOT_FOUND, "No '${params.propertyFile}' property template found for environment '${params.puppetEnvironment}'")
             return
         }
-        def templateData = template.getContent()
-        def templateOutput = new SimpleTemplateEngine().createTemplate(templateData).make(binding)
         
-        response << templateOutput.toString()
+        def templateOutput
+        try {
+            templateOutput = new SimpleTemplateEngine().createTemplate(templateInstance?.template).make(binding)
+            response << templateOutput.toString()
+
+        } catch (MissingPropertyException ex) {
+            this.sendError(HttpStatus.BAD_REQUEST, ex.message)
+            return
+        }
+        
         response.flushBuffer()
     }
 

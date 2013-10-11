@@ -1,7 +1,5 @@
 package org.zenboot.portal
 
-import java.sql.Timestamp;
-
 class TemplateVersion implements Comparable {
     static auditable = true
     

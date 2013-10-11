@@ -1,6 +1,5 @@
 package org.zenboot.portal
 
-import java.sql.Timestamp
 import org.zenboot.portal.processing.ExecutionZone;
 
 class Template {
@@ -48,4 +47,5 @@ class Template {
     def afterInsert(){
         addToTemplateVersions(new TemplateVersion(content: this.template))
     }
+    
 }

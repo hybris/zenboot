@@ -21,7 +21,7 @@ class TemplateController {
 
     def save() {
         def templateInstance = new Template(params)
-        if (!templateInstance.save()) {
+        if (!templateInstance.save(flush:true)) {
             render(view: "create", model: [templateInstance: templateInstance])
             return
         }
@@ -79,9 +79,10 @@ class TemplateController {
 
     def update() {
         def templateInstance = Template.get(params.id)
+        
         if (!templateInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(action: "list")
+            redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
             return
         }
 
@@ -97,16 +98,16 @@ class TemplateController {
         }
 
         templateInstance.properties = params
-
-        if (!templateInstance.save()) {
-            render(view: "edit", model: [templateInstance: templateInstance])
+        templateInstance.addToTemplateVersions(new TemplateVersion(content: params.template))
+        if (!templateInstance.save(flush: true)) {
+            redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
             return
         }
         
-        templateInstance.addToTemplateVersions(new TemplateVersion(params)).save(flush: true)
+        
         
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(action: "show", id: templateInstance.id)
+        redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
     }
 
     def delete() {
