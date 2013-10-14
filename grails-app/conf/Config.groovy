@@ -143,6 +143,7 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
     '/login/**':                            ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/logout/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/plugins/**':                          ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    //'/**/rest/**':                          ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/**/rest/**':                          ['IS_AUTHENTICATED_FULLY'],
     '/home/index':                          [Role.ROLE_USER],
     '/exposedExecutionZoneAction/list':     [Role.ROLE_USER],

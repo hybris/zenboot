@@ -19,7 +19,7 @@ class UrlMappings {
         "/rest/action/$id/status"(controller:'executionZoneAction', action:'rest')
         "/rest/hiera/$puppetEnvironment"(controller:'hieraRest', action:'rest')
         "/rest/hiera/$puppetEnvironment/$qualityStage"(controller:'hieraRest', action:'rest')
-        "/rest/properties/$puppetEnvironment/$propertyFile"(controller:'propertiesRest', action:'rest')
+        "/rest/properties/$puppetEnvironment"(controller:'propertiesRest', action:'rest')
         "/rest/$url?"(controller:'exposedExecutionZoneAction', action:'rest')
         
         "500"(view:'/error')
