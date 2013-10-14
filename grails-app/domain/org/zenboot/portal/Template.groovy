@@ -40,12 +40,33 @@ class Template {
         return templateFile.content
     }
     
+    TemplateVersion getTemplateObject(){
+        TemplateVersion templateFile
+        if(templateVersions){
+            templateFile = templateVersions.last()
+        } else {
+            templateFile = new TemplateVersion()
+        }
+        return templateFile
+    }
+    
     void setTemplate(String template){
         this.template = template;
     }
         
+    def afterUpdate(){
+        saveTeamplateVersion()
+    }
+    
     def afterInsert(){
-        addToTemplateVersions(new TemplateVersion(content: this.template))
+        saveTeamplateVersion()
+    }
+    
+    def saveTeamplateVersion(){
+        if(this.template){
+            addToTemplateVersions(new TemplateVersion(content: this.template))
+        }
+        this.template = null
     }
     
 }

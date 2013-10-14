@@ -38,20 +38,28 @@ class TemplateController {
             return
         }
         render (contentType:"text/json"){
-            template name:templateInstance.name, templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.id),  dateCreated:templateInstance.dateCreated, updateUrl:createLink(action:'update', id:templateInstance.id)
+            template name:templateInstance.name, 
+                    templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
+                    versions: array{
+                        templateInstance.templateVersions.each {
+                            version(id:it.id, create:it.dateCreated, url:createLink(action: 'ajaxGetTemplate', id:it.id))
+                        }
+                    },
+                    dateCreated:templateInstance.dateCreated, 
+                    updateUrl:createLink(action:'update', id:templateInstance.id)
         }
         return
     }
     
     def ajaxGetTemplate() {
-        def templateInstance = Template.get(params.id)
+        def templateInstance = TemplateVersion.get(params.id)
         
         if (!templateInstance) {
             this.renderRestResult(HttpStatus.NOT_FOUND, null, null, "Not Template exists for this id")
             return
         }
         
-        render(text: templateInstance.template)
+        render(text: templateInstance.content)
         return
     }
 
@@ -96,7 +104,9 @@ class TemplateController {
                 return
             }
         }
-
+        
+        templateInstance.version++ // Workaround to force a object save. 
+        
         templateInstance.properties = params
         if (!templateInstance.save(flush: true)) {
             redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)

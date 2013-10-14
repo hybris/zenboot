@@ -209,6 +209,12 @@ zenboot.loadTemplateFrom = function(url) {
         	$('input#name').val(data.template.name);
         	$('#templateForm').attr("action", data.template.updateUrl);
         	$("#templateForm :submit").attr("name", "_action_update")
+        	$("#template_versions").html("");
+        	
+        	$.each(data.template.versions.reverse(), function(index, version){
+        		$("#template_versions").append($("<option>").val(version.url).html(version.create));
+        	});
+        	
         	zenboot.loadTemplate(data.template.templateUrl);
         	$('#templateForm :input').removeAttr('disabled');
         	$("#templateForm a#cancelbtn").show();
