@@ -11,9 +11,9 @@
 </div>
 
 <div class="control-group fieldcontain ${hasErrors(bean: templateInstance, field: 'template', 'error')} ">
-	<label class="control-label" for="content"><g:message code="template.template.label" default="Content" /></label>
+	<label class="control-label" for="template"><g:message code="template.template.label" default="Template" /></label>
     <div class="controls">
-        <g:textArea name="content" value="${templateInstance?.template}"/>
+        <g:textArea name="template" value="${templateInstance?.template}"/>
     </div>
 </div>
 

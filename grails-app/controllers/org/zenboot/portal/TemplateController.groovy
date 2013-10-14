@@ -98,7 +98,6 @@ class TemplateController {
         }
 
         templateInstance.properties = params
-        templateInstance.addToTemplateVersions(new TemplateVersion(content: params.template))
         if (!templateInstance.save(flush: true)) {
             redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
             return
