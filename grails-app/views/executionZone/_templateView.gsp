@@ -1,13 +1,23 @@
 
 <div class="row-fluid">
 	<div class="span3">
-		<g:select name="executionZone_templates" from="${executionZoneInstance?.templates}" optionKey="id" optionValue="name" size="3" style="height: 500px"/>
+		<g:select name="executionZone_templates" from="${executionZoneInstance?.templates}" optionKey="id" optionValue="name" size="3" style="height: 450px"/>
+		<span title="Import Template" class="btn import-templates-button">
+			<g:message code="default.button.import.label" default="Import" />
+		</span>
+		
+		<g:link controller="Template" action="export" params="[execId: executionZoneInstance?.id ]" class="btn">
+			<g:message code="default.button.export.label" default="Export" />
+		</g:link>
+			
+		</span>
 	</div>
+	
 	
 	<div class="span9">
 		<g:form name="templateForm" controller="Template" action="save">
 			<fieldset>
-				<g:hiddenField name="executionZone.id" value="${executionZoneInstance?.id}" optionKey="id" optionValue="dateCreated" class="pull-right" />
+				<g:hiddenField name="executionZone.id" value="${executionZoneInstance?.id}" />
 				<div class="row-fluid">
 					<span class="3">	
 						<g:textField name="name" value="${templateInstance?.name}" placeholder="${message(code: 'executionZone.name.label', default: 'Name')}"/>
@@ -23,11 +33,55 @@
 				<a id="cancelbtn" class="btn btn-success" onclick="CancelTemplate()" style="display:none;">
 					<g:message code="default.button.cancel.label" default="Cancel" />
 				</a>
+							
+				<a id="delete_template" class="btn btn-danger delete_template" data-dismiss="modal" disabled="disabled">
+					<g:message code="default.button.delete.label" default="Delete" />
+				</a>	
+				
+				
 				<g:actionSubmit class="btn btn-success" action="save" value="${message(code: 'executionZone.button.save.label', default: 'Save')}" />
 			</fieldset>
 		</g:form>
 	</div>
 </div>
+
+	<div id="template-import" class="modal hide fade">
+		<g:uploadForm action="upload" controller="Template">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3><g:message code="executionZone.import.templates.label" default="Import Templates" /></h3>
+			</div>
+			<div class="modal-body">
+				<g:hiddenField name="execId" value="${executionZoneInstance?.id}"  />
+				<g:message code="executionZone.import.templates.label" default="Import Templates" />: <br />
+		    <input type="file" name="importFile" />
+			</div>
+			<div class="modal-footer">
+				<a class="btn modal-close-button" data-dismiss="modal">
+					<g:message code="default.button.close.label" default="Close" />
+				</a>	
+				<g:submitButton class="btn btn-success" name="${message(code: 'executionZone.button.import.label', default: 'Import')}" />
+				
+			</div>
+		</g:uploadForm>
+	</div>
+	
+		<div id="template-remove" class="modal hide fade">
+		<g:form action="delete" controller="Template">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3><g:message code="default.button.delete.confirm.message" default="Are you sure?" /></h3>
+			</div>
+			<div class="modal-body">
+				<a class="btn modal-close-button" data-dismiss="modal">
+					<g:message code="default.button.close.label" default="Close" />
+				</a>	
+				<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}"/>
+			</div>
+
+		</g:form>
+	</div>
+
 
 <g:javascript>
 $('#template_versions').change(function(event) {
@@ -38,10 +92,19 @@ $('#executionZone_templates').change(function(event) {
 	zenboot.loadTemplateFrom('<g:createLink controller="template" action="ajaxGetTemplateParameters" />/' + $('#executionZone_templates option:selected').val());
 });
 
+$('.import-templates-button').click(function() {
+    $('#template-import').modal('toggle')
+});
+
+$('.delete_template').click(function() {
+    $('#template-remove').modal('toggle')
+});
+
 function CancelTemplate(){
   	$('#templateParametersSpinner').hide();      	
   	$('#templateForm').attr("action", "${createLink(controller:"template", action: 'save')}");
 	$("#templateForm input#name").val("");
+	$('.delete_template').attr("disabled", "disabled");
 	$("#template_versions").attr("disabled", "disabled");
 	$("#templateForm textarea#template").html("");
 	$("#templateForm :submit").attr("name", "save");

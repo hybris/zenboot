@@ -215,6 +215,9 @@ zenboot.loadTemplateFrom = function(url) {
         		$("#template_versions").append($("<option>").val(version.url).html(version.create));
         	});
         	
+        	$('.delete_template').removeAttr('disabled');
+        	$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
+        	
         	zenboot.loadTemplate(data.template.templateUrl);
         	$('#templateForm :input').removeAttr('disabled');
         	$("#templateForm a#cancelbtn").show();

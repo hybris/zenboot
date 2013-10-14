@@ -1,10 +1,19 @@
 package org.zenboot.portal
 
+import java.nio.charset.Charset;
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+
+import org.apache.ivy.util.url.BasicURLHandler.HttpStatus;
 import org.springframework.dao.DataIntegrityViolationException
+import org.zenboot.portal.processing.*
 
 class TemplateController {
+    
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+    static allowedMethods = [save: "POST", update: "POST", delete: "POST", upload: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -40,6 +49,7 @@ class TemplateController {
         render (contentType:"text/json"){
             template name:templateInstance.name, 
                     templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
+                    deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.getTemplateObject().id),
                     versions: array{
                         templateInstance.templateVersions.each {
                             version(id:it.id, create:it.dateCreated, url:createLink(action: 'ajaxGetTemplate', id:it.id))
@@ -118,23 +128,118 @@ class TemplateController {
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
         redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
     }
+    
+    def upload() {
+        def executionZoneInstance = ExecutionZone.get(params.execId)
+        
+        if (!executionZoneInstance) {
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.executionZone.id])
+            redirect(controller: "executionZone", action: "index")
+            return
+        }
+        
+        def f = request.getFile('importFile')
+        if (f.empty) {
+            flash.message = 'file cannot be empty'
+            render(controller: "executionZone", action: "show", id: executionZoneInstance.id)
+            return
+        }
+        
+        try{
+            new File(this.grailsApplication.config.zenboot.template.tempDir.toString()).deleteDir()
+            new File(this.grailsApplication.config.zenboot.template.tempDir.toString() + "/tmp").mkdirs()
+        } catch (all) {
+            flash.message = "Can't create tmp dir."
+            render(controller: "executionZone", action: "show", id: executionZoneInstance.id)
+        }
+        
+        f.transferTo(new File(this.grailsApplication.config.zenboot.template.tempDir.toString() + "/import.zip"))
+        
+        def zipFile = new ZipFile(new File(this.grailsApplication.config.zenboot.template.tempDir.toString() + "/import.zip"))
+        
+        int files = 0
+        int imported = 0
+        zipFile.entries().each {
+            files++
+            Template template = new Template(name: it.name, template: zipFile.getInputStream(it).text, executionZone:executionZoneInstance)
+            
+            if(template.save(flush:true)){
+                imported++
+            }
+         }
+        
+        
+        new File(this.grailsApplication.config.zenboot.template.tempDir.toString()).deleteDir()
+        
+        flash.message = message(code: 'template.imported', default: "{1} of {0} templates imported!", args: [files, imported])
+        redirect(controller: "executionZone", action: "show", id: executionZoneInstance.id)
+        return
+    }
+    
+    def export() {
+        def executionZoneInstance = ExecutionZone.get(params.execId)
+        
+        if (!executionZoneInstance) {
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
+            redirect(controller: "executionZone", action: "index")
+            return
+        }
+        
+        try{
+            new File(this.grailsApplication.config.zenboot.template.tempDir.toString()).deleteDir()
+            new File(this.grailsApplication.config.zenboot.template.tempDir.toString()).mkdirs()
+        } catch (all) {
+            flash.message = "Can't create tmp dir."
+            render(controller: "executionZone", action: "show", id: executionZoneInstance.id)
+        }
+        
+        
+        def exportFile = new File(this.grailsApplication.config.zenboot.template.tempDir.toString() + "/export.zip")
+        def zipFile = new ZipOutputStream(new FileOutputStream(exportFile))
+        
+        
+        if(executionZoneInstance.templates){
+            executionZoneInstance.templates.each {
+                zipFile.putNextEntry(new ZipEntry(it.name))
+                zipFile.write(it.template.getBytes(Charset.forName("UTF-8")))
+                zipFile.closeEntry();
+            }
+        } else {
+            flash.message = "There are no Templates in this zone"
+            render(controller: "executionZone", action: "show", id: executionZoneInstance.id)
+        }
+        
+        
+        
+        zipFile.close()
+        
+        
+        
+        response.setContentType("application/octet-stream")
+        response.setHeader("Content-disposition", "attachment;filename=${exportFile.getName()}")
+        
+        response.outputStream << exportFile.newInputStream() // Performing a binary stream copy
+        
+        new File(this.grailsApplication.config.zenboot.template.tempDir.toString()).deleteDir()
+        return
+    }
 
     def delete() {
         def templateInstance = Template.get(params.id)
         if (!templateInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(action: "list")
+            redirect(controller: "executionZone", action: "index")
             return
         }
 
         try {
             templateInstance.delete(flush: true)
 			flash.message = message(code: 'default.deleted.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(action: "list")
+            redirect(controller: "executionZone", action: "show", id:templateInstance.executionZone.id)
         }
         catch (DataIntegrityViolationException e) {
 			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(action: "show", id: params.id)
+            redirect(controller: "executionZone", action: "show", id:templateInstance.executionZone.id)
         }
     }
 }

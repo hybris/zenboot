@@ -15,6 +15,8 @@ class ExecutionZone {
     Set actions = []
     boolean enabled = true
     boolean enableExposedProcessingParameters = true
+    
+    SortedSet templates
 
     static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter, templates:Template]
 

@@ -1,8 +1,10 @@
 package org.zenboot.portal
 
 import org.zenboot.portal.processing.ExecutionZone;
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
-class Template {
+class Template implements Comparable {
     static auditable = true
     
     String name
@@ -19,7 +21,10 @@ class Template {
     
     static mapping = {
         templateVersions cascade: "all-delete-orphan"
-
+    }
+    
+    int compareTo(obj) {
+        name <=> obj.name
     }
     
     static constraints = {
@@ -67,6 +72,16 @@ class Template {
             addToTemplateVersions(new TemplateVersion(content: this.template))
         }
         this.template = null
+    }
+    
+    
+    def importFile(String file){
+        template = new File(file).getText()
+        name = (file =~ /.*\//).replaceAll("")
+    }
+    
+    def exportFile(String path){
+        new File(path + name).write(getTemplate())
     }
     
 }

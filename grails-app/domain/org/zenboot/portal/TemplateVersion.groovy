@@ -18,7 +18,6 @@ class TemplateVersion implements Comparable {
 
     static mapping = {
         content type: "text"
-        sort dateCreated: "desc"
     }
 
     static constraints = {
