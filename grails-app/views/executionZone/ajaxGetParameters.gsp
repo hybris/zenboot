@@ -1,4 +1,4 @@
-<table class="table parameters-table">
+<table class="table exec-parameters-table">
 	<thead>
 		<tr>
 			<th style="width: 45%">Key</th>
@@ -29,7 +29,7 @@
 					<span title="Remove parameter" class="btn btn-mini remove-parameter-button">
 						<i class="icon-minus-sign"></i>
 					</span>
-					<span title="Add parameter" class="btn btn-mini add-parameter-button">
+					<span title="Add parameter" class="btn btn-mini add-exec-parameter-button">
 						<i class="icon-plus-sign"></i>
 					</span>
 					<span title="Show details" class="btn btn-mini details-parameter-button">
@@ -49,12 +49,7 @@
 
 <g:field type="hidden" value="${containsInvisibleParameters}" name="containsInvisibleParameters" />
 
-<span title="Add parameter" class="btn btn-mini add-parameter-button">
+<span title="Add parameter" class="btn btn-mini add-exec-parameter-button">
 	<i class="icon-plus-sign"></i>
 </span>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        zenboot.enableParameterList();
-    })
-</script>

@@ -55,15 +55,22 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     }
 
     def execute = { ExecuteExposedExecutionZoneActionCommand cmd ->
+        cmd.parameters = params.parameters
+        def resolvedParams = cmd.executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(params.execId), ControllerUtils.getParameterMap(params))
+        cmd.exposedExecutionZoneActionParameters = resolvedParams.resolvedParameters
+        resolvedParams.missingParameters.each { paramName ->
+           cmd.errors.reject('executionZone.parameters.emptyValue', [paramName].asType(Object[]), 'Mandatory parameter is empty')
+        }
+        
         if (cmd.hasErrors()) {
-            chain(action:'show', id:cmd.id, model:[cmd:cmd])
+            chain(action:'show', id:cmd.execId, model:[cmd:cmd])
             return
         } else {
             ExecutionZoneAction action = cmd.getExecutionZoneAction()
             this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
-        redirect(action:"show", id:cmd.id)
+        redirect(action:"show", id:cmd.execId)
     }
 
     def index() {
@@ -272,24 +279,27 @@ class ExecuteExposedExecutionZoneActionCommand {
 
     def executionZoneService
     
-    Long id
+    Long execId
     Map exposedExecutionZoneActionParameters
+    Map parameters
 
     static constraints = {
-        id nullable:false
+        execId nullable:false
     }
+    
 
-    boolean validate() {
-        def resolvedParams = executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(this.id), ControllerUtils.getParameterMap(params))
+
+    /*boolean validate() {
+        def resolvedParams = executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(this.execId), ControllerUtils.getParameterMap(params))
         this.exposedExecutionZoneActionParameters = resolvedParams.resolvedParameters
         resolvedParams.missingParameters.each { paramName ->
             this.errors.reject('executionZone.parameters.emptyValue', [paramName].asType(Object[]), 'Mandatory parameter is empty')
         }
         return this.errors.hasErrors()
-    }
+    }*/
 
     ExecutionZoneAction getExecutionZoneAction() {
-        ExposedExecutionZoneAction exposedAction = ExposedExecutionZoneAction.get(this.id)
+        ExposedExecutionZoneAction exposedAction = ExposedExecutionZoneAction.get(this.execId)
         return executionZoneService.createExecutionZoneAction(exposedAction, this.exposedExecutionZoneActionParameters)
     }
 }
