@@ -143,9 +143,6 @@
 							<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
 				
 							<fieldset class="spacer buttons">
-								<g:link class="btn btn-primary" action="edit" id="${executionZoneInstance?.id}">
-									<g:message code="default.button.edit.label" default="Edit" />
-								</g:link>
 								<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" disabled="${!executionZoneInstance?.enabled}" />
 							</fieldset>
 						</g:form>
@@ -233,6 +230,18 @@
 				 	</div>
 				 </div>
 			</div>
+			<div class="accordion-group">
+				<div class="accordion-heading">
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#manageTemplates">
+        		<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
+      		</a>
+				</div>
+				 <div id="manageTemplates" class="accordion-body collapse">
+				 	<div class="accordion-inner">
+						<g:render template="templateView"></g:render>
+				 	</div>
+				 </div>
+			</div>
 		</div>
 	</div>
 
@@ -253,7 +262,7 @@
             },
             error: function(jqHXR, status, error) {
 		        	$('#parametersSpinner').hide();
-		        	$("#parameters").html('<div class="alert alert-error">' + error + '</div>');
+		        	$("#parameters").html('<div class="alert alert-error">Some ERROR occured: ' + error + '</div>').slideDown('slow');
 		        	$('#scriptDirs input:radio').removeAttr('disabled');
             }
         });

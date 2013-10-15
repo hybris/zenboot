@@ -1,8 +1,11 @@
 package org.zenboot.portal.processing
 
 
-class ExecutionZone {
+import org.zenboot.portal.Template;
 
+class ExecutionZone {
+    static auditable = true
+    
     Date creationDate
     ExecutionZoneType type
     String description
@@ -12,8 +15,10 @@ class ExecutionZone {
     Set actions = []
     boolean enabled = true
     boolean enableExposedProcessingParameters = true
+    
+    SortedSet templates
 
-    static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter]
+    static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter, templates:Template]
 
     static constraints = {
         type nullable:false

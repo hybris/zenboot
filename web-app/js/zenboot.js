@@ -196,6 +196,59 @@ zenboot.finalizeAjaxLoading = function(targetNodeId, spinnerNodeId) {
 	$('#' + spinnerNodeId).hide();
 }
 
+zenboot.loadTemplateFrom = function(url) {
+    $.ajax({
+        url : url,
+        dataType: "json",
+        beforeSend : function() {
+        	$('#templateParametersSpinner').fadeIn('fast');
+        	$("#templateForm :input").attr("disabled", "disabled");
+        },
+        success: function(data) {
+        	$('#templateParametersSpinner').hide();
+        	$('input#name').val(data.template.name);
+        	$('#templateForm').attr("action", data.template.updateUrl);
+        	$("#templateForm :submit").attr("name", "_action_update")
+        	$("#template_versions").html("");
+        	
+        	$.each(data.template.versions.reverse(), function(index, version){
+        		$("#template_versions").append($("<option>").val(version.url).html(version.create));
+        	});
+        	
+        	$('.delete_template').removeAttr('disabled');
+        	$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
+        	
+        	zenboot.loadTemplate(data.template.templateUrl);
+        	$('#templateForm :input').removeAttr('disabled');
+        	$("#templateForm a#cancelbtn").removeAttr('disabled');
+        },
+        error: function(jqHXR, status, error) {
+	        $('#templateParametersSpinner').hide();
+	        $('#templateForm :input').removeAttr('disabled');
+        }
+    });	
+}
+
+zenboot.loadTemplate = function(url) {
+    $.ajax({
+        url : url,
+        beforeSend : function() {
+        	$('#templateParametersSpinner').fadeIn('fast');
+        	$("#templateForm :input").attr("disabled", "disabled");
+        },
+        success: function(data) {
+        	$('#templateParametersSpinner').hide();
+        	$('textarea#template').html(data);
+        	$('#templateForm :input').removeAttr('disabled');
+        },
+        error: function(jqHXR, status, error) {
+	        $('#templateParametersSpinner').hide();
+	        $('#templateForm :input').removeAttr('disabled');
+        }
+    });
+	
+}
+
 $(document).ready(function() {
 	zenboot.enableCollapsableList()
 });

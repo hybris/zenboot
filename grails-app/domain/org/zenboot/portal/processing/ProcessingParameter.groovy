@@ -2,6 +2,8 @@ package org.zenboot.portal.processing
 
 class ProcessingParameter {
 
+    static auditable = true
+    
     String name
     String value
     String description
