@@ -1,4 +1,7 @@
 eclipse.preferences.version=1
+encoding//.link_to_grails_plugins/audit-logging-0.5.4/grails-app/i18n/messages.properties=UTF-8
+encoding//.link_to_grails_plugins/hibernate-3.6.10.1/grails-app/i18n/messages.properties=UTF-8
+encoding//.link_to_grails_plugins/jquery-1.7.1/grails-app/i18n/messages.properties=UTF-8
 encoding//.link_to_grails_plugins/jquery-ui-1.8.15/grails-app/i18n=UTF-8
 encoding//.link_to_grails_plugins/jquery-ui-1.8.15/grails-app/i18n/messages.properties=UTF-8
 encoding//.link_to_grails_plugins/mail-1.0/grails-app/i18n=UTF-8
