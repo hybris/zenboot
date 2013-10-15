@@ -13,7 +13,7 @@ import org.zenboot.portal.processing.ScriptletBatch
 @TestMixin(GrailsUnitTestMixin)
 class ProcessHandlerTests {
 
-    private outputScript = new File("${this.class.getClassLoader().getResource("${this.class.getPackage().getName()}/processHandler_testOutput.sh").getFile()}")
+    private outputScript = new File("test/resources/${this.class.getPackage().getName()}/processHandler_testOutput.sh")
     
     @Before
     void setUp() {

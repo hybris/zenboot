@@ -4,12 +4,14 @@ class ProcessingParameter {
 
     String name
     String value
+    String description
     Boolean published = Boolean.FALSE
     Boolean exposed = Boolean.FALSE
 
     static constraints = {
         name nullable:false
         value nullable:false
+        
         published nullable:false
         exposed nullable:false
     }
@@ -17,6 +19,7 @@ class ProcessingParameter {
     static mapping = {
         name type: 'text'
         value type: 'text'
+        description type: 'text'
         cache false
     }
 
