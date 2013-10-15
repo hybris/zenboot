@@ -2,14 +2,15 @@
 <div class="row-fluid">
 	<div class="span3">
 		<g:select name="executionZone_templates" from="${executionZoneInstance?.templates}" optionKey="id" optionValue="name" size="3" style="height: 450px"/>
-		<span title="Import Template" class="btn import-templates-button">
-			<g:message code="default.button.import.label" default="Import" />
-		</span>
-		
-		<g:link controller="Template" action="export" params="[execId: executionZoneInstance?.id ]" class="btn">
-			<g:message code="default.button.export.label" default="Export" />
-		</g:link>
+		<fieldset class="buttons spacer">
+			<span title="Import Template" class="btn import-templates-button">
+				<g:message code="default.button.import.label" default="Import" />
+			</span>
 			
+			<g:link controller="Template" action="export" params="[execId: executionZoneInstance?.id ]" class="btn">
+				<g:message code="default.button.export.label" default="Export" />
+			</g:link>
+		</fieldset>
 		</span>
 	</div>
 	
@@ -30,8 +31,8 @@
 			</fieldset>
 
 			<fieldset class="buttons spacer pull-right">
-				<a id="cancelbtn" class="btn btn-success" onclick="CancelTemplate()" style="display:none;">
-					<g:message code="default.button.cancel.label" default="Cancel" />
+				<a id="cancelbtn" class="btn btn-success" onclick="CancelTemplate()" disabled="disabled">
+					<g:message code="default.button.cancel_new.label" default="Cancel/New" />
 				</a>
 							
 				<a id="delete_template" class="btn btn-danger delete_template" data-dismiss="modal" disabled="disabled">
@@ -101,14 +102,14 @@ $('.delete_template').click(function() {
 });
 
 function CancelTemplate(){
-  	$('#templateParametersSpinner').hide();      	
-  	$('#templateForm').attr("action", "${createLink(controller:"template", action: 'save')}");
+  $('#templateParametersSpinner').hide();      	
+  $('#templateForm').attr("action", "${createLink(controller:"template", action: 'save')}");
 	$("#templateForm input#name").val("");
 	$('.delete_template').attr("disabled", "disabled");
 	$("#template_versions").attr("disabled", "disabled");
 	$("#templateForm textarea#template").html("");
 	$("#templateForm :submit").attr("name", "save");
-	$("#templateForm a#cancelbtn").hide();
+	$("#templateForm a#cancelbtn").attr("disabled", "disabled");
 	$("#executionZone_templates option:selected").removeAttr("selected");
 }
 </g:javascript>

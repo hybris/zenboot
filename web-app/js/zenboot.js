@@ -220,7 +220,7 @@ zenboot.loadTemplateFrom = function(url) {
         	
         	zenboot.loadTemplate(data.template.templateUrl);
         	$('#templateForm :input').removeAttr('disabled');
-        	$("#templateForm a#cancelbtn").show();
+        	$("#templateForm a#cancelbtn").removeAttr('disabled');
         },
         error: function(jqHXR, status, error) {
 	        $('#templateParametersSpinner').hide();
