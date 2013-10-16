@@ -28,11 +28,14 @@ class Template implements Comparable {
     }
     
     static constraints = {
-        name(blank: false)
         name validator: { val, obj ->
             def templateWithSameNameAndExecZone = Template.findByNameAndExecutionZone(val, obj.executionZone)
-            return !templateWithSameNameAndExecZone || templateWithSameNameAndExecZone == obj
-        }
+            log.error("ExecZone: " + obj.executionZone.id)
+            log.error("Name: " + val)
+            log.error("Template: " + templateWithSameNameAndExecZone.toString())
+            log.error("Obj: " + obj)
+            return !templateWithSameNameAndExecZone || templateWithSameNameAndExecZone.id == obj.id
+        }, blank: false, nullable: false
     }
     
     String getTemplate(){

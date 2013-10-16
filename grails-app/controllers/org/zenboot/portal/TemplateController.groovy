@@ -5,7 +5,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
-import org.apache.ivy.util.url.BasicURLHandler.HttpStatus;
+
 import org.springframework.dao.DataIntegrityViolationException
 import org.zenboot.portal.processing.*
 
@@ -43,7 +43,7 @@ class TemplateController {
         def templateInstance = Template.get(params.id)
         
         if (!templateInstance) {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, "Not Template exists for this id")
+            this.renderRestResult(404, null, null, "Not Template exists for this id")
             return
         }
         render (contentType:"text/json"){
@@ -65,7 +65,7 @@ class TemplateController {
         def templateInstance = TemplateVersion.get(params.id)
         
         if (!templateInstance) {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, "Not Template exists for this id")
+            this.renderRestResult(404, null, null, "Not Template exists for this id")
             return
         }
         
@@ -119,7 +119,7 @@ class TemplateController {
         
         templateInstance.properties = params
         if (!templateInstance.save(flush: true)) {
-            redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
+            render(view: "edit", model: [templateInstance: templateInstance])
             return
         }
         
