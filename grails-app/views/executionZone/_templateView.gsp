@@ -32,7 +32,7 @@
 
 			<fieldset class="buttons spacer pull-right">
 				<a id="cancelbtn" class="btn btn-success" onclick="CancelTemplate()" disabled="disabled">
-					<g:message code="default.button.cancel_new.label" default="Cancel/New" />
+					<g:message code="default.button.cancel.label" default="Cancel" />
 				</a>
 							
 				<a id="delete_template" class="btn btn-danger delete_template" data-dismiss="modal" disabled="disabled">
