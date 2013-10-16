@@ -30,10 +30,6 @@ class Template implements Comparable {
     static constraints = {
         name validator: { val, obj ->
             def templateWithSameNameAndExecZone = Template.findByNameAndExecutionZone(val, obj.executionZone)
-            log.error("ExecZone: " + obj.executionZone.id)
-            log.error("Name: " + val)
-            log.error("Template: " + templateWithSameNameAndExecZone.toString())
-            log.error("Obj: " + obj)
             return !templateWithSameNameAndExecZone || templateWithSameNameAndExecZone.id == obj.id
         }, blank: false, nullable: false
     }
