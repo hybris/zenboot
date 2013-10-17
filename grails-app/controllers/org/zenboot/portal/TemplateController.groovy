@@ -49,7 +49,7 @@ class TemplateController {
         render (contentType:"text/json"){
             template name:templateInstance.name, 
                     templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
-                    deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.getTemplateObject().id),
+                    deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.id),
                     versions: array{
                         templateInstance.templateVersions.each {
                             version(id:it.id, create:it.dateCreated, url:createLink(action: 'ajaxGetTemplate', id:it.id))
