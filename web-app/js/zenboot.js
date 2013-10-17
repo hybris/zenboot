@@ -212,13 +212,13 @@ zenboot.loadTemplateFrom = function(url) {
         	$("#template_versions").html("");
         	
         	$.each(data.template.versions.reverse(), function(index, version){
-        		$("#template_versions").append($("<option>").val(version.url).html(version.create));
+        		$("#template_versions").append($("<option>").val(version.url).html(version.create + " (" + version.user + ")"));
         	});
         	
         	$('.delete_template').removeAttr('disabled');
         	$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
         	
-        	zenboot.loadTemplate(data.template.templateUrl);
+        	zenboot.loadTemplate(data.template.url);
         	$('#templateForm :input').removeAttr('disabled');
         	$("#templateForm a#cancelbtn").removeAttr('disabled');
         },
@@ -232,13 +232,15 @@ zenboot.loadTemplateFrom = function(url) {
 zenboot.loadTemplate = function(url) {
     $.ajax({
         url : url,
+        dataType: "json",
         beforeSend : function() {
         	$('#templateParametersSpinner').fadeIn('fast');
         	$("#templateForm :input").attr("disabled", "disabled");
         },
         success: function(data) {
         	$('#templateParametersSpinner').hide();
-        	$('textarea#template').html(data);
+        	zenboot.loadTextAreaContent(data.version.url, $('textarea#template'))
+        	zenboot.loadPlaceholderContent(data.version.commentUrl, $('textarea#message'))
         	$('#templateForm :input').removeAttr('disabled');
         },
         error: function(jqHXR, status, error) {
@@ -246,7 +248,44 @@ zenboot.loadTemplate = function(url) {
 	        $('#templateForm :input').removeAttr('disabled');
         }
     });
-	
+}
+
+zenboot.loadTextAreaContent = function(url, textArea) {
+    $.ajax({
+        url : url,
+        beforeSend : function() {
+        	$('#templateParametersSpinner').fadeIn('fast');
+        	$("#templateForm :input").attr("disabled", "disabled");
+        },
+        success: function(data) {
+        	$('#templateParametersSpinner').hide();
+        	textArea.html(data);
+        	$('#templateForm :input').removeAttr('disabled');
+        },
+        error: function(jqHXR, status, error) {
+	        $('#templateParametersSpinner').hide();
+	        $('#templateForm :input').removeAttr('disabled');
+        }
+    });
+}
+
+zenboot.loadPlaceholderContent = function(url, textArea) {
+    $.ajax({
+        url : url,
+        beforeSend : function() {
+        	$('#templateParametersSpinner').fadeIn('fast');
+        	$("#templateForm :input").attr("disabled", "disabled");
+        },
+        success: function(data) {
+        	$('#templateParametersSpinner').hide();
+        	textArea.attr('placeholder',data);
+        	$('#templateForm :input').removeAttr('disabled');
+        },
+        error: function(jqHXR, status, error) {
+	        $('#templateParametersSpinner').hide();
+	        $('#templateForm :input').removeAttr('disabled');
+        }
+    });
 }
 
 $(document).ready(function() {

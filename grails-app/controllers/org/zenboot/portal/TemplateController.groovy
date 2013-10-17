@@ -5,7 +5,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
-import org.apache.ivy.util.url.BasicURLHandler.HttpStatus;
+
 import org.springframework.dao.DataIntegrityViolationException
 import org.zenboot.portal.processing.*
 
@@ -43,16 +43,20 @@ class TemplateController {
         def templateInstance = Template.get(params.id)
         
         if (!templateInstance) {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, "Not Template exists for this id")
+            this.renderRestResult(404, null, null, "Not Template exists for this id")
             return
         }
         render (contentType:"text/json"){
             template name:templateInstance.name, 
+                    url:createLink(action: 'ajaxGetVersion', id:templateInstance.getTemplateObject().id),
                     templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
-                    deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.getTemplateObject().id),
+                    deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.id),
                     versions: array{
                         templateInstance.templateVersions.each {
-                            version(id:it.id, create:it.dateCreated, url:createLink(action: 'ajaxGetTemplate', id:it.id))
+                            version(id:it.id, 
+                            create:it.dateCreated, 
+                            url:createLink(action: 'ajaxGetVersion', id:it.id),
+                            user:it.user)
                         }
                     },
                     dateCreated:templateInstance.dateCreated, 
@@ -61,15 +65,46 @@ class TemplateController {
         return
     }
     
+    def ajaxGetVersion() {
+        def templateInstance = TemplateVersion.get(params.id)
+        
+        if (!templateInstance) {
+            this.renderRestResult(404, null, null, "Not Version exists for this id")
+            return
+        }
+        
+        render (contentType:"text/json"){
+          version(id:templateInstance.id, 
+              create:templateInstance.dateCreated, 
+              url:createLink(action: 'ajaxGetTemplate', id:templateInstance.id), 
+              commentUrl:createLink(action: 'ajaxGetComment', id:templateInstance.id)
+          )
+        }
+        
+        return
+    }
+    
     def ajaxGetTemplate() {
         def templateInstance = TemplateVersion.get(params.id)
         
         if (!templateInstance) {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, "Not Template exists for this id")
+            this.renderRestResult(404, null, null, "Not Template exists for this id")
             return
         }
         
         render(text: templateInstance.content)
+        return
+    }
+    
+    def ajaxGetComment() {
+        def templateInstance = TemplateVersion.get(params.id)
+        
+        if (!templateInstance) {
+            this.renderRestResult(404, null, null, "Not Template exists for this id")
+            return
+        }
+        
+        render(text: templateInstance.comment)
         return
     }
 
@@ -119,7 +154,7 @@ class TemplateController {
         
         templateInstance.properties = params
         if (!templateInstance.save(flush: true)) {
-            redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
+            render(view: "edit", model: [templateInstance: templateInstance])
             return
         }
         
@@ -161,10 +196,13 @@ class TemplateController {
         int imported = 0
         zipFile.entries().each {
             files++
-            Template template = new Template(name: it.name, template: zipFile.getInputStream(it).text, executionZone:executionZoneInstance)
-            
-            if(template.save(flush:true)){
-                imported++
+            if(!(it =~ /(\/\.)|(\/$)/)){
+              def name = (it.name =~ /.*\//).replaceAll("")
+              Template template = new Template(name: name, template: zipFile.getInputStream(it).text, message: "Import", executionZone:executionZoneInstance)
+              
+              if(template.save(flush:true)){
+                  imported++
+              }
             }
          }
         

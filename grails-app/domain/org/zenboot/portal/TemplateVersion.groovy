@@ -4,6 +4,8 @@ class TemplateVersion implements Comparable {
     static auditable = true
     
     String content
+    String user
+    String comment
     Date dateCreated
     Date lastUpdated
     
@@ -18,8 +20,13 @@ class TemplateVersion implements Comparable {
 
     static mapping = {
         content type: "text"
+        comment type: "text"
     }
 
     static constraints = {
+    }
+    
+    def beforeInsert(){
+        user = domainClass.grailsApplication.mainContext.springSecurityService.principal?.username
     }
 }

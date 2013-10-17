@@ -38,7 +38,7 @@
     <div class="controls">
         <g:textField name="puppetEnvironment" value="${executionZoneInstance?.puppetEnvironment}" />
         <br/>
-        <small><g:message code="executionZone.puppetenvironment.comment" default="Will become part of the Hiera REST-url" /></small>
+        <small><g:message code="executionZone.puppetenvironment.comment" default="Will become part of the REST-url" /></small>
     </div>
 </div>
 
@@ -49,7 +49,7 @@
     <div class="controls">
         <g:textField name="qualityStage" value="${executionZoneInstance?.qualityStage}" />
         <br/>
-        <small><g:message code="executionZone.qualityStage.comment" default="Will become part of the Hiera REST-url" /></small>
+        <small><g:message code="executionZone.qualityStage.comment" default="Will become part of the REST-url" /></small>
     </div>
 </div>
 
