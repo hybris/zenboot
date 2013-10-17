@@ -1,6 +1,7 @@
 package org.zenboot.portal.processing
 
 
+import org.codehaus.groovy.grails.plugins.orm.auditable.AuditLogEvent
 import org.zenboot.portal.Template;
 
 class ExecutionZone {
@@ -56,6 +57,12 @@ class ExecutionZone {
         } else {
             this.processingParameters << param
         }
+    }
+
+    ArrayList getAuditLogEvents() {
+        def parameterList = processingParameters.findAll().collect { item -> item.id.toString() }
+        def auditLogEvent = AuditLogEvent.findAllByClassNameAndPersistedObjectIdInList(ProcessingParameter.class.name, parameterList, [sort: "dateCreated", order: "desc"])
+        return auditLogEvent
     }
 
 }
