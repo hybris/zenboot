@@ -83,6 +83,7 @@ class Template implements Comparable {
     
     def importFile(String file){
         template = new File(file).getText()
+        log.error(file)
         name = (file =~ /.*\//).replaceAll("")
     }
     
