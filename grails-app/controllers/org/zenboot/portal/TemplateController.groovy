@@ -48,16 +48,39 @@ class TemplateController {
         }
         render (contentType:"text/json"){
             template name:templateInstance.name, 
+                    url:createLink(action: 'ajaxGetVersion', id:templateInstance.getTemplateObject().id),
                     templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
                     deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.id),
                     versions: array{
                         templateInstance.templateVersions.each {
-                            version(id:it.id, create:it.dateCreated, url:createLink(action: 'ajaxGetTemplate', id:it.id))
+                            version(id:it.id, 
+                            create:it.dateCreated, 
+                            url:createLink(action: 'ajaxGetVersion', id:it.id),
+                            user:it.user)
                         }
                     },
                     dateCreated:templateInstance.dateCreated, 
                     updateUrl:createLink(action:'update', id:templateInstance.id)
         }
+        return
+    }
+    
+    def ajaxGetVersion() {
+        def templateInstance = TemplateVersion.get(params.id)
+        
+        if (!templateInstance) {
+            this.renderRestResult(404, null, null, "Not Version exists for this id")
+            return
+        }
+        
+        render (contentType:"text/json"){
+          version(id:templateInstance.id, 
+              create:templateInstance.dateCreated, 
+              url:createLink(action: 'ajaxGetTemplate', id:templateInstance.id), 
+              commentUrl:createLink(action: 'ajaxGetComment', id:templateInstance.id)
+          )
+        }
+        
         return
     }
     
@@ -70,6 +93,18 @@ class TemplateController {
         }
         
         render(text: templateInstance.content)
+        return
+    }
+    
+    def ajaxGetComment() {
+        def templateInstance = TemplateVersion.get(params.id)
+        
+        if (!templateInstance) {
+            this.renderRestResult(404, null, null, "Not Template exists for this id")
+            return
+        }
+        
+        render(text: templateInstance.comment)
         return
     }
 
@@ -161,7 +196,7 @@ class TemplateController {
         int imported = 0
         zipFile.entries().each {
             files++
-            Template template = new Template(name: it.name, template: zipFile.getInputStream(it).text, executionZone:executionZoneInstance)
+            Template template = new Template(name: it.name, template: zipFile.getInputStream(it).text, message: "Import", executionZone:executionZoneInstance)
             
             if(template.save(flush:true)){
                 imported++

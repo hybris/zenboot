@@ -17,3 +17,9 @@
     </div>
 </div>
 
+<div class="control-group fieldcontain ${hasErrors(bean: templateInstance, field: 'message', 'error')} ">
+	<label class="control-label" for="message"><g:message code="template.message.label" default="Commit Message" /></label>
+    <div class="controls">
+        <g:textArea name="message" value=""/>
+    </div>
+</div>
