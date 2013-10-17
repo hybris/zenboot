@@ -9,6 +9,7 @@ class Template implements Comparable {
     
     String name
     String template
+    String message
     Date dateCreated
     Date lastUpdated
     
@@ -17,7 +18,7 @@ class Template implements Comparable {
     static belongsTo = [executionZone: ExecutionZone]
     static hasMany = [templateVersions: TemplateVersion]
     
-    static transients = ['template','content']
+    static transients = ['message', 'template']
     
     static mapping = {
         templateVersions cascade: "all-delete-orphan"
@@ -28,11 +29,11 @@ class Template implements Comparable {
     }
     
     static constraints = {
-        name(blank: false)
         name validator: { val, obj ->
             def templateWithSameNameAndExecZone = Template.findByNameAndExecutionZone(val, obj.executionZone)
-            return !templateWithSameNameAndExecZone || templateWithSameNameAndExecZone == obj
-        }
+            return !templateWithSameNameAndExecZone || templateWithSameNameAndExecZone.id == obj.id
+        }, blank: false, nullable: false
+        message blank: false, nullable: false
     }
     
     String getTemplate(){
@@ -58,6 +59,11 @@ class Template implements Comparable {
     void setTemplate(String template){
         this.template = template;
     }
+    
+    void setMessage(String message){
+        this.message = message;
+    }
+    
         
     def afterUpdate(){
         saveTeamplateVersion()
@@ -69,7 +75,7 @@ class Template implements Comparable {
     
     def saveTeamplateVersion(){
         if(this.template){
-            addToTemplateVersions(new TemplateVersion(content: this.template))
+          addToTemplateVersions(new TemplateVersion(content: this.template, comment: this.message))
         }
         this.template = null
     }
@@ -77,6 +83,7 @@ class Template implements Comparable {
     
     def importFile(String file){
         template = new File(file).getText()
+        log.error(file)
         name = (file =~ /.*\//).replaceAll("")
     }
     
