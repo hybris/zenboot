@@ -35,7 +35,11 @@ class PropertiesRestController {
         def templateOutput
         try {
             templateOutput = new SimpleTemplateEngine().createTemplate(templateInstance?.template).make(binding)
-            response << templateOutput.toString()
+            
+            response.contentType = 'application/octet-stream'
+            response.setHeader 'Content-disposition', "attachment; filename=\"templateInstance?.name\""
+            response.outputStream << templateOutput.toString()
+            response.outputStream.flush()
 
         } catch (MissingPropertyException ex) {
             this.sendError(HttpStatus.BAD_REQUEST, ex.message)
