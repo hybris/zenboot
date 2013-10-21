@@ -14,6 +14,11 @@ class ProcessingEvent extends ApplicationEvent {
         this.user = user
         this.comment = comment
     }
+    
+    ProcessingEvent(ExecutionZoneAction action, Person user) {
+        super(action)
+        this.user = user
+    }
 
     ExecutionZoneAction getExecutionZoneAction() {
         return this.source
