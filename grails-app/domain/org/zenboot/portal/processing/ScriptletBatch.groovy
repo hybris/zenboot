@@ -2,7 +2,7 @@ package org.zenboot.portal.processing
 
 import org.apache.log4j.*
 import org.zenboot.portal.processing.Processable.ProcessState
-
+import org.zenboot.portal.security.Person
 
 class ScriptletBatch extends Processable {
 
@@ -10,7 +10,7 @@ class ScriptletBatch extends Processable {
 
     static hasMany = [processables: Processable]
 
-    static belongsTo = [executionZoneAction: ExecutionZoneAction]
+    static belongsTo = [executionZoneAction: ExecutionZoneAction, user:Person]
 
     static constraints = {
         processables(nullable:false)
