@@ -8,6 +8,7 @@ import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
+import org.zenboot.portal.security.Person
 
 class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
@@ -30,7 +31,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
                 map[param.name] = param.value
                 return map
             })
-            ScriptletBatch batch = this.buildScriptletBatch(action)
+            ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
 
             batch.execute(processContext)
             this.synchronizeExposedProcessingParameters(batch, processContext)
@@ -90,11 +91,11 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             " (${model.id}) denies parameter updates [Stored:${procParam.value} != New:${newValue}]")
     }
 
-    private ScriptletBatch buildScriptletBatch(ExecutionZoneAction action) {
+    private ScriptletBatch buildScriptletBatch(ExecutionZoneAction action, Person user, String comment) {
         if (this.log.debugEnabled) {
             this.log.debug("Build scriptlet batch for action ${action}")
         }
-        ScriptletBatch batch = new ScriptletBatch(description: "${action.executionZone.type}: ${action.scriptDir.name}", executionZoneAction:action)
+        ScriptletBatch batch = new ScriptletBatch(description: "${action.executionZone.type}: ${action.scriptDir.name}", executionZoneAction:action, user:user, comment:comment)
 
         PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(action.executionZone.type))
         File pluginFile = pluginResolver.resolveScriptletBatchPlugin(batch, action.runtimeAttributes)

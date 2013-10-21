@@ -36,6 +36,15 @@
 				</dd>
 			</g:if>
 			
+			<g:if test="${scriptletBatchInstance?.user.username}">
+				<dt>
+					<g:message code="scriptletBatch.user.label" default="Started by user" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${scriptletBatchInstance?.user}" field="username" />
+				</dd>
+			</g:if>
+			
 			<g:if test="${scriptletBatchInstance.getProcessTime() >= 0}">
 				<dt>
 					<g:message code="scriptletBatch.executiontime.label" default="Execution Time" />
@@ -72,6 +81,18 @@
 					<g:formatDate date="${scriptletBatchInstance?.endDate}" />
 				</dd>
 			</g:if>
+			
+			<g:if test="${scriptletBatchInstance?.comment}">
+			  <hr />
+			  <dt>
+			    <g:message code="scriptletBatch.comment.label" default="Execution comment" />
+			  </dt>
+			  <dd>
+			    <g:fieldValue bean="${scriptletBatchInstance}" field="comment" />
+			  </dd>
+			  
+			</g:if>
+			
 			
 			<g:if test="${scriptletBatchInstance?.executionZoneAction.executionZone}">
 				<hr />

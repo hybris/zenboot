@@ -27,7 +27,7 @@
 						<g:select name="template_versions" from="${templateInstance?.templateVersions}" disabled="disabled" class="input-xlarge" />
 					</span>
 				</div>
-				<g:textArea name="template" value="${templateInstance?.template}" style="height: 400px; width: 100%; white-space: nowrap; overflow: auto;" placeholder="${message(code: 'executionZone.template.label', default: 'Template')}" />
+				<g:textArea name="template" value="${templateInstance?.template}" style="height: 400px; width: 100%; overflow: auto;" placeholder="${message(code: 'executionZone.template.label', default: 'Template')}" />
 				<g:textArea name="message" value="${templateInstance?.message}" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;" placeholder="${message(code: 'executionZone.comment.label', default: 'Commit message')}" data-placeholder="${message(code: 'executionZone.comment.label', default: 'Commit message')}" />
 			</fieldset>
 
@@ -109,7 +109,7 @@ function CancelTemplate(){
 	$('.delete_template').attr("disabled", "disabled");
 	$("#template_versions").attr("disabled", "disabled");
 	$("#templateForm textarea#template").html("");
-	$("#templateForm textarea#message").html("");
+	$("#templateForm textarea#message").val("");
   placeholder = $("#templateForm textarea#message").attr("data-placeholder");	
   $("#templateForm select#template_versions").html("");
   $("#templateForm textarea#message").attr("placeholder", placeholder);	

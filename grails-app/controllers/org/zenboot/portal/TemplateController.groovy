@@ -196,10 +196,13 @@ class TemplateController {
         int imported = 0
         zipFile.entries().each {
             files++
-            Template template = new Template(name: it.name, template: zipFile.getInputStream(it).text, message: "Import", executionZone:executionZoneInstance)
-            
-            if(template.save(flush:true)){
-                imported++
+            if(!(it =~ /(\/\.)|(\/$)/)){
+              def name = (it.name =~ /.*\//).replaceAll("")
+              Template template = new Template(name: name, template: zipFile.getInputStream(it).text, message: "Import", executionZone:executionZoneInstance)
+              
+              if(template.save(flush:true)){
+                  imported++
+              }
             }
          }
         

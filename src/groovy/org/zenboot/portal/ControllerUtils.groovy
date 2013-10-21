@@ -11,7 +11,7 @@ class ControllerUtils {
         def descriptions = params[paramDescription]
         def exposed = params[paramExposed]
         def published = params[paramPublished]
-        if (keys && values && descriptions && exposed && published) {
+        if (keys && values && descriptions != null && exposed && published) {
             if (keys.class.isArray() && values.class.isArray() && descriptions.class.isArray() && exposed.class.isArray() && published.class.isArray()) {
                 if (keys.length == values.length && keys.length == descriptions.length && keys.length == exposed.length  && keys.length == published.length) {
                     keys.eachWithIndex { key, index ->

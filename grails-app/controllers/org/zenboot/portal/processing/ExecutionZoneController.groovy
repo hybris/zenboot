@@ -29,7 +29,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             return
         } else {
             ExecutionZoneAction action = cmd.getExecutionZoneAction()
-            this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
+            this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, params.comment))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
         redirect(action:"show", id:cmd.execId)
