@@ -198,6 +198,11 @@
 				 			
 				 			<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
 				 			
+				 			<hr />
+				 			<div class="row-fluid">
+  				 			<g:textArea name="comment" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;" placeholder="${message(code: 'executionZone.comment.label', default: 'Execution comment')}" />
+				 			</div>
+				 			
 				 			<fieldset class="spacer buttons">
 				 			
 				 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Zone')}" disabled="${!executionZoneInstance?.enabled}" />

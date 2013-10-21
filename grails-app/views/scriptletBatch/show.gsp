@@ -82,6 +82,18 @@
 				</dd>
 			</g:if>
 			
+			<g:if test="${scriptletBatchInstance?.comment}">
+			  <hr />
+			  <dt>
+			    <g:message code="scriptletBatch.comment.label" default="Execution comment" />
+			  </dt>
+			  <dd>
+			    <g:fieldValue bean="${scriptletBatchInstance}" field="comment" />
+			  </dd>
+			  
+			</g:if>
+			
+			
 			<g:if test="${scriptletBatchInstance?.executionZoneAction.executionZone}">
 				<hr />
 				<dt>

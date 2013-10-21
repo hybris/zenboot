@@ -7,10 +7,12 @@ class ProcessingEvent extends ApplicationEvent {
 
     boolean processAsync = true
     Person user
+    String comment
 
-    ProcessingEvent(ExecutionZoneAction action, Person user) {
+    ProcessingEvent(ExecutionZoneAction action, Person user, String comment) {
         super(action)
         this.user = user
+        this.comment = comment
     }
 
     ExecutionZoneAction getExecutionZoneAction() {
