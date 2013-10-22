@@ -24,7 +24,28 @@ class ScriptletBatchController {
         if (!params.order) {
             params.order = "desc"
         }
-        [scriptletBatchInstanceList: ScriptletBatch.list(params), scriptletBatchInstanceTotal: ScriptletBatch.count()]
+        
+        
+        def batchInstanceList
+        def batchInstanceCount
+        def parameters = [:]
+        if (params.execId) {
+          def executionZoneInstance = ExecutionZone.get(params.execId)
+          if (!executionZoneInstance) {
+              flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
+              redirect(action: "list")
+              return
+          }
+            parameters.execId = params.execId
+            batchInstanceList = ScriptletBatch.findAllByExecutionZoneActionInList(executionZoneInstance.actions, params)
+            batchInstanceCount = ScriptletBatch.findAllByExecutionZoneActionInList(executionZoneInstance.actions).size()
+        } else {
+            batchInstanceList = ScriptletBatch.list(params)
+            batchInstanceCount = ScriptletBatch.count()
+        }
+        
+        
+        [scriptletBatchInstanceList: batchInstanceList, scriptletBatchInstanceTotal: batchInstanceCount, parameters:parameters]
     }
     
     def ajaxList() {
