@@ -70,7 +70,7 @@ class ControllerUtils {
                 procParam.value = value
                 procParam.save()
             } else {
-                model.addProcessingParameter(new ProcessingParameter(name:key, value:value))
+                model.addProcessingParameter(new ProcessingParameter(name:key, value:value, comment:"Parameters added automatically by an execution zone action."))
             }
         }
     }

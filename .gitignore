@@ -14,4 +14,5 @@ zenboot-scripts/internal/scripts/sanity-restcheck/temp
 *.ipr
 *.iws
 .idea
-
+out/
+lib/
