@@ -45,7 +45,7 @@
 		</g:link>
 
 		<g:form method="post">
-			<g:hiddenField name="id" value="${exposedExecutionZoneActionInstance?.id}" />
+			<g:hiddenField name="execId" value="${exposedExecutionZoneActionInstance?.id}" />
 			<g:hiddenField name="version" value="${exposedExecutionZoneActionInstance?.version}" />
 			<fieldset class="form-horizontal">
 				<g:render template="form" />

@@ -59,7 +59,6 @@
 				<g:link class="btn btn-primary" action="edit" id="${executionZoneTypeInstance?.id}">
 					<g:message code="default.button.edit.label" default="Edit" />
 				</g:link>
-				<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 			</fieldset>
 		</g:form>
 	</div>

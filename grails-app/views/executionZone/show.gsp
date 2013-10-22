@@ -143,7 +143,9 @@
 							<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
 				
 							<fieldset class="spacer buttons">
-								<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" disabled="${!executionZoneInstance?.enabled}" />
+								<g:link controller="scriptletBatch" action="list" params="[execId : executionZoneInstance?.id]" class="btn">
+										<g:message code="executionZone.showExecutedActions.label" default="Log" />
+								</g:link>
 							</fieldset>
 						</g:form>
 					</div>
@@ -197,6 +199,11 @@
 							</div>
 				 			
 				 			<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
+				 			
+				 			<hr />
+				 			<div class="row-fluid">
+  				 			<g:textArea name="comment" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;" placeholder="${message(code: 'executionZone.comment.label', default: 'Execution comment')}" />
+				 			</div>
 				 			
 				 			<fieldset class="spacer buttons">
 				 			

@@ -57,7 +57,7 @@
 		</table>
 
 		<div class="pagination">
-			<g:paginate total="${scriptletBatchInstanceTotal}" />
+			<g:paginate controller="ScriptletBatch" action="list" total="${scriptletBatchInstanceTotal}" params="${parameters}"/>
 		</div>
 	</div>
 </body>

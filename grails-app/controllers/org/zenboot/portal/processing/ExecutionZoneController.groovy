@@ -29,7 +29,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             return
         } else {
             ExecutionZoneAction action = cmd.getExecutionZoneAction()
-            this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
+            this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, params.comment))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
         redirect(action:"show", id:cmd.execId)
@@ -198,9 +198,9 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
     }
 
     def delete() {
-        def executionZoneInstance = ExecutionZone.get(params.id)
+        def executionZoneInstance = ExecutionZone.get(params.execId)
         if (!executionZoneInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
             redirect(action: "list")
             return
         }
@@ -208,12 +208,12 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         try {
             executionZoneInstance.enabled = Boolean.FALSE
             executionZoneInstance.save(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.id])
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
             redirect(action: "list")
         }
         catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.id])
-            redirect(action: "show", id: params.id)
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
+            redirect(action: "show", id: params.execId)
         }
     }
     
