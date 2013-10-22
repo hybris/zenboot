@@ -151,6 +151,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
     def update = { UpdateExposedExecutionZoneActionCommand cmd ->
         cmd.setParameters(params.parameters)
+        cmd.params = params
         if (cmd.hasErrors()) {
             render(view:"edit", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.executionZoneAction])
             return
@@ -212,6 +213,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand {
 
     def grailsLinkGenerator
+    def params
 
     Long executionZone
     String url
@@ -261,7 +263,7 @@ class UpdateExposedExecutionZoneActionCommand extends SaveExposedExecutionZoneAc
 
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {
-        ExposedExecutionZoneAction exposedExcZnActn = ExposedExecutionZoneAction.get(this.execId)
+        ExposedExecutionZoneAction exposedExcZnActn = ExposedExecutionZoneAction.get(execId)
         exposedExcZnActn.url = this.url
         exposedExcZnActn.cronExpression = this.cronExpression
         //set params
