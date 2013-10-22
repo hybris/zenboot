@@ -5,7 +5,6 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class Template implements Comparable {
-    static auditable = true
     
     String name
     String template

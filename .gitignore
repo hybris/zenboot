@@ -9,3 +9,9 @@ stacktrace.log
 zenboot-scripts/internal/scripts/sanity-restcheck/temp
 .settings
 .project
+.classpath
+*.iml
+*.ipr
+*.iws
+.idea
+

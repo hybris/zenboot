@@ -251,13 +251,13 @@
 			</div>
 			<div class="accordion-group">
 				<div class="accordion-heading">
-					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#logData">
-        				<g:message code="executionZone.Logs.label" default="Logs" />
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#parameterLogData">
+        				<g:message code="executionZone.ParametersLogs.label" default="Parameters Change Logs" />
 		      		</a>
 				</div>
-				<div id="logData" class="accordion-body collapse">
+				<div id="parameterLogData" class="accordion-body collapse">
 					<div class="accordion-inner">
-						<g:render template="logDataView" model="[auditLogEvents:executionZoneInstance?.getAuditLogEvents(), parameters:executionZoneInstance.processingParameters]"></g:render>
+						<g:render template="parameterLogDataView" model="[auditLogEvents:executionZoneInstance?.getAuditLogEvents()]"></g:render>
 				 	</div>
 				</div>
 			</div>

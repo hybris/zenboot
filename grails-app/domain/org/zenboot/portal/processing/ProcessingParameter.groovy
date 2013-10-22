@@ -2,27 +2,34 @@ package org.zenboot.portal.processing
 
 class ProcessingParameter {
 
-    static auditable = true
-    
     String name
     String value
     String description
+    String comment
     Boolean published = Boolean.FALSE
     Boolean exposed = Boolean.FALSE
+    Date dateCreated
+    Date lastUpdated
+
+    static hasMany = [processingParameterLogs: ProcessingParameterLog]
+
+    static transients = ['comment']
 
     static constraints = {
         name nullable:false
         value nullable:false
-        
         published nullable:false
         exposed nullable:false
+        comment blank: false, nullable: false
     }
 
     static mapping = {
         name type: 'text'
         value type: 'text'
         description type: 'text'
+        comment type: 'text'
         cache false
+        processingParameterLogs cascade: "all-delete-orphan"
     }
 
     @Override
@@ -53,5 +60,31 @@ class ProcessingParameter {
             return false
         }
         return true
+    }
+
+    void setComment(String comment){
+        this.comment = comment;
+    }
+
+    def addParameterLogs() {
+        if (this.comment != null) {
+            addToProcessingParameterLogs(new ProcessingParameterLog(name: this.name, description: this.description, value: this.value, comment: this.comment))
+            this.comment = null
+        }
+    }
+
+    def beforeUpdate() {
+        // if nothing changes, do not log update
+        if(!this.isDirty()) {
+            this.comment = null
+        }
+    }
+
+    def afterInsert(){
+        addParameterLogs()
+    }
+
+    def afterUpdate(){
+        addParameterLogs()
     }
 }

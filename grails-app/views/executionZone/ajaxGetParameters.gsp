@@ -29,9 +29,6 @@
 					<span title="Remove parameter" class="btn btn-mini remove-parameter-button">
 						<i class="icon-minus-sign"></i>
 					</span>
-					<span title="Add parameter" class="btn btn-mini add-exec-parameter-button">
-						<i class="icon-plus-sign"></i>
-					</span>
 					<span title="Show details" class="btn btn-mini details-parameter-button">
 						<i class="icon-question-sign"></i>
 					</span>

@@ -88,13 +88,3 @@
 		<g:render template="showParameters" model="[parameters:executionZoneInstance.processingParameters]" />
 	</div>
 </div>
-
-<div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'processingParameters', 'error')} ">
-	<label class="control-label" for="parameters">
-		<g:message code="executionZone.comment.label" default="Comment" />
-	</label>
-	<div class="controls">
-		<g:textArea name="comment" value="" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;" />
-	</div>
-</div>
-       

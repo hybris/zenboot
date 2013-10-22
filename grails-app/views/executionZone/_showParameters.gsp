@@ -33,20 +33,17 @@
 					<span title="Remove parameter" class="btn btn-mini remove-parameter-button">
 						<i class="icon-minus-sign"></i>
 					</span>
-					<span title="Add parameter" class="btn btn-mini add-parameter-button">
-						<i class="icon-plus-sign"></i>
-					</span>
 				</td>
 			</tr>
 		</g:each>
 	</tbody>
 </table>
 
-<span title="Add parameter" class="btn btn-mini add-parameter-button">
-	<i class="icon-plus-sign"></i>
-</span>
-
 <div class="spacer">
+    <span title="Add parameter" class="btn btn-mini add-parameter-button">
+        <i class="icon-plus-sign"></i>
+    </span>
+
 	<span title="Export parameter" class="btn btn-mini export-button">
 		<i class="icon-share"></i>
 	</span>
@@ -105,6 +102,11 @@
 			</a>
 		</div>
 	</div>
+</div>
+
+<hr />
+<div class="row-fluid">
+    <g:textArea name="parameters.comments" value="" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;"  placeholder="${message(code: 'processingParameter.changeComment.label', default: 'Parameter Changes Comment')}" />
 </div>
 
 
