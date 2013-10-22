@@ -2,6 +2,7 @@ package org.zenboot.portal.processing.converter
 
 import grails.test.mixin.*
 import grails.test.mixin.support.GrailsUnitTestMixin
+import org.junit.Test
 
 import javax.mail.internet.InternetAddress
 
