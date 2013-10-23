@@ -20,7 +20,6 @@ class ProcessingParameter {
         value nullable:false
         published nullable:false
         exposed nullable:false
-        comment blank: false, nullable: false
     }
 
     static mapping = {
