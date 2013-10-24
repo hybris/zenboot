@@ -219,8 +219,8 @@
 			<div class="accordion-group">
 				<div class="accordion-heading">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#editExecZone">
-        		<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
-      		</a>
+        				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
+      				</a>
 				</div>
 				 <div id="editExecZone" class="accordion-body collapse">
 				 	<div class="accordion-inner">
@@ -240,14 +240,26 @@
 			<div class="accordion-group">
 				<div class="accordion-heading">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#manageTemplates">
-        		<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
-      		</a>
+        				<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
+		      		</a>
 				</div>
 				 <div id="manageTemplates" class="accordion-body collapse">
 				 	<div class="accordion-inner">
 						<g:render template="templateView"></g:render>
 				 	</div>
 				 </div>
+			</div>
+			<div class="accordion-group">
+				<div class="accordion-heading">
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#parameterLogData">
+        				<g:message code="executionZone.ParametersLogs.label" default="Parameters Change Logs" />
+		      		</a>
+				</div>
+				<div id="parameterLogData" class="accordion-body collapse">
+					<div class="accordion-inner">
+						<g:render template="parameterLogDataView" model="[auditLogEvents:executionZoneInstance?.getAuditLogEvents()]"></g:render>
+				 	</div>
+				</div>
 			</div>
 		</div>
 	</div>

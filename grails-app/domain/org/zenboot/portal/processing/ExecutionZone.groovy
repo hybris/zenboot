@@ -1,10 +1,8 @@
 package org.zenboot.portal.processing
 
-
 import org.zenboot.portal.Template;
 
 class ExecutionZone {
-    static auditable = true
     
     Date creationDate
     ExecutionZoneType type
@@ -22,6 +20,19 @@ class ExecutionZone {
 
     static constraints = {
         type nullable:false
+
+        processingParameters validator: { val, obj ->
+            val.each {ProcessingParameter pParam ->
+                // if (pParam.id) { // only check updated parameters???
+                    if(! pParam.validate()) {
+                        pParam.errors.allErrors.each { error ->
+                            obj.errors.rejectValue('processingParameters', error.getCode(), error.getArguments(), error.getDefaultMessage())
+                        }
+                    }
+                // }
+            }
+            return true
+        }
     }
 
     static mapping = {
@@ -52,10 +63,15 @@ class ExecutionZone {
             existingParam.published = param.published
             existingParam.description = param.description
             existingParam.exposed = param.exposed
+            existingParam.comment = param.comment
             existingParam.save()
         } else {
             this.processingParameters << param
         }
+    }
+
+    List getAuditLogEvents() {
+        return ProcessingParameterLog.findAllByProcessingParameterInList(this.processingParameters, [sort: "dateCreated", order: "desc"])
     }
 
 }

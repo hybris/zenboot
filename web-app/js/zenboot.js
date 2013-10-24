@@ -48,7 +48,6 @@ zenboot.addParameter = function(key, value, description) {
 		+ '</td>'
 		+ '<td>'
 		+ '<span title="Remove parameter" onclick="zenboot.removeParameter.call(this)" class="btn btn-mini"><i class="icon-minus-sign"></i></span>&nbsp;'
-		+ '<span title="Add parameter" onclick="zenboot.addParameter.call(this)" class="btn btn-mini"><i class="icon-plus-sign"></i></span>'
 		+ '</td>'
 		+ '</tr>'
 	);
@@ -83,7 +82,6 @@ zenboot.addProcessingParameter = function(key, value, description) {
 		+ '</td>'
 		+ '<td>'
 		+ '<span title="Remove parameter" onclick="zenboot.removeParameter.call(this)" class="btn btn-mini"><i class="icon-minus-sign"></i></span>&nbsp;'
-		+ '<span title="Add parameter" onclick="zenboot.addProcessingParameter.call(this)" class="btn btn-mini"><i class="icon-plus-sign"></i></span>'
 		+ '</td>'
 		+ '</tr>'
 	);

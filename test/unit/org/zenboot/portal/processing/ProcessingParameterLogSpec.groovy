@@ -1,4 +1,4 @@
-package org.zenboot.portal
+package org.zenboot.portal.processing
 
 
 
@@ -8,10 +8,10 @@ import org.junit.*
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
-@TestFor(TemplateVersion)
-class TemplateVersionSpec {
+@TestFor(ProcessingParameterLog)
+class ProcessingParameterLogSpec {
 
     void testSomething() {
-       fail "Implement me"
+        fail "Implement me"
     }
 }

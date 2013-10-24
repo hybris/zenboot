@@ -12,6 +12,6 @@ class ProcessContext {
 
     @Override
     String toString() {
-        return "${this.class.getSimpleName()} (host=${this.host}/params=${this.parameters})"
+        return "${this.class.getSimpleName()} (host=${this.host}/params=${this.parameters}/users=${this.user.username})"
     }
 }

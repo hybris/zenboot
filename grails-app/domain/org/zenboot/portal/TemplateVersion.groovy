@@ -1,7 +1,6 @@
 package org.zenboot.portal
 
 class TemplateVersion implements Comparable {
-    static auditable = true
     
     String content
     String user
