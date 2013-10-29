@@ -48,15 +48,37 @@
 </div>
 
 	<div id="template-import" class="modal hide fade">
-		<g:uploadForm action="upload" controller="Template">
+		<g:uploadForm action="upload" controller="Template" class="form-horizontal">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 				<h3><g:message code="executionZone.import.templates.label" default="Import Templates" /></h3>
 			</div>
 			<div class="modal-body">
 				<g:hiddenField name="execId" value="${executionZoneInstance?.id}"  />
-				<g:message code="executionZone.import.templates.label" default="Import Templates" />: <br />
-		    <input type="file" name="importFile" />
+        <div class="control-group fieldcontain">
+          <label class="control-label" for="importFile">
+            <g:message code="executionZone.import.templates.label" default="Import templates" />
+          </label>
+          <div class="controls">
+            <input type="file" name="importFile" />
+          </div>
+        </div>
+        <div class="control-group fieldcontain">
+          <label class="control-label" for="importMessage">
+            <g:message code="executionZone.importMessage.templates.label" default="Commit message" />
+          </label>
+          <div class="controls">
+            <g:textArea name="commitMessage" value="${message(code: 'executionZone.importComment.label', default: 'Import')}" />
+          </div>
+        </div>
+        <div class="control-group fieldcontain">
+          <label class="control-label" for="updateTemplates">
+            <g:message code="executionZone.importUpdate.templates.label" default="Update existing templates" />
+          </label>
+          <div class="controls">
+            <g:checkBox name="updateTemplates" value="${false}" />
+          </div>
+        </div>
 			</div>
 			<div class="modal-footer">
 				<a class="btn modal-close-button" data-dismiss="modal">

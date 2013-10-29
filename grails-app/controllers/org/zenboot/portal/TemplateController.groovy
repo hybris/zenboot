@@ -198,7 +198,14 @@ class TemplateController {
             files++
             if(!(it =~ /(\/\.)|(\/$)/)){
               def name = (it.name =~ /.*\//).replaceAll("")
-              Template template = new Template(name: name, template: zipFile.getInputStream(it).text, message: "Import", executionZone:executionZoneInstance)
+              Template template = Template.findByName(name) 
+              if(template && params.updateTemplates) {
+                template.template = zipFile.getInputStream(it).text
+                template.message = params.commitMessage
+                template.version++ // Workaround to force a object save. 
+              }else{
+                template = new Template(name: name, template: zipFile.getInputStream(it).text, message: params.commitMessage, executionZone:executionZoneInstance)
+              }
               
               if(template.save(flush:true)){
                   imported++
