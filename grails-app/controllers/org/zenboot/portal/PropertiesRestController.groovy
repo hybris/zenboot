@@ -34,7 +34,7 @@ class PropertiesRestController {
         
         def templateOutput
         try {
-            templateOutput = new SimpleTemplateEngine().createTemplate(templateInstance?.template).make(binding)
+            templateOutput = new SimpleTemplateEngine().createTemplate(templateInstance?.template).make(binding.withDefault{''})
             
             response.contentType = 'application/octet-stream'
             response.setHeader 'Content-disposition', "attachment; filename=\"templateInstance?.name\""
