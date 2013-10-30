@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
+import org.springframework.http.HttpStatus
 
 
 import org.springframework.dao.DataIntegrityViolationException
@@ -15,35 +16,36 @@ class TemplateController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST", upload: "POST"]
 
-    def index() {
-        redirect(action: "list", params: params)
-    }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [templateInstanceList: Template.list(params), templateInstanceTotal: Template.count()]
+      render (contentType:"text/json"){
+         templates: array{
+            Template.findAll().each {
+                template(id:it.id, 
+                name:it.name)
+            }
+         }
+      }
     }
 
-    def create() {
-        [templateInstance: new Template(params)]
-    }
 
     def save() {
+        
         def templateInstance = new Template(params)
         if (!templateInstance.save(flush:true)) {
-            render(view: "create", model: [templateInstance: templateInstance])
+            this.sendError(HttpStatus.BAD_REQUEST, "Can't save template! Please add a commit message and check if the name is unique.")
             return
         }
 
-		flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
+		    flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
+        redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
     }
     
     def ajaxGetTemplateParameters() {
         def templateInstance = Template.get(params.id)
-        
+
         if (!templateInstance) {
-            this.renderRestResult(404, null, null, "Not Template exists for this id")
+            this.sendError(HttpStatus.NOT_FOUND, "Not Template exists for this id")
             return
         }
         render (contentType:"text/json"){
@@ -60,7 +62,8 @@ class TemplateController {
                         }
                     },
                     dateCreated:templateInstance.dateCreated, 
-                    updateUrl:createLink(action:'update', id:templateInstance.id)
+                    updateUrl:createLink(action:'update', id:templateInstance.id),
+                    message: flash.message
         }
         return
     }
@@ -69,7 +72,7 @@ class TemplateController {
         def templateInstance = TemplateVersion.get(params.id)
         
         if (!templateInstance) {
-            this.renderRestResult(404, null, null, "Not Version exists for this id")
+            this.sendError(HttpStatus.NOT_FOUND, "No Version exists for this id")
             return
         }
         
@@ -88,7 +91,7 @@ class TemplateController {
         def templateInstance = TemplateVersion.get(params.id)
         
         if (!templateInstance) {
-            this.renderRestResult(404, null, null, "Not Template exists for this id")
+            this.sendError(HttpStatus.NOT_FOUND, "No Template exists for this id")
             return
         }
         
@@ -100,7 +103,7 @@ class TemplateController {
         def templateInstance = TemplateVersion.get(params.id)
         
         if (!templateInstance) {
-            this.renderRestResult(404, null, null, "Not Template exists for this id")
+            this.sendError(HttpStatus.NOT_FOUND, "No Template exists for this id")
             return
         }
         
@@ -108,63 +111,34 @@ class TemplateController {
         return
     }
 
-    def show() {
-        def templateInstance = Template.get(params.id)
-        if (!templateInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(action: "list")
-            return
-        }
 
-        [templateInstance: templateInstance]
-    }
 
-    def edit() {
-        def templateInstance = Template.get(params.id)
-        if (!templateInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(action: "list")
-            return
-        }
 
-        [templateInstance: templateInstance]
-    }
 
     def update() {
+        flash.action = 'template'
         def templateInstance = Template.get(params.id)
-        
         if (!templateInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
+            this.sendError(HttpStatus.NOT_FOUND, "No Template exists for this id")
             return
-        }
-
-        if (params.version) {
-            def version = params.version.toLong()
-            if (templateInstance.version > version) {
-                templateInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'template.label', default: 'Template')] as Object[],
-                          "Another user has updated this Template while you were editing")
-                render(view: "edit", model: [templateInstance: templateInstance])
-                return
-            }
         }
         
         templateInstance.version++ // Workaround to force a object save. 
         
         templateInstance.properties = params
         if (!templateInstance.save(flush: true)) {
-            render(view: "edit", model: [templateInstance: templateInstance])
+            this.sendError(HttpStatus.BAD_REQUEST, "Can't save template! Please add a commit message and check if the name is unique.")
             return
         }
         
         
         
-		flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(controller: "executionZone", action: "show", id: templateInstance.executionZone.id)
+		    flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
+        redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
     }
     
     def upload() {
+        flash.action = 'template'
         def executionZoneInstance = ExecutionZone.get(params.execId)
         
         if (!executionZoneInstance) {
@@ -270,21 +244,29 @@ class TemplateController {
     }
 
     def delete() {
+      flash.action = 'template'
         def templateInstance = Template.get(params.id)
         if (!templateInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(controller: "executionZone", action: "index")
+            this.sendError(HttpStatus.NOT_FOUND, "No Template exists for this id")
             return
         }
 
         try {
             templateInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(controller: "executionZone", action: "show", id:templateInstance.executionZone.id)
+            this.sendError(HttpStatus.OK, "Template deleted.")
+            return
         }
         catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'template.label', default: 'Template'), params.id])
-            redirect(controller: "executionZone", action: "show", id:templateInstance.executionZone.id)
+            this.sendError(HttpStatus.BAD_REQUEST, "Can't delete template.")
+            return
         }
+    }
+    
+    private sendError(HttpStatus httpStatus, String errorMessage="") {
+        response.setStatus(httpStatus.value())
+        if (errorMessage) {
+            response << errorMessage
+        }
+        response.flushBuffer()
     }
 }

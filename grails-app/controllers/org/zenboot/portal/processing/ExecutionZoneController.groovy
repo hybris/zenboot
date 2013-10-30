@@ -23,6 +23,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
     
     def execute = { ExecuteExecutionZoneCommand cmd ->
+        flash.action = 'execute'
         cmd.setParameters(params.parameters)
         if (cmd.hasErrors()) {
             chain(action:"show", id:cmd.execId, model:[cmd:cmd])
@@ -32,6 +33,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, params.comment))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
+        
         redirect(action:"show", id:cmd.execId)
     }
 
@@ -137,6 +139,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             return
         }
 
+
         flash.message = message(code: 'default.created.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
     }
@@ -161,7 +164,6 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             redirect(action: "list")
             return
         }
-
         [executionZoneInstance: executionZoneInstance,, executionZoneTypes:ExecutionZoneType.list()]
     }
 
@@ -179,7 +181,8 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
                 executionZoneInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
                 [message(code: 'executionZone.label', default: 'ExecutionZone')] as Object[],
                 "Another user has updated this ExecutionZone while you were editing")
-                render(view: "edit", model: [executionZoneInstance: executionZoneInstance])
+                flash.action = 'update'
+                render(view: "show", model: [executionZoneInstance: executionZoneInstance])
                 return
             }
         }
@@ -189,10 +192,12 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         ControllerUtils.synchronizeProcessingParameters(ControllerUtils.getProcessingParameters(params), executionZoneInstance)
 
         if (!executionZoneInstance.save(flush: true)) {
-            render(view: "edit", model: [executionZoneInstance: executionZoneInstance])
+            flash.action = 'update'
+            render(view: "show", model: [executionZoneInstance: executionZoneInstance])
             return
         }
-
+        
+        flash.action = 'update'
         flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
     }
