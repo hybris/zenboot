@@ -1,4 +1,6 @@
+<div id="template_messages">
 
+</div>
 <div class="row-fluid">
 	<div class="span3">
 		<g:select name="executionZone_templates" from="${executionZoneInstance?.templates}" optionKey="id" optionValue="name" size="3" style="height: 620px"/>
@@ -32,7 +34,7 @@
 			</fieldset>
 
 			<fieldset class="buttons spacer pull-right">
-				<a id="cancelbtn" class="btn btn-success" onclick="CancelTemplate()" disabled="disabled">
+				<a id="cancelbtn" class="btn btn-success" onclick="zenboot.templateCancel('${createLink(controller:'template', action: 'save')}')" disabled="disabled">
 					<g:message code="default.button.cancel.label" default="Cancel" />
 				</a>
 							
@@ -91,7 +93,7 @@
 	</div>
 	
 		<div id="template-remove" class="modal hide fade">
-		<g:form action="delete" controller="Template">
+		<g:form name="templateRemoveForm" action="delete" controller="Template">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 				<h3><g:message code="default.button.delete.confirm.message" default="Are you sure?" /></h3>
@@ -124,19 +126,16 @@ $('.delete_template').click(function() {
     $('#template-remove').modal('toggle')
 });
 
-function CancelTemplate(){
-  $('#templateParametersSpinner').hide();      	
-  $('#templateForm').attr("action", "${createLink(controller:"template", action: 'save')}");
-	$("#templateForm input#name").val("");
-	$('.delete_template').attr("disabled", "disabled");
-	$("#template_versions").attr("disabled", "disabled");
-	$("#templateForm textarea#template").html("");
-	$("#templateForm textarea#message").val("");
-  placeholder = $("#templateForm textarea#message").attr("data-placeholder");	
-  $("#templateForm select#template_versions").html("");
-  $("#templateForm textarea#message").attr("placeholder", placeholder);	
-	$("#templateForm :submit").attr("name", "save");
-	$("#templateForm a#cancelbtn").attr("disabled", "disabled");
-	$("#executionZone_templates option:selected").removeAttr("selected");
-}
+$('#templateForm').submit(function(event){
+  zenboot.templateSave('<g:createLink controller="template" action="list" />');
+  event.preventDefault();
+});
+
+$('#templateRemoveForm').submit(function(event){
+  zenboot.templateRemove('<g:createLink controller="template" action="list" />' );
+  zenboot.templateCancel('<g:createLink controller="template" action="save" />');
+  $('#template-remove').modal('toggle')
+  event.preventDefault();
+});
+
 </g:javascript>

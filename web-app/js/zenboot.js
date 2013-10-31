@@ -1,5 +1,6 @@
 zenboot = {}
 
+
 zenboot.refreshInterval = null
 
 zenboot.startProcessQueue = function(url, refreshRate) {
@@ -237,8 +238,8 @@ zenboot.loadTemplate = function(url) {
         },
         success: function(data) {
         	$('#templateParametersSpinner').hide();
-        	zenboot.loadTextAreaContent(data.version.url, $('textarea#template'))
-        	zenboot.loadPlaceholderContent(data.version.commentUrl, $('textarea#message'))
+        	zenboot.loadTextAreaContent(data.version.url, $('textarea#template'));
+        	zenboot.loadPlaceholderContent(data.version.commentUrl, $('textarea#message'));
         	$('#templateForm :input').removeAttr('disabled');
         },
         error: function(jqHXR, status, error) {
@@ -257,7 +258,7 @@ zenboot.loadTextAreaContent = function(url, textArea) {
         },
         success: function(data) {
         	$('#templateParametersSpinner').hide();
-        	textArea.html(data);
+        	textArea.val(data);
         	$('#templateForm :input').removeAttr('disabled');
         },
         error: function(jqHXR, status, error) {
@@ -276,6 +277,7 @@ zenboot.loadPlaceholderContent = function(url, textArea) {
         },
         success: function(data) {
         	$('#templateParametersSpinner').hide();
+        	textArea.val("");
         	textArea.attr('placeholder',data);
         	$('#templateForm :input').removeAttr('disabled');
         },
@@ -284,6 +286,112 @@ zenboot.loadPlaceholderContent = function(url, textArea) {
 	        $('#templateForm :input').removeAttr('disabled');
         }
     });
+}
+
+zenboot.templateCancel = function(link) {
+  $('#templateParametersSpinner').hide();      	
+  $('#templateForm').attr("action", link);
+	$("#templateForm input#name").val("");
+	$('.delete_template').attr("disabled", "disabled");
+	$("#template_versions").attr("disabled", "disabled");
+	$("#templateForm textarea#template").val("");
+	$("#templateForm textarea#message").val("");
+  placeholder = $("#templateForm textarea#message").attr("data-placeholder");	
+  $("#templateForm select#template_versions").html("");
+  $("#templateForm textarea#message").attr("placeholder", placeholder);	
+	$("#templateForm :submit").attr("name", "save");
+	$("#templateForm a#cancelbtn").attr("disabled", "disabled");
+	$("#executionZone_templates option:selected").removeAttr("selected");
+}
+
+zenboot.templateSave = function(url){
+    $.ajax({
+        url : $('#templateForm').attr("action"),
+        data : $('#templateForm').serialize(),
+        dataType: "json",
+        type: "POST",
+        beforeSend : function() {
+        	$('#templateParametersSpinner').fadeIn('fast');
+        	$("#templateForm :input").attr("disabled", "disabled");
+        },
+        success: function(data) {
+        	$('#templateParametersSpinner').hide();
+        	$('input#name').val(data.template.name);
+        	$('#templateForm').attr("action", data.template.updateUrl);
+        	$("#templateForm :submit").attr("name", "_action_update")
+        	$("#template_versions").html("");
+        	
+        	$.each(data.template.versions.reverse(), function(index, version){
+        		$("#template_versions").append($("<option>").val(version.url).html(version.create + " (" + version.user + ")"));
+        	});
+        	
+        	$('.delete_template').removeAttr('disabled');
+        	$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
+        	
+        	zenboot.loadTemplate(data.template.url);
+        	
+        	$('#templateForm :input').removeAttr('disabled');
+        	$("#templateForm a#cancelbtn").removeAttr('disabled');
+        	$("#template_messages").html("<div class='alert alert-info'>" + data.template.message + "</div>")
+        	zenboot.loadTemplateList(url);
+        },
+        error: function(jqHXR, status, error) {
+	        $('#templateParametersSpinner').hide();
+	        $('#templateForm :input').removeAttr('disabled');
+        	$("#template_messages").html("<div class='alert alert-error'>" + jqHXR.responseText + "</div>")
+        }
+    });	
+}
+
+zenboot.templateRemove = function(url){
+    $.ajax({
+        url : $('#templateRemoveForm').attr("action"),
+        data : $('#templateRemoveForm').serialize(),
+        type: "POST",
+        beforeSend : function() {
+        	$('#templateParametersSpinner').fadeIn('fast');
+        	$("#templateForm :input").attr("disabled", "disabled");
+        },
+        success: function(data) {
+        	$('#templateParametersSpinner').hide();
+
+        	$('#templateForm :input').removeAttr('disabled');
+        	$("#template_messages").html("<div class='alert alert-info'>" + data + "</div>")
+        	zenboot.loadTemplateList(url);
+        },
+        error: function(jqHXR, status, error) {
+
+	        $('#templateParametersSpinner').hide();
+	        $('#templateForm :input').removeAttr('disabled');
+        	$("#template_messages").html("<div class='alert alert-error'>" + jqHXR.responseText + "</div>")
+        }
+    });	
+}
+
+zenboot.loadTemplateList = function(url){
+    $.ajax({
+      url : url,
+      dataType: "json",
+      beforeSend : function() {
+      	$('#templateParametersSpinner').fadeIn('fast');
+      	$("#executionZone_templates").attr("disabled", "disabled");
+      },
+      success: function(data) {
+      	$('#templateParametersSpinner').hide();
+      	$("#executionZone_templates").html("");
+      	$.each(data, function(index, template){
+      		$("#executionZone_templates").append($("<option>").val(template.id).html(template.name));
+      	});
+      	
+      	$("#executionZone_templates").removeAttr('disabled');
+
+      },
+      error: function(jqHXR, status, error) {
+        alert("ERROR");
+        $('#templateParametersSpinner').hide();
+        $('#templateForm :input').removeAttr('disabled');
+      }
+    });	
 }
 
 $(document).ready(function() {
