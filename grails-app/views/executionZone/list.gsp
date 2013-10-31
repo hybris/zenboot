@@ -19,7 +19,21 @@
 				${flash.message}
 			</div>
 		</g:if>
-
+    
+    
+    <div class="row-fluid">
+      <g:if test="${!params.disabled}">
+        <g:link action="list" params="[disabled: 'show']" class="btn btn-submit pull-right">
+          <g:message code="executionZone.show.disabled" default="Show disabled" />
+        </g:link>
+      </g:if>
+      <g:else>
+        <g:link action="list" class="btn btn-submit pull-right">
+          <g:message code="executionZone.show.enabled" default="Show enabled" />
+        </g:link>
+      </g:else>
+    </div>
+    
 		<table class="table table-striped">
 			<thead>
 				<tr>

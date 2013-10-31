@@ -119,9 +119,14 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         if (!params.order) {
             params.order = "desc"
         }
+        def enabled = false
+        if (!params.disabled) {
+            enabled = true
+        }
+        
         [
-            executionZoneInstanceList: ExecutionZone.list(params),
-            executionZoneInstanceTotal: ExecutionZone.count(),
+            executionZoneInstanceList: ExecutionZone.findAllByEnabled(enabled, params),
+            executionZoneInstanceTotal: ExecutionZone.countByEnabled(enabled),
             executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list()
         ]
     }
