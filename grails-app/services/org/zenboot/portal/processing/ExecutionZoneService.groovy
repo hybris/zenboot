@@ -8,7 +8,9 @@ import org.zenboot.portal.processing.meta.ParameterMetadataList
 
 class ExecutionZoneService {
 
-    static final String ZENBOOT_SCRIPTS_DIR = 'zenboot-scripts'
+    
+    
+    
     static final String SCRIPTS_DIR = 'scripts'
     static final String JOBS_DIR = 'jobs'
     static final String PLUGINS_DIR = 'plugins'
@@ -110,7 +112,8 @@ class ExecutionZoneService {
     }
 
     File getZenbootScriptsDir() {
-        File scriptDir = new File(PathResolver.getAbosolutePath(ZENBOOT_SCRIPTS_DIR))
+        log.error("TEST: " + grailsApplication.config.zenboot.processing.scriptDir)
+        File scriptDir = new File(PathResolver.getAbosolutePath(grailsApplication.config.zenboot.processing.scriptDir))
         if (!scriptDir.exists() || !scriptDir.isDirectory()) {
             throw new ExecutionZoneException("Could not find script directory ${scriptDir}")
         }

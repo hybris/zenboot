@@ -2,7 +2,7 @@ package org.zenboot.portal.processing
 
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
-import org.zenboot.portal.PathResolver
+
 
 class CronjobService implements ApplicationEventPublisherAware {
 

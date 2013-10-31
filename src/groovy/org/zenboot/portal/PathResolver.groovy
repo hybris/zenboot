@@ -8,7 +8,7 @@ class PathResolver {
 
     static String getAbosolutePath(String path) {
         if (path.startsWith('/')) {
-            path = path.substring(1)
+            return path
         }
         if (Environment.current == Environment.PRODUCTION) {
             return "${new File(ServletContextHolder.servletContext.getRealPath('/'))}${System.getProperty('file.separator')}${path}"
