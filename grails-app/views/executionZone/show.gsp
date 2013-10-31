@@ -47,7 +47,7 @@
         		<g:message code="default.show.label" args="[entityName]" />
       		</a>
     		</div>
-    		<div id="showZone" class="accordion-body collapse in">
+    		<div id="showZone" class="accordion-body collapse ${!flash.action ? 'in' : ''}">
     			<div class="accordion-inner">
 						<g:form method="post">
 							<dl class="dl-horizontal">
@@ -157,7 +157,7 @@
         		<g:message code="executionZone.execAction.label" default="Execute Script" />
       		</a>
 				</div>
-				 <div id="execScript" class="accordion-body collapse">
+				 <div id="execScript" class="accordion-body collapse ${flash.action == 'execute' ? 'in' : ''}">
 				 	<div id="scriptDirs" class="accordion-inner">
 				 		<g:form method="post">
 				 			
@@ -222,7 +222,7 @@
         				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
       				</a>
 				</div>
-				 <div id="editExecZone" class="accordion-body collapse">
+				 <div id="editExecZone" class="accordion-body collapse ${flash.action == 'update' ? 'in' : ''}">
 				 	<div class="accordion-inner">
 						<g:form method="post">
 							<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
@@ -243,7 +243,7 @@
         				<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
 		      		</a>
 				</div>
-				 <div id="manageTemplates" class="accordion-body collapse">
+				 <div id="manageTemplates" class="accordion-body collapse ${flash.action == 'template' ? 'in' : ''}">
 				 	<div class="accordion-inner">
 						<g:render template="templateView"></g:render>
 				 	</div>
