@@ -112,7 +112,6 @@ class ExecutionZoneService {
     }
 
     File getZenbootScriptsDir() {
-        log.error("TEST: " + grailsApplication.config.zenboot.processing.scriptDir)
         File scriptDir = new File(PathResolver.getAbosolutePath(grailsApplication.config.zenboot.processing.scriptDir))
         if (!scriptDir.exists() || !scriptDir.isDirectory()) {
             throw new ExecutionZoneException("Could not find script directory ${scriptDir}")
