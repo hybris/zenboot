@@ -341,7 +341,12 @@ zenboot.templateSave = function(url){
         	
         	$('#templateForm :input').removeAttr('disabled');
         	$("#templateForm a#cancelbtn").removeAttr('disabled');
-        	$("#template_messages").html("<div class='alert alert-info'>" + data.template.message + "</div>")
+
+            $("#template_messages").html("<div class='alert alert-info'>" + data.template.message + "</div>")
+            if ( "warning" in data.template  && data.template.warning != null && data.template.warning.length > 0){
+                $("#template_messages").append("<div class='alert alert-error'>" + data.template.warning + "</div>")
+            }
+
         	zenboot.loadTemplateList(url);
         },
         error: function(jqHXR, status, error) {

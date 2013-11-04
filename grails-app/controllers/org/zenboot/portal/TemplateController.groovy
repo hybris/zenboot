@@ -1,5 +1,7 @@
 package org.zenboot.portal
 
+import groovy.text.SimpleTemplateEngine
+
 import java.nio.charset.Charset;
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -37,7 +39,13 @@ class TemplateController {
             return
         }
 
-		    flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
+        // test template for non existing parameters?
+        def missingParameters = getTemplateMissingParameters(templateInstance)
+        if ( missingParameters.size() ) {
+            flash.warning = "Warning, missing parameters: " + missingParameters.join(", ")
+        }
+
+        flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
         redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
     }
     
@@ -64,7 +72,8 @@ class TemplateController {
                     },
                     dateCreated:templateInstance.dateCreated, 
                     updateUrl:createLink(action:'update', id:templateInstance.id),
-                    message: flash.message
+                    message: flash.message,
+                    warning: flash?.warning
         }
         return
     }
@@ -131,10 +140,14 @@ class TemplateController {
             this.sendError(HttpStatus.BAD_REQUEST, "Can't save template! Please add a commit message and check if the name is unique.")
             return
         }
-        
-        
-        
-		    flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
+
+        // test template for non existing parameters?
+        def missingParameters = getTemplateMissingParameters(templateInstance)
+        if ( missingParameters.size() ) {
+            flash.warning = "Warning, missing parameters: " + missingParameters.join(", ")
+        }
+
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
         redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
     }
     
@@ -262,7 +275,20 @@ class TemplateController {
             return
         }
     }
-    
+
+    private getTemplateMissingParameters(Template templateInstance) {
+        def procParams = templateInstance.executionZone.getProcessingParameters()
+        def binding = procParams.inject([:]) { Map map, ProcessingParameter procParam ->
+            map[procParam.name?.toLowerCase()] = procParam.value
+            return map
+        }
+
+        def templateOutput = new SimpleTemplateEngine().createTemplate(templateInstance?.template).make(binding.withDefault{"[MISSINGPARAMETER_$it]"})
+        def missingParameters = []
+        templateOutput.toString().eachMatch(/\[MISSINGPARAMETER_([^]]*)\]/) { missingParameters << it[1] }
+        return missingParameters
+    }
+
     private sendError(HttpStatus httpStatus, String errorMessage="") {
         response.setStatus(httpStatus.value())
         if (errorMessage) {
