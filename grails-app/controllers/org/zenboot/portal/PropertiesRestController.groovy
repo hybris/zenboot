@@ -31,7 +31,40 @@ class PropertiesRestController {
             this.sendError(HttpStatus.NOT_FOUND, "No '${params.propertyFile}' property template found for environment '${params.puppetEnvironment}'")
             return
         }
+        this.sendFile(templateInstance, binding)
+        return
         
+    }
+    
+    def showFile = {
+        def templateInstance = Template.get(params.id)
+        if (!templateInstance) {
+            this.sendError(HttpStatus.NOT_FOUND, "No Template exists for this id")
+            return
+        }
+        
+        def procParams = templateInstance.executionZone.getProcessingParameters()
+        def binding = procParams.inject([:]) { Map map, ProcessingParameter procParam ->
+            map[procParam.name?.toLowerCase()] = procParam.value
+            return map
+        }
+        
+        this.sendFile(templateInstance, binding)
+        return
+
+        
+    }
+
+    
+    private sendError(HttpStatus httpStatus, String errorMessage="") {
+        response.setStatus(httpStatus.value())
+        if (errorMessage) {
+            response << errorMessage
+        }
+        response.flushBuffer()
+    }
+    
+    private sendFile(Template templateInstance, def binding){
         def templateOutput
         try {
             templateOutput = new SimpleTemplateEngine().createTemplate(templateInstance?.template).make(binding.withDefault{''})
@@ -46,15 +79,6 @@ class PropertiesRestController {
             return
         }
         
-        response.flushBuffer()
-    }
-
-    
-    private sendError(HttpStatus httpStatus, String errorMessage="") {
-        response.setStatus(httpStatus.value())
-        if (errorMessage) {
-            response << errorMessage
-        }
         response.flushBuffer()
     }
 }

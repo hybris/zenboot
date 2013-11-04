@@ -53,6 +53,7 @@ class TemplateController {
                     url:createLink(action: 'ajaxGetVersion', id:templateInstance.getTemplateObject().id),
                     templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
                     deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.id),
+                    showFileUrl:createLink(controller: 'propertiesRest', action: 'showFile', id:templateInstance.id),
                     versions: array{
                         templateInstance.templateVersions.each {
                             version(id:it.id, 
