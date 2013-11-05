@@ -7,7 +7,7 @@ class UrlMappings {
                 // apply constraints here
             }
         }
-        
+
         
         //homepage
         "/"(controller:'home', action:'index')
@@ -16,12 +16,12 @@ class UrlMappings {
         "/rest/customer/$id/$property?"(controller:'customer', action:'rest')
         "/rest/action/$id/status"(controller:'executionZoneAction', action:'rest')
         "/rest/hiera/$puppetEnvironment/$qualityStage?"(controller:'hieraRest', action:'rest')
-        
+        "/rest/templates" (resources:'template')
         "/rest/properties/$puppetEnvironment/$qualityStage?"(controller:'propertiesRest', action:'rest')
         "/rest/$url?"(controller:'exposedExecutionZoneAction', action:'rest')
         
         // templates
-        "/executionZone/$execId/template/$action?/$id?"(controller:'template')
+        name template : "/template/$action?/$id?" { controller='template' }
         "/properties/$id"(controller:'propertiesRest', action:'showFile')
         
         "500"(view:'/error')
