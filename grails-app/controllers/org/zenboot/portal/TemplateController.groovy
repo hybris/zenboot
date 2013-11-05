@@ -20,9 +20,17 @@ class TemplateController {
 
 
     def list() {
+      def executionZoneInstance = ExecutionZone.get(params.execId)
+      def templates
+      if (!executionZoneInstance) {
+        templates = Template.findAll()
+      }else{
+        templates = executionZoneInstance.templates
+      }
+        
       render (contentType:"text/json"){
          templates: array{
-            Template.findAll().each {
+            templates.each {
                 template(id:it.id, 
                 name:it.name)
             }
@@ -46,10 +54,10 @@ class TemplateController {
         }
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
+        redirect(action: "show", id: templateInstance.id)
     }
     
-    def ajaxGetTemplateParameters() {
+    def show() {
         def templateInstance = Template.get(params.id)
 
         if (!templateInstance) {
@@ -148,7 +156,7 @@ class TemplateController {
         }
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
+        redirect(action: "show", id: templateInstance.id)
     }
     
     def upload() {

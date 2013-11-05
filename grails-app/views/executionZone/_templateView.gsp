@@ -133,7 +133,7 @@ $('#template_versions').change(function(event) {
 });
 
 $('#executionZone_templates').change(function(event) {
-	zenboot.loadTemplateFrom('<g:createLink controller="template" action="ajaxGetTemplateParameters" />/' + $('#executionZone_templates option:selected').val());
+	zenboot.loadTemplateFrom('<g:createLink controller="template" action="show" />/' + $('#executionZone_templates option:selected').val());
 });
 
 $('.import-templates-button').click(function() {
