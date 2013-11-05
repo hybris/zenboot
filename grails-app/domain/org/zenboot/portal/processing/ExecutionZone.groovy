@@ -9,7 +9,7 @@ class ExecutionZone {
     String description
     String puppetEnvironment
     String qualityStage
-    Set processingParameters = []
+    SortedSet processingParameters
     Set actions = []
     boolean enabled = true
     boolean enableExposedProcessingParameters = true
