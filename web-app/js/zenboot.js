@@ -209,6 +209,13 @@ zenboot.loadTemplateFrom = function(url) {
         	$('#templateForm').attr("action", data.template.updateUrl);
         	$("#templateForm :submit").attr("name", "_action_update")
         	$("#template_versions").html("");
+      		$("#templateForm a#showFileButton").removeAttr('disabled');
+     			$("#templateForm a#showFileButton").off('click');
+      		$("#templateForm a#showFileButton").click( function(e) {
+        		zenboot.loadTextAreaContent(data.template.showFileUrl, $('#show-file-field'));
+        		$("#show-file-name").html(data.template.name);
+      		  $('#show-file').modal("show");
+      		});
         	
         	$.each(data.template.versions.reverse(), function(index, version){
         		$("#template_versions").append($("<option>").val(version.url).html(version.create + " (" + version.user + ")"));
@@ -301,6 +308,8 @@ zenboot.templateCancel = function(link) {
   $("#templateForm textarea#message").attr("placeholder", placeholder);	
 	$("#templateForm :submit").attr("name", "save");
 	$("#templateForm a#cancelbtn").attr("disabled", "disabled");
+	$("#templateForm a#showFileButton").attr("disabled", "disabled");
+	$("#templateForm a#showFileButton").off('click');
 	$("#executionZone_templates option:selected").removeAttr("selected");
 }
 
@@ -332,7 +341,12 @@ zenboot.templateSave = function(url){
         	
         	$('#templateForm :input').removeAttr('disabled');
         	$("#templateForm a#cancelbtn").removeAttr('disabled');
-        	$("#template_messages").html("<div class='alert alert-info'>" + data.template.message + "</div>")
+
+            $("#template_messages").html("<div class='alert alert-info'>" + data.template.message + "</div>")
+            if ( "warning" in data.template  && data.template.warning != null && data.template.warning.length > 0){
+                $("#template_messages").append("<div class='alert alert-error'>" + data.template.warning + "</div>")
+            }
+
         	zenboot.loadTemplateList(url);
         },
         error: function(jqHXR, status, error) {

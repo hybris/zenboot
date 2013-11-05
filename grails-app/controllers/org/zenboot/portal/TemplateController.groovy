@@ -1,5 +1,7 @@
 package org.zenboot.portal
 
+import groovy.text.SimpleTemplateEngine
+
 import java.nio.charset.Charset;
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -18,9 +20,17 @@ class TemplateController {
 
 
     def list() {
+      def executionZoneInstance = ExecutionZone.get(params.execId)
+      def templates
+      if (!executionZoneInstance) {
+        templates = Template.findAll()
+      }else{
+        templates = executionZoneInstance.templates
+      }
+        
       render (contentType:"text/json"){
          templates: array{
-            Template.findAll().each {
+            templates.each {
                 template(id:it.id, 
                 name:it.name)
             }
@@ -37,11 +47,17 @@ class TemplateController {
             return
         }
 
-		    flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
+        // test template for non existing parameters?
+        def missingParameters = getTemplateMissingParameters(templateInstance)
+        if ( missingParameters.size() ) {
+            flash.warning = "Warning, missing parameters: " + missingParameters.join(", ")
+        }
+
+        flash.message = message(code: 'default.created.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
+        redirect(action: "show", id: templateInstance.id)
     }
     
-    def ajaxGetTemplateParameters() {
+    def show() {
         def templateInstance = Template.get(params.id)
 
         if (!templateInstance) {
@@ -53,6 +69,7 @@ class TemplateController {
                     url:createLink(action: 'ajaxGetVersion', id:templateInstance.getTemplateObject().id),
                     templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
                     deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.id),
+                    showFileUrl:createLink(controller: 'propertiesRest', action: 'showFile', id:templateInstance.id),
                     versions: array{
                         templateInstance.templateVersions.each {
                             version(id:it.id, 
@@ -63,7 +80,8 @@ class TemplateController {
                     },
                     dateCreated:templateInstance.dateCreated, 
                     updateUrl:createLink(action:'update', id:templateInstance.id),
-                    message: flash.message
+                    message: flash.message,
+                    warning: flash?.warning
         }
         return
     }
@@ -130,11 +148,15 @@ class TemplateController {
             this.sendError(HttpStatus.BAD_REQUEST, "Can't save template! Please add a commit message and check if the name is unique.")
             return
         }
-        
-        
-        
-		    flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
-        redirect(action: "ajaxGetTemplateParameters", id: templateInstance.id)
+
+        // test template for non existing parameters?
+        def missingParameters = getTemplateMissingParameters(templateInstance)
+        if ( missingParameters.size() ) {
+            flash.warning = "Warning, missing parameters: " + missingParameters.join(", ")
+        }
+
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'template.label', default: 'Template'), templateInstance.id])
+        redirect(action: "show", id: templateInstance.id)
     }
     
     def upload() {
@@ -261,7 +283,20 @@ class TemplateController {
             return
         }
     }
-    
+
+    private getTemplateMissingParameters(Template templateInstance) {
+        def procParams = templateInstance.executionZone.getProcessingParameters()
+        def binding = procParams.inject([:]) { Map map, ProcessingParameter procParam ->
+            map[procParam.name?.toLowerCase()] = procParam.value
+            return map
+        }
+
+        def templateOutput = new SimpleTemplateEngine().createTemplate(templateInstance?.template).make(binding.withDefault{"[MISSINGPARAMETER_$it]"})
+        def missingParameters = []
+        templateOutput.toString().eachMatch(/\[MISSINGPARAMETER_([^]]*)\]/) { missingParameters << it[1] }
+        return missingParameters
+    }
+
     private sendError(HttpStatus httpStatus, String errorMessage="") {
         response.setStatus(httpStatus.value())
         if (errorMessage) {

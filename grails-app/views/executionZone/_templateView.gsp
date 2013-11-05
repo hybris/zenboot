@@ -34,6 +34,9 @@
 			</fieldset>
 
 			<fieldset class="buttons spacer pull-right">
+				<a id="showFileButton" class="btn" disabled="disabled">
+					<g:message code="default.button.showFile.label" default="Preview" />
+				</a>
 				<a id="cancelbtn" class="btn btn-success" onclick="zenboot.templateCancel('${createLink(controller:'template', action: 'save')}')" disabled="disabled">
 					<g:message code="default.button.cancel.label" default="Cancel" />
 				</a>
@@ -92,7 +95,8 @@
 		</g:uploadForm>
 	</div>
 	
-		<div id="template-remove" class="modal hide fade">
+		
+	<div id="template-remove" class="modal hide fade">
 		<g:form name="templateRemoveForm" action="delete" controller="Template">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -107,6 +111,20 @@
 
 		</g:form>
 	</div>
+	
+	<div id="show-file" class="modal hide fade">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3 id="show-file-name"></h3>
+			</div>
+			<div class="modal-body">
+  			<g:textArea name="show-file-field" value="" style="height: 300px; width: 96%; overflow: auto;" />
+				<a class="btn modal-close-button" data-dismiss="modal">
+					<g:message code="default.button.close.label" default="Close" />
+				</a>	
+			</div>
+
+	</div>
 
 
 <g:javascript>
@@ -115,7 +133,7 @@ $('#template_versions').change(function(event) {
 });
 
 $('#executionZone_templates').change(function(event) {
-	zenboot.loadTemplateFrom('<g:createLink controller="template" action="ajaxGetTemplateParameters" />/' + $('#executionZone_templates option:selected').val());
+	zenboot.loadTemplateFrom('<g:createLink controller="template" action="show" />/' + $('#executionZone_templates option:selected').val());
 });
 
 $('.import-templates-button').click(function() {
