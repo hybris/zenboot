@@ -85,7 +85,7 @@
 			<g:textArea name="parameters-export" escapeHtml="false" style="width:98%; height:100%;" rows="7">
 {
 "parameters" : [
-	<g:set var="last" value="${ parameters.size() - 1 }" />
+	<g:set var="last" value="${ parameters ? parameters.size() - 1 : 0 }" />
   <g:each in="${parameters}" var="entry" status="i">
   {
 	   "name": "${ entry.name }",
