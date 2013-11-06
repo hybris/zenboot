@@ -19,7 +19,8 @@ class TemplateController {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST", upload: "POST"]
 
 
-    def list() {
+    
+    def index() {
       def executionZoneInstance = ExecutionZone.get(params.execId)
       def templates
       if (!executionZoneInstance) {
@@ -59,27 +60,26 @@ class TemplateController {
     
     def show() {
         def templateInstance = Template.get(params.id)
-
         if (!templateInstance) {
             this.sendError(HttpStatus.NOT_FOUND, "Not Template exists for this id")
             return
         }
         render (contentType:"text/json"){
             template name:templateInstance.name, 
-                    url:createLink(action: 'ajaxGetVersion', id:templateInstance.getTemplateObject().id),
-                    templateUrl:createLink(action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
-                    deleteTemplateUrl:createLink(action: 'delete', id:templateInstance.id),
+                    url:createLink(mapping:'template', action: 'ajaxGetVersion', id:templateInstance.getTemplateObject().id),
+                    templateUrl:createLink(mapping:'template',action: 'ajaxGetTemplate', id:templateInstance.getTemplateObject().id),
+                    deleteTemplateUrl:createLink(mapping:'template',action: 'delete', id:templateInstance.id),
                     showFileUrl:createLink(controller: 'propertiesRest', action: 'showFile', id:templateInstance.id),
                     versions: array{
                         templateInstance.templateVersions.each {
                             version(id:it.id, 
                             create:it.dateCreated, 
-                            url:createLink(action: 'ajaxGetVersion', id:it.id),
+                            url:createLink(mapping:'template',action: 'ajaxGetVersion', id:it.id),
                             user:it.user)
                         }
                     },
                     dateCreated:templateInstance.dateCreated, 
-                    updateUrl:createLink(action:'update', id:templateInstance.id),
+                    updateUrl:createLink(mapping:'template', action:'update', id:templateInstance.id),
                     message: flash.message,
                     warning: flash?.warning
         }
@@ -97,8 +97,8 @@ class TemplateController {
         render (contentType:"text/json"){
           version(id:templateInstance.id, 
               create:templateInstance.dateCreated, 
-              url:createLink(action: 'ajaxGetTemplate', id:templateInstance.id), 
-              commentUrl:createLink(action: 'ajaxGetComment', id:templateInstance.id)
+              url:createLink(mapping:'template', action: 'ajaxGetTemplate', id:templateInstance.id), 
+              commentUrl:createLink( mapping:'template', action: 'ajaxGetComment', id:templateInstance.id)
           )
         }
         

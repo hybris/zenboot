@@ -1,6 +1,6 @@
 package org.zenboot.portal.processing
 
-class ProcessingParameter {
+class ProcessingParameter implements Comparable {
 
     String name
     String value
@@ -29,6 +29,7 @@ class ProcessingParameter {
         comment type: 'text'
         cache false
         processingParameterLogs cascade: "all-delete-orphan"
+        sort "name"
     }
 
     @Override
@@ -85,5 +86,10 @@ class ProcessingParameter {
 
     def afterUpdate(){
         addParameterLogs()
+    }
+
+    @Override
+    int compareTo(Object obj) {
+        name.toUpperCase() <=> obj.name.toUpperCase()
     }
 }

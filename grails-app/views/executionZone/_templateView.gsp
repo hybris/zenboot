@@ -9,7 +9,7 @@
 				<g:message code="default.button.import.label" default="Import" />
 			</span>
 			
-			<g:link controller="Template" action="export" params="[execId: executionZoneInstance?.id ]" class="btn">
+			<g:link mapping="template" controller="Template" action="export" params="[execId: executionZoneInstance?.id ]" class="btn">
 				<g:message code="default.button.export.label" default="Export" />
 			</g:link>
 		</fieldset>
@@ -37,7 +37,7 @@
 				<a id="showFileButton" class="btn" disabled="disabled">
 					<g:message code="default.button.showFile.label" default="Preview" />
 				</a>
-				<a id="cancelbtn" class="btn btn-success" onclick="zenboot.templateCancel('${createLink(controller:'template', action: 'save')}')" disabled="disabled">
+				<a id="cancelbtn" class="btn btn-success" onclick="zenboot.templateCancel('${createLink(mapping:'template', controller:'template', action: 'save')}')" disabled="disabled">
 					<g:message code="default.button.cancel.label" default="Cancel" />
 				</a>
 							
@@ -133,7 +133,7 @@ $('#template_versions').change(function(event) {
 });
 
 $('#executionZone_templates').change(function(event) {
-	zenboot.loadTemplateFrom('<g:createLink controller="template" action="show" />/' + $('#executionZone_templates option:selected').val());
+	zenboot.loadTemplateFrom('<g:createLink mapping="template" controller="template" action="show" />/' + $('#executionZone_templates option:selected').val());
 });
 
 $('.import-templates-button').click(function() {
@@ -145,13 +145,13 @@ $('.delete_template').click(function() {
 });
 
 $('#templateForm').submit(function(event){
-  zenboot.templateSave('<g:createLink controller="template" action="list" />');
+  zenboot.templateSave('<g:createLink mapping="template" controller="template" action="index" />');
   event.preventDefault();
 });
 
 $('#templateRemoveForm').submit(function(event){
-  zenboot.templateRemove('<g:createLink controller="template" action="list" />' );
-  zenboot.templateCancel('<g:createLink controller="template" action="save" />');
+  zenboot.templateRemove('<g:createLink mapping="template" controller="template" action="index" />' );
+  zenboot.templateCancel('<g:createLink mapping="template" controller="template" action="save" />');
   $('#template-remove').modal('toggle')
   event.preventDefault();
 });
