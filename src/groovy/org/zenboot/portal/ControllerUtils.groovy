@@ -53,7 +53,7 @@ class ControllerUtils {
         def deletedExecZoneParams = model.processingParameters.findAll { ProcessingParameter param ->
             !procParams*.name.contains(param.name)
         }
-        model.processingParameters.removeAll(deletedExecZoneParams)
+        model.processingParameters?.removeAll(deletedExecZoneParams)
         procParams.each { ProcessingParameter procParam ->
             model.addProcessingParameter(procParam)
         }
