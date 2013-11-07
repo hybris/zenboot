@@ -21,7 +21,15 @@ class TemplateController {
 
     
     def index() {
-      def executionZoneInstance = ExecutionZone.get(params.execId)
+      def executionZoneInstance 
+      if(params.execId) {
+        executionZoneInstance = ExecutionZone.get(params.execId)
+      } 
+      
+      if(params.puppetEnvironment){
+        executionZoneInstance = ExecutionZone.findByPuppetEnvironmentAndQualityStage(params.puppetEnvironment, params.qualityStage)
+      }
+      
       def templates
       if (!executionZoneInstance) {
         templates = Template.findAll()
