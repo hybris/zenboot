@@ -28,6 +28,10 @@ class TemplateController {
       
       if(params.puppetEnvironment){
         executionZoneInstance = ExecutionZone.findByPuppetEnvironmentAndQualityStage(params.puppetEnvironment, params.qualityStage)
+        if (!executionZoneInstance) {
+            this.sendError(HttpStatus.NOT_FOUND, "No ${ExecutionZone.class.simpleName} found for environment '${params.puppetEnvironment}'")
+            return
+        }
       }
       
       def templates
@@ -50,7 +54,22 @@ class TemplateController {
 
     def save() {
         
+        def executionZoneInstance
+        
+        log.error("TEST. " + params)
+        
+        if(params.puppetEnvironment){
+          executionZoneInstance = ExecutionZone.findByPuppetEnvironmentAndQualityStage(params.puppetEnvironment, params.qualityStage)
+          if (!executionZoneInstance) {
+              this.sendError(HttpStatus.NOT_FOUND, "No ${ExecutionZone.class.simpleName} found for environment '${params.puppetEnvironment}'")
+              return
+          }
+        } else {
+          executionZoneInstance = ExecutionZone.get(params.executionZone.id)
+        }
+        
         def templateInstance = new Template(params)
+        templateInstance.executionZone = executionZoneInstance
         if (!templateInstance.save(flush:true)) {
             this.sendError(HttpStatus.BAD_REQUEST, "Can't save template! Please add a commit message and check if the name is unique.")
             return
@@ -142,6 +161,7 @@ class TemplateController {
 
 
     def update() {
+        log.error("TEST: " + params)
         flash.action = 'template'
         def templateInstance = Template.get(params.id)
         if (!templateInstance) {
@@ -169,7 +189,13 @@ class TemplateController {
     
     def upload() {
         flash.action = 'template'
-        def executionZoneInstance = ExecutionZone.get(params.execId)
+        def executionZoneInstance
+        
+        if(params.puppetEnvironment){
+          executionZoneInstance = ExecutionZone.findByPuppetEnvironmentAndQualityStage(params.puppetEnvironment, params.qualityStage)
+        } else {
+          executionZoneInstance = ExecutionZone.get(params.execId)
+        }
         
         if (!executionZoneInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.executionZone.id])
