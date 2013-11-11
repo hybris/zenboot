@@ -145,12 +145,12 @@ $('.delete_template').click(function() {
 });
 
 $('#templateForm').submit(function(event){
-  zenboot.templateSave('<g:createLink mapping="template" controller="template" action="index" />');
+  zenboot.templateSave('<g:createLink mapping="template" controller="template" action="index" params="[execId: executionZoneInstance?.id]"/>');
   event.preventDefault();
 });
 
 $('#templateRemoveForm').submit(function(event){
-  zenboot.templateRemove('<g:createLink mapping="template" controller="template" action="index" />' );
+  zenboot.templateRemove('<g:createLink mapping="template" controller="template" action="index" params="[execId: executionZoneInstance?.id]" />' );
   zenboot.templateCancel('<g:createLink mapping="template" controller="template" action="save" />');
   $('#template-remove').modal('toggle')
   event.preventDefault();
