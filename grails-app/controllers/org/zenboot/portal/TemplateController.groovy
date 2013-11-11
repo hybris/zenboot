@@ -156,12 +156,33 @@ class TemplateController {
         return
     }
 
-
+    def checkParameters(){
+    
+      def executionZoneInstance = ExecutionZone.get(params.execId)
+      if (!executionZoneInstance) {
+        this.sendError(HttpStatus.NOT_FOUND, "No ExecutionZone exists for this id")
+        return
+      }
+      def missingParameters = []
+      
+      executionZoneInstance.templates.each {      
+        missingParameters = (missingParameters << getTemplateMissingParameters(it)).flatten().unique()
+      }
+      
+      render (contentType:"text/json"){
+        parameters: array{
+          missingParameters.each {
+            parameter(name: it)
+          }
+        }
+      }
+      return
+      
+    }
 
 
 
     def update() {
-        log.error("TEST: " + params)
         flash.action = 'template'
         def templateInstance = Template.get(params.id)
         if (!templateInstance) {
