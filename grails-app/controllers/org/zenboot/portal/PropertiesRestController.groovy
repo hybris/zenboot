@@ -20,6 +20,11 @@ class PropertiesRestController {
             return
         }
 
+        if (!execZone.enabled) {
+            this.sendError(HttpStatus.NOT_FOUND, "${ExecutionZone.class.simpleName} is disabled!")
+            return
+        }
+
         def procParams = execZone.getProcessingParameters()
         def binding = procParams.inject([:]) { Map map, ProcessingParameter procParam ->
             map[procParam.name?.toLowerCase()] = procParam.value
