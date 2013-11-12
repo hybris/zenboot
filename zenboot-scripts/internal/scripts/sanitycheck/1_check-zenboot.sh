@@ -8,6 +8,9 @@
 
 HTTP_CODE=`curl -sL -o /dev/null --write-out %{http_code} --basic --user "${USERNAME}:${PASSWORD}" --request "POST" "http://localhost:8080/zenboot/"`
 
+
+sleep 200
+
 if [ "$HTTP_CODE" = "200" ]; then
   echo "Zenboot is running :)"
   # to enable Status-check, let's sleep for 3 seconds
