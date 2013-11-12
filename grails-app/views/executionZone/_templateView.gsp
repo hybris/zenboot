@@ -12,6 +12,9 @@
 			<g:link mapping="template" controller="Template" action="export" params="[execId: executionZoneInstance?.id ]" class="btn">
 				<g:message code="default.button.export.label" default="Export" />
 			</g:link>
+		  <span title="Check Parameters" class="btn check-templates-button">
+				<g:message code="default.button.check.label" default="Check Templates" />
+			</span>
 		</fieldset>
 		</span>
 	</div>
@@ -125,6 +128,20 @@
 			</div>
 
 	</div>
+	
+	<div id="check-templates" class="modal hide fade">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3><g:message code="default.executionZone.checkParameters" default="Missing Parameters" /></h3>
+			</div>
+			<div class="modal-body">
+  			<g:textArea name="check-templates-field" value="" style="height: 300px; width: 96%; overflow: auto;" />
+				<a class="btn modal-close-button" data-dismiss="modal">
+					<g:message code="default.button.close.label" default="Close" />
+				</a>	
+			</div>
+
+	</div>
 
 
 <g:javascript>
@@ -140,17 +157,21 @@ $('.import-templates-button').click(function() {
     $('#template-import').modal('toggle')
 });
 
+$('.check-templates-button').click(function() {
+  zenboot.templateCheck('<g:createLink mapping="template" controller="template" action="checkParameters" params="[execId: executionZoneInstance?.id]"/>');
+});
+
 $('.delete_template').click(function() {
     $('#template-remove').modal('toggle')
 });
 
 $('#templateForm').submit(function(event){
-  zenboot.templateSave('<g:createLink mapping="template" controller="template" action="index" />');
+  zenboot.templateSave('<g:createLink mapping="template" controller="template" action="index" params="[execId: executionZoneInstance?.id]"/>');
   event.preventDefault();
 });
 
 $('#templateRemoveForm').submit(function(event){
-  zenboot.templateRemove('<g:createLink mapping="template" controller="template" action="index" />' );
+  zenboot.templateRemove('<g:createLink mapping="template" controller="template" action="index" params="[execId: executionZoneInstance?.id]" />' );
   zenboot.templateCancel('<g:createLink mapping="template" controller="template" action="save" />');
   $('#template-remove').modal('toggle')
   event.preventDefault();

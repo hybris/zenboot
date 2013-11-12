@@ -408,6 +408,30 @@ zenboot.loadTemplateList = function(url){
     });	
 }
 
+zenboot.templateCheck = function(url){
+    $.ajax({
+      url : url,
+      dataType: "json",
+      beforeSend : function() {
+      	$('#templateParametersSpinner').fadeIn('fast');
+      },
+      success: function(data) {
+      	$('#templateParametersSpinner').hide();
+      	$("#check-templates-field").html("");
+      	$.each(data, function(index, param){
+      		$("#check-templates-field").append(param.name + "\n");
+      	});
+      	$('#check-templates').modal('show');
+      	
+
+      },
+      error: function(jqHXR, status, error) {
+        alert("ERROR");
+        $('#templateParametersSpinner').hide();
+      }
+    });	
+}
+
 $(document).ready(function() {
 	zenboot.enableCollapsableList()
 });

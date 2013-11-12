@@ -21,6 +21,11 @@ class HieraRestController {
             this.sendError(HttpStatus.NOT_FOUND, "No ${ExecutionZone.class.simpleName} found for environment '${params.puppetEnvironment}'")
             return
         }
+        
+        if (!execZone.enabled) {
+            this.sendError(HttpStatus.NOT_FOUND, "${ExecutionZone.class.simpleName} is disabled!")
+            return
+        }
 
         request.withFormat {
             def procParams = execZone.getProcessingParameters()
