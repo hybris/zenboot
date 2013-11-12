@@ -141,15 +141,15 @@ class ScriptletBatchController {
 
 class GetScriptletBatchStepsCommand {
 
-    Long id
+    Long scriptletId
 
     static constraints = {
-        id nullable:false, validator: { value, commandObj ->
-            ScriptletBatch.get(commandObj.id) != null
+        scriptletId nullable:false, validator: { value, commandObj ->
+            ScriptletBatch.get(commandObj.scriptletId) != null
         }
     }
 
     ScriptletBatch getScriptletBatch() {
-        return ScriptletBatch.get(this.id)
+        return ScriptletBatch.get(this.scriptletId)
     }
 }

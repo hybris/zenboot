@@ -81,6 +81,15 @@
 					<g:formatDate date="${scriptletBatchInstance?.endDate}" />
 				</dd>
 			</g:if>
+			<g:else>
+			  <dt>
+			    <g:message code="scriptletBatch.autorefresh" default="Autorefresh" />
+			  </dt>
+			  <dd>
+			    <g:checkBox name="autorefresh" value="${true}" />
+			  </dd>
+			  
+			</g:else>
 			
 			<g:if test="${scriptletBatchInstance?.comment}">
 			  <hr />
@@ -153,29 +162,31 @@
 					</span>
 					<g:javascript>
 				    $(document).ready(function() {
-                           var interval = setInterval(function() {
-				            $.ajax({
-				                url : '<g:createLink action="ajaxSteps" params="[id:scriptletBatchInstance?.id]" />',
-				                contentType: 'application/json',
-				                dataType: 'json'
-				            }).success(function(data) {
-				               var steps = $("#steps li")
-				            
-				               if (steps.size() != data.length) {
-				                   alert("Not able to update process list. Different number of steps between server-managed list and the shown list!")
-				                   clearInterval(interval);
-				                   return;
-				               }
-					               for (i = 0; i < data.length; i++) {
-				                   //update running steps  
-				                   if ($(steps[i]).find("span.label").hasClass("label-info") || data[i].status == "RUNNING") {
-				                       $(steps[i]).replaceWith(data[i].markup);
-				                   }
-				               }
-				            }).error(function() {
-                                   clearInterval(interval);
-				                window.location.reload();
-				            });
+                    var interval = setInterval(function() {
+			                $.ajax({
+			                    url : '<g:createLink action="ajaxSteps" params="[scriptletId:scriptletBatchInstance?.id]" />',
+			                    contentType: 'application/json',
+			                    dataType: 'json'
+			                }).success(function(data) {
+                        if($('#autorefresh').is(':checked')){
+			                     var steps = $("#steps li")
+			                  
+			                     if (steps.size() != data.length) {
+			                         alert("Not able to update process list. Different number of steps between server-managed list and the shown list!")
+			                         clearInterval(interval);
+			                         return;
+			                     }
+				                     for (i = 0; i < data.length; i++) {
+			                         //update running steps  
+			                         if ($(steps[i]).find("span.label").hasClass("label-info") || data[i].status == "RUNNING") {
+			                             $(steps[i]).replaceWith(data[i].markup);
+			                         }
+			                     }
+			                  }
+			                }).error(function() {
+                          clearInterval(interval);
+			                    window.location.reload();
+			                });
 				        }, 1500);
 				    });
 				    </g:javascript>
