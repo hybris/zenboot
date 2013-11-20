@@ -56,8 +56,6 @@ class TemplateController {
         
         def executionZoneInstance
         
-        log.error("TEST. " + params)
-        
         if(params.puppetEnvironment){
           executionZoneInstance = ExecutionZone.findByPuppetEnvironmentAndQualityStage(params.puppetEnvironment, params.qualityStage)
           if (!executionZoneInstance) {
