@@ -93,7 +93,10 @@ class ExecutionZoneService {
         ExecutionZoneAction execAction = new ExecutionZoneAction(executionZone:execZone, scriptDir:scriptDir)
 
         if (processParameters) {
-            execAction.processingParameters.addAll(execZone.processingParameters)
+            execZone.processingParameters.each { it ->
+                execZone.processingParameters << new ProcessingParameter(name:it.name, value:it.value, comment:"Parameters added automatically by an execution zone action.")
+            }
+
             ControllerUtils.synchronizeProcessingParameterValues(processParameters, execAction)
         }
 

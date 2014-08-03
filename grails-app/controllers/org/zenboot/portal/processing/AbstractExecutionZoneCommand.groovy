@@ -36,13 +36,11 @@ abstract class AbstractExecutionZoneCommand {
                 }
             }
         }
-
         this.execZoneParameters.each { key, value ->
             if (!value) {
                 this.errors.reject('executionZone.parameters.emptyValue', [key].asType(Object[]), 'Mandatory parameter is empty')
             }
         }
-        
         return this.errors.hasErrors()
     }
 
