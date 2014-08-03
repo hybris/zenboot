@@ -16,7 +16,9 @@ grails.config.locations = [
     "file:${basedir}/grails-app/conf/NavigationConfig.groovy", //won't work in WAR
     "classpath:NavigationConfig.groovy", //copied to classpath in scripts/_Events.groovy
     "file:${basedir}/zenboot.properties", //won't work in WAR
-    "classpath:zenboot.properties" //${basedir}/*.properties (except log4.properties) is automatically copied to classpath by Grails
+    "classpath:zenboot.properties", //${basedir}/*.properties (except log4.properties) is automatically copied to classpath by Grails
+    "file:/etc/zenboot/zenboot.properties",         // Mainly for Docker-Usage
+    "file:${userHome}/zenboot/zenboot.properties.Docker"  // Mainly for Docker-Usage
 ]
 
 grails.project.groupId = 'org.zenboot.portal' // change this to alter the default package name and Maven publishing destination
@@ -151,7 +153,7 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
     '/exposedExecutionZoneAction/execute':  [Role.ROLE_USER],
     '/scriptletBatch/ajaxList':             [Role.ROLE_USER],
     //default
-    '/**':                                  [Role.ROLE_ADMIN],    
+    '/**':                                  [Role.ROLE_ADMIN],
  ]
 
 //fix pagination bug in bootstrap
@@ -159,7 +161,7 @@ grails.plugins.twitterbootstrap.fixtaglib = true
 
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements
 
-/* remove this line 
+/* remove this line
 // GSP settings
 grails {
     views {
