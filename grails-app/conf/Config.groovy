@@ -18,7 +18,7 @@ grails.config.locations = [
     "file:${basedir}/zenboot.properties", //won't work in WAR
     "classpath:zenboot.properties", //${basedir}/*.properties (except log4.properties) is automatically copied to classpath by Grails
     "file:/etc/zenboot/zenboot.properties",         // Mainly for Docker-Usage
-    "file:${userHome}/zenboot/zenboot.properties.Docker"  // Mainly for Docker-Usage
+    "file:${userHome}/zenboot/zenboot.Docker.properties"  // Mainly for Docker-Usage
 ]
 
 grails.project.groupId = 'org.zenboot.portal' // change this to alter the default package name and Maven publishing destination
