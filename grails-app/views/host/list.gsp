@@ -24,6 +24,7 @@
 			<thead>
 				<tr>
 					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" />
+					<g:sortableColumn property="cname" title="${message(code: 'host.cname.label', default: 'Cname')}" />
 					<g:sortableColumn property="macAddress" title="${message(code: 'host.macAddress.label', default: 'Mac Address')}" />
 					<g:sortableColumn property="hostname.name" title="${message(code: 'host.hostname.label', default: 'Hostname')}" />
 					<g:sortableColumn property="instanceId" title="${message(code: 'host.instanceId.label', default: 'Instance Id')}" />
@@ -43,6 +44,9 @@
 							</g:link>
 						</td>
 						<td>
+							${fieldValue(bean: hostInstance, field: "cname")}
+						</td>
+                        <td>
 							${fieldValue(bean: hostInstance, field: "macAddress")}
 						</td>
 						<td>
