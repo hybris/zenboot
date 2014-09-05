@@ -78,7 +78,7 @@ function assert_http_code() {
   debug "$COMMAND $URL"
 
   local OUTPUT=`eval $COMMAND $URL`
-  echo $OUTPUT | grep -q $EXPECTED 
+  echo $OUTPUT | grep -q $EXPECTED
   local res=$?
   $_RESULT $res "Assert response code $EXPECTED for $URL" "Expected response code was $EXPECTED, got $OUTPUT"
   return $res
@@ -99,7 +99,7 @@ function assert_http_response() {
   local OUTPUT=$(curl $OPTIONS -sL $URL)
   echo $OUTPUT | grep -q "$EXPECTED"
   local res=$?
-  $_RESULT $res "Assert response of $URL" "Output does not contain '$EXPECTED'"
+  $_RESULT $res "Assert response of $URL" "Output does not contain '$EXPECTED', got $OUTPUT"
   return $res
 }
 
