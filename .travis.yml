@@ -8,7 +8,7 @@ script:
 - ./grailsw test-app
 - echo "n" | ./grailsw run-app &
 - sleep 120
-- cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh
+- cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh && cd ../../../..
 - ./grailsw war
 notifications:
   email:
