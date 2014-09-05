@@ -1,18 +1,23 @@
 language: groovy
 jdk:
-  - openjdk7
-branches:
-  only:
-    - master
+- openjdk7
 before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq xmlindent
-script: 
-    - ./grailsw test-app
-    - echo "n" | ./grailsw run-app &
-    - sleep 120
-    - cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh 
+- sudo apt-get update -qq
+- sudo apt-get install -qq xmlindent
+script:
+- ./grailsw test-app
+- echo "n" | ./grailsw run-app &
+- sleep 120
+- cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh
 notifications:
   email:
-    - k9ert@gmx.de
-    - johannes.engelke@hybris.com
+  - k9ert@gmx.de
+  - pawel.oczadly@hybris.com
+before_deploy: "./grailsw war"
+deploy:
+  provider: releases
+  api_key:
+    secure: O/57Mm3YYVSeyPlOJYA0jbkmrGMP3Et3eYS12ztCG0S1Duna1/2Ni/v5h/1z1KYvFnV0mtWYwDHQSPJ89R1QUzVKARFkYAAgJt5IjgXnQmsygSxganE8uG37WDh/+XqODw6/oUQp6isJ6VeoIZ/TMfyfm8uM2Udh0AAdafcYEvI=
+  file: target/zenboot.war
+  on:
+    repo: hybris/zenboot
