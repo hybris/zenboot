@@ -17,6 +17,15 @@
 	</div>
 </div>
 
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'cname', 'error')} ">
+	<label class="control-label" for="cname">
+		<g:message code="host.cname.label" default="Cname" />
+	</label>
+	<div class="controls">
+		<g:textField name="cname" value="${hostInstance?.cname}" readonly="true" />
+	</div>
+</div>
+
 <div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'macAddress', 'error')} ">
 	<label class="control-label" for="macAddress">
 		<g:message code="host.macAddress.label" default="Mac Address" />

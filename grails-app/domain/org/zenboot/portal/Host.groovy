@@ -3,6 +3,7 @@ package org.zenboot.portal
 class Host {
 
     String ipAddress
+    String cname
     String macAddress
     Date creationDate
     Date expiryDate
@@ -22,6 +23,7 @@ class Host {
 
     static constraints = {
         ipAddress(blank:false, length:7..15)
+        cname(blank:false)
         macAddress(blank:false)
         hostname(nullable:false)
         instanceId(blank:false)
