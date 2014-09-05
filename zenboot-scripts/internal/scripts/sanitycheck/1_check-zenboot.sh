@@ -11,11 +11,12 @@ HTTP_CODE=`curl -sL -o /dev/null --write-out %{http_code} --basic --user "${USER
 
 
 if [ "$HTTP_CODE" = "200" ]; then
-  echo "Zenboot is running :)"
+  echo "# Zenboot is running :)"
   # to enable Status-check, let's sleep for 3 seconds
   sleep 3
   exit 0
 else
-  echo "Zenboot is not running ($HTTP_CODE) :("  >&2
+  echo "# Zenboot is not running ($HTTP_CODE) :("  >&2a
+  sleep 3
   exit 2
 fi
