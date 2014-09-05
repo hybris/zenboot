@@ -23,4 +23,4 @@ deploy:
   on:
     repo: hybris/zenboot
     tags: true
-    all_branches: false
+    all_branches: true
