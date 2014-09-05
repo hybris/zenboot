@@ -5,6 +5,7 @@ class ScriptFile extends AbstractRankableFile {
 
     static final String ATTRIBUTE_SEPARATOR = "_"
     static final String SCRIPT_SEPARATOR = "-"
+    static final int MAGIC_WEIRD_NUMBER = -18 // for no having an order
 
     private String[] tokens
     private String scriptName
@@ -15,7 +16,7 @@ class ScriptFile extends AbstractRankableFile {
         super(file)
         this.setTokens(file.name)
         this.scriptName = this.tokens[-1]
-        this.order = this.tokens[0].asType(Integer)
+        setOrder(this.tokens[0])
     }
 
     String getScriptName(boolean withExtension=true) {
@@ -27,8 +28,17 @@ class ScriptFile extends AbstractRankableFile {
 
     private setTokens(String name) {
         this.tokens = name.split(ATTRIBUTE_SEPARATOR)
-        if (this.tokens.length < 2) {
-            throw new ProcessingException("Scriptlet has invalid name pattern: ${name}")
+    }
+
+    def setOrder(String token) {
+        this.order = token.isNumber() ? token.asType(Integer) : MAGIC_WEIRD_NUMBER
+    }
+
+    def getOrder() {
+        if (this.order == MAGIC_WEIRD_NUMBER) {
+            throw new RuntimeException("Your file name does not start from number.")
+        } else {
+            return this.order
         }
     }
 

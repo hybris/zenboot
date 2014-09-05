@@ -2,7 +2,7 @@
 	<strong>
 		<g:message code="executionZone.scriptletMetadata.file" default="Required by:" />
 	</strong>
-	${scriptlet.script?.path.split(System.properties['file.separator'])[-2]}/${scriptlet.script?.name}
+	${scriptlet.script?.path.replace('\\', '/').split('/')[-2]}/${scriptlet.script?.name}
 	<br />
 
 	<strong>
