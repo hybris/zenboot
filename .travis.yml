@@ -18,6 +18,9 @@ deploy:
   provider: releases
   api_key:
     secure: O/57Mm3YYVSeyPlOJYA0jbkmrGMP3Et3eYS12ztCG0S1Duna1/2Ni/v5h/1z1KYvFnV0mtWYwDHQSPJ89R1QUzVKARFkYAAgJt5IjgXnQmsygSxganE8uG37WDh/+XqODw6/oUQp6isJ6VeoIZ/TMfyfm8uM2Udh0AAdafcYEvI=
+  skip_cleanup: true
   file: target/zenboot.war
   on:
     repo: hybris/zenboot
+    tags: true
+    all_branches: false
