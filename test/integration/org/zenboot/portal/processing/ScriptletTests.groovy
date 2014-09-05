@@ -158,7 +158,7 @@ class ScriptletTests {
         if (expected.empty) {
             assertTrue("Result should be empty", ctx.parameters.empty)
         } else {
-            assertEquals("Parameters size is different", expected.size(), ctx.parameters.size())
+            assertEquals("Parameters size is different (${ctx.toString()}):", expected.size(), ctx.parameters.size())
             def keys = expected.keySet()
             keys.each {
                 //be aware, that the ctx.parameters always returns STRING values [see ParameterConverters]! If you want work type-safe, use ctx.getObject()
