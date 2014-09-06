@@ -2,13 +2,16 @@ language: groovy
 jdk:
 - openjdk7
 before_install:
+- openssl aes-256-cbc -K $encrypted_86c85184f8a5_key -iv $encrypted_86c85184f8a5_iv
+  -in id_rsa.enc -out .travis/id_rsa -d
 - sudo apt-get update -qq
 - sudo apt-get install -qq xmlindent
 script:
 - ./grailsw test-app
 - echo "n" | ./grailsw run-app &
 - sleep 120
-- cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh && cd ../../../..
+- cd ./zenboot-scripts/internal/scripts/sanity-restcheck && ./010_sanity-restcheck.sh
+  && cd ../../../..
 - ./grailsw war
 notifications:
   email:
@@ -24,3 +27,10 @@ deploy:
     repo: hybris/zenboot
     tags: true
     all_branches: true
+after_success:
+- chmod 600 .travis/id_rsa
+- ssh-add .travis/id_rsa
+- sed -i 's/ADD http.*/ADD https:\/\/github.com\/hybris\/zenboot\/releases\/download\/v0.7.3\/zenboot.war \/home\/user\/tomcat7\/webapps\/zenboot.war/' Dockerfile
+- git add Dockerfile
+- git commit -m "Release and adapt Dockerfile"
+- git push
