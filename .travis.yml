@@ -3,7 +3,7 @@ jdk:
 - openjdk7
 before_install:
 - openssl aes-256-cbc -K $encrypted_86c85184f8a5_key -iv $encrypted_86c85184f8a5_iv
-  -in id_rsa.enc -out .travis/id_rsa -d
+  -in .travis/id_rsa.enc -out .travis/id_rsa -d
 - sudo apt-get update -qq
 - sudo apt-get install -qq xmlindent
 script:
