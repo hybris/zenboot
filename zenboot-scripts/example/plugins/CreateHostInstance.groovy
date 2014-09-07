@@ -16,10 +16,10 @@ import org.zenboot.portal.processing.meta.annotation.Plugin
 /**
  * The hooks of this plugin will be executed at the beginning (onStart) and at the end (onSuccess, onFailure, onStop)
  * of the exection of script "X_create-host-instance.rb".
- * 
+ *
  * This plugin generates first a unique hostname which is passed to the X_create-host-instance.rb script.
  * If the script was successfully finished, a customer and host model will be created in the database.
- * 
+ *
  */
 @Plugin(author="Tobias Schuhmacher (tschuhmacher@nemeses.de)", description="Create a host model in the database (host-state is initally set to CREATED)")
 class CreateHostInstance {
@@ -34,10 +34,14 @@ class CreateHostInstance {
         //generate the next available hostname
         HostService hostService = grailsApplication.mainContext.getBean(HostService.class)
 
-        if (hostService.countAvailableHosts() <= 0) {
+        int existingHosts = Host.countByStateNotEqual(HostState.DELETED)
+        int poolsize = 15 // could be something like: railsApplication.config.zenboot.host.instances.poolSize.toInteger()
+
+        if (poolsize - existingHosts <= 0) {
             throw new InstancePoolExhaustedException("Can not create host because host pool is exhausted")
         }
 
+        // We could do it here but for convenience, we have something in the code:
         Hostname hostname = hostService.nextHostName()
         log.info("Hostname created: ${hostname}")
 
@@ -59,7 +63,7 @@ class CreateHostInstance {
         Host host = new Host(
                 ipAddress :ctx.parameters['IP'],
                 macAddress: ctx.parameters['MAC'],
-                instanceId: '', //can be an internal id to manage this host in a cloud environment
+                instanceId: ctx.parameters.getObject('HOSTNAME').id, //can be an internal id to manage this host in a cloud environment
                 hostname: ctx.parameters.getObject('HOSTNAME'),
                 owner: Customer.findByEmail(ctx.parameters['CUSTOMER_EMAIL']) ?: new Customer(email:ctx.parameters['CUSTOMER_EMAIL']).save(),
                 expiryDate: hostService.getExpiryDate(),
