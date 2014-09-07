@@ -41,10 +41,10 @@
 			<div class="accordion-group">
 				<div class="accordion-heading">
       		<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#showZone">
-        		<g:message code="default.show.label" args="[entityName]" />
+        		<g:message code="default.show.label" args="[entityName]" /> (${executionZoneInstance?.type})
       		</a>
     		</div>
-    		<div id="showZone" class="accordion-body collapse ${!flash.action ? 'in' : ''}">
+    		<div id="showZone" class="accordion-body collapse">
     			<div class="accordion-inner">
 						<g:form method="post">
 							<dl class="dl-horizontal">

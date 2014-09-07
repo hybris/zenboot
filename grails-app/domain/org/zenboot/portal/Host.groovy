@@ -19,6 +19,7 @@ class Host {
     static mapping = {
         dnsEntries cascade: 'all-delete-orphan'
         hostname cascade: 'all'
+        sort creationDate: "desc"
     }
 
     static constraints = {
@@ -33,7 +34,7 @@ class Host {
     }
 
     def beforeInsert = { creationDate = new Date() }
-    
+
     String toString() {
         return "${this.hostname} (${this.ipAddress})"
     }

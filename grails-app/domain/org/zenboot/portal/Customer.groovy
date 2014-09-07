@@ -8,6 +8,10 @@ class Customer {
 
     static hasMany = [hosts:Host]
 
+    static mapping = {
+        sort creationDate: "desc"
+    }
+
     static constraints = {
         email(blank: false, email:true, unique:true)
     }

@@ -35,13 +35,13 @@
 			<thead>
 				<tr>
 					<g:sortableColumn property="type.name" title="${message(code: 'executionZone.type.label', default: 'Type')}" />
-					<g:sortableColumn property="creationDate" title="${message(code: 'executionZone.creationDate.label', default: 'Creation Date')}" />
 					<g:sortableColumn property="puppetEnvironment" title="${message(code: 'executionZone.puppetEnvironment.label', default: 'Puppet-Env')}" />
 					<g:sortableColumn property="qualityStage" title="${message(code: 'executionZone.qualityStage.label', default: 'Quality-Stage')}" />
 					<g:sortableColumn style="width:20%" property="description" title="${message(code: 'executionZone.description.label', default: 'Description')}" />
 					<th style="width: 45%">
 						<g:message code="executionZone.parameters.label" default="Parameters" />
 					</th>
+					<g:sortableColumn property="creationDate" title="${message(code: 'executionZone.creationDate.label', default: 'Creation Date')}" />
 					<g:sortableColumn property="enabled" title="${message(code: 'executionZone.enabled.label', default: 'Enabled')}" />
 				</tr>
 			</thead>
@@ -52,9 +52,6 @@
 							<g:link action="show" id="${executionZoneInstance.id}">
 								${fieldValue(bean: executionZoneInstance, field: "type")}
 							</g:link>
-						</td>
-						<td>
-							<g:formatDate date="${executionZoneInstance.creationDate}" />
 						</td>
                         <td>
                             ${fieldValue(bean: executionZoneInstance, field: "puppetEnvironment")}
@@ -67,6 +64,9 @@
 						</td>
 						<td>
 							<g:render template="parametersInList" model="[parameters:executionZoneInstance.processingParameters]"></g:render>
+						</td>
+						<td>
+							<g:formatDate date="${executionZoneInstance.creationDate}" />
 						</td>
 						<td>
 							<g:if test="${executionZoneInstance.enabled}">

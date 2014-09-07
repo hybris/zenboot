@@ -9,6 +9,10 @@ class DnsEntry {
 
     static belongsTo = [owner:Host]
 
+    static mapping = {
+        sort creationDate: "desc"
+    }
+
     static constraints = {
         fqdn(unique:true, blank:false)
         hostType(blank:false)
