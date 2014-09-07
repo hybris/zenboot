@@ -1,5 +1,8 @@
 package org.zenboot.portal.processing
 
+/*  Something executable. Currently the execution is done on Domain-Objects
+ *  So currently only Scriptlet and ScriptletBatch
+ */
 abstract class Processable {
 
     Date creationDate

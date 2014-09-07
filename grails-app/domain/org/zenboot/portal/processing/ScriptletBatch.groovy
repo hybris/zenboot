@@ -4,8 +4,12 @@ import org.apache.log4j.*
 import org.zenboot.portal.processing.Processable.ProcessState
 import org.zenboot.portal.security.Person
 
-class ScriptletBatch extends Processable { 
-    
+
+/**  a Domain-class to Stores the result of a complete Stack-run in the DB
+ *   Stores a List of Proecessables, which are Scriptlets (only) at this point
+ */
+class ScriptletBatch extends Processable {
+
     String comment
 
     List processables = []
@@ -69,10 +73,10 @@ class ScriptletBatch extends Processable {
                 return 0
             default:
                 int total = this.processables.inject(0) { int counter, Processable processable ->
-                    counter += processable.countProcessables() 
+                    counter += processable.countProcessables()
                 }
                 int done = this.processables.inject(0) { int counter, Processable processable ->
-                    counter += processable.countExecutedProcessables() 
+                    counter += processable.countExecutedProcessables()
                 }
                 return (done/total) * 100
         }
@@ -80,7 +84,7 @@ class ScriptletBatch extends Processable {
 
     boolean isExecutable() {
         return !this.processables.empty
-    }  
+    }
 
     @Override
     public boolean cancel() {
