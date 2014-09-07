@@ -10,17 +10,14 @@
 </head>
 <body>
 	<div id="list-executionZone" class="content scaffold-list" role="main">
-		<h2 class="page-header">
-			<g:message code="default.list.label" args="[entityName]" />
-		</h2>
 
 		<g:if test="${flash.message}">
 			<div class="alert alert-info" role="status">
 				${flash.message}
 			</div>
 		</g:if>
-    
-    
+
+
     <div class="row-fluid">
       <g:if test="${!params.disabled}">
         <g:link action="list" params="[disabled: 'show']" class="btn btn-submit pull-right">
@@ -33,7 +30,7 @@
         </g:link>
       </g:else>
     </div>
-    
+
 		<table class="table table-striped">
 			<thead>
 				<tr>

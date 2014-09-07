@@ -56,7 +56,6 @@ class ScriptResolver {
     }
 
     private List injectYamlScriptFiles(List scriptFiles, int recursiveCounter = 0) {
-  		log.info("... on recursiveLevel:"+recursiveCounter)
       if (recursiveCounter >= 50 ) {
         throw new ZenbootException("recursive YAML-Lookup exceeded recursiveLevel of 50")
       }
@@ -69,10 +68,8 @@ class ScriptResolver {
   			}
       }
       if (containsYamlFile(result)) {
-        log.info("still needs resolving: "+result)
         return injectYamlScriptFiles(result, ++recursiveCounter)
       } else {
-        log.info("now it's flat! " + result)
         return result
       }
 	  }

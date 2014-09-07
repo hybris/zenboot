@@ -13,9 +13,6 @@
 </head>
 <body>
 	<div id="show-executionZone" class="content scaffold-show" role="main">
-		<h2 class="page-header">
-			<g:message code="default.show.label" args="[entityName]" />
-		</h2>
 
 		<g:if test="${flash.message}">
 			<div class="alert alert-info" role="status">
@@ -39,7 +36,7 @@
 			<i class="icon-list"></i>
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
-		
+
 		<div class="accordion" id="execution-show-accordion">
 			<div class="accordion-group">
 				<div class="accordion-heading">
@@ -61,7 +58,7 @@
 											</g:link>
 									</dd>
 								</g:if>
-								
+
 								<g:if test="${executionZoneInstance?.actions}">
 									<dt>
 										<g:message code="executionZone.actions.label" default="Actions" />
@@ -87,7 +84,7 @@
 										</ul>
 									</dd>
 								</g:if>
-								
+
 								<g:if test="${executionZoneInstance?.creationDate}">
 									<dt>
 										<g:message code="executionZone.creationDate.label" default="Creation Date" />
@@ -96,7 +93,7 @@
 										<g:formatDate date="${executionZoneInstance?.creationDate}" />
 									</dd>
 								</g:if>
-								
+
 				        <g:if test="${executionZoneInstance?.puppetEnvironment}">
 				        	<dt>
 				        		<g:message code="executionZone.puppetEnvironment.label" default="Puppet-Environment" />
@@ -111,7 +108,7 @@
 				        		<g:fieldValue bean="${executionZoneInstance}" field="qualityStage" />
 				        	</dd>
 				        </g:if>
-				        
+
 				        <g:if test="${executionZoneInstance?.description}">
 				        	<dt>
 				        		<g:message code="executionZone.description.label" default="Description" />
@@ -120,14 +117,14 @@
 				        		<g:fieldValue bean="${executionZoneInstance}" field="description" />
 				        	</dd>
 				        </g:if>
-				        
+
 				        <dt>
 				        	<g:message code="executionZone.enabled.label" default="Enabled" />
 				        </dt>
 								<dd>
 									<g:checkBox name="enabled" checked="${executionZoneInstance.enabled}" disabled="true" />
 								</dd>
-								
+
 								<g:if test="${executionZoneInstance?.enableExposedProcessingParameters}">
 									<dt>
 										<g:message code="executionZone.enableExposedProcessingParameters.label" default="Support exposed parameters" />
@@ -135,13 +132,13 @@
 									<dd>
 										<g:checkBox name="enableExposedProcessingParameters" checked="${executionZoneInstance.enableExposedProcessingParameters}" disabled="true" />
 									</dd>
-									
+
 								</g:if>
-						
+
 							</dl>
-				
+
 							<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
-				
+
 							<fieldset class="spacer buttons">
 								<g:link controller="scriptletBatch" action="list" params="[execId : executionZoneInstance?.id]" class="btn">
 										<g:message code="executionZone.showExecutedActions.label" default="Log" />
@@ -157,17 +154,17 @@
         		<g:message code="executionZone.execAction.label" default="Execute Script" />
       		</a>
 				</div>
-				 <div id="execScript" class="accordion-body collapse ${flash.action == 'execute' ? 'in' : ''}">
+				 <div id="execScript" class="accordion-body collapse in">
 				 	<div id="scriptDirs" class="accordion-inner">
 				 		<g:form method="post">
-				 			
+
 				 			<g:if test="${cmd}">
 								<g:set value="${cmd.scriptDir}" var="selectedScriptDir" />
 							</g:if>
 							<g:elseif test="${!scriptDirs.empty}">
 								<g:set value="${scriptDirs.iterator().next()}" var="selectedScriptDir" />
 							</g:elseif>
-				 			
+
 				 			<g:each var="scriptDir" in="${scriptDirs}" status="i">
 								<div style="margin-bottom: 10px;">
 									<g:radio name="scriptDir" id="scriptdir-${i}" value="${scriptDir}" checked="${scriptDir == selectedScriptDir}" />
@@ -185,28 +182,28 @@
 									<div id="scriptdir-${i}_flow" class="hide flow-chart"></div>
 								</div>
 							</g:each>
-										
+
 							<h3>
 								<g:message code="executionZone.parameters.label" default="Parameters" />
 							</h3>
-							
+
 							<span id="parametersSpinner" style="display:none" >
 								<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 							</span>
-							
+
 							<div class="property-value" aria-labelledby="parameters-label" id="parameters">
 								<g:include action="ajaxGetParameters" params="[scriptDir:selectedScriptDir, execId:executionZoneInstance?.id]" />
 							</div>
-				 			
+
 				 			<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
-				 			
+
 				 			<hr />
 				 			<div class="row-fluid">
   				 			<g:textArea name="comment" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;" placeholder="${message(code: 'executionZone.comment.label', default: 'Execution comment')}" />
 				 			</div>
-				 			
+
 				 			<fieldset class="spacer buttons">
-				 			
+
 				 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Zone')}" disabled="${!executionZoneInstance?.enabled}" />
 				 				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 									<g:actionSubmit class="btn btn-inverse" action="createExposedAction" value="${message(code: 'executionZone.button.createExposedAction.label', default: 'Expose Action')}" disabled="${!executionZoneInstance?.enabled}" />
