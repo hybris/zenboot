@@ -25,7 +25,7 @@
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
 
-		
+
 		<dl class="dl-horizontal">
 			<dt>
 				<g:message code="host.type.label" default="Type" />
@@ -33,7 +33,7 @@
 			<dd>
 				${hostInstance?.class.getSimpleName()}
 			</dd>
-			
+
 			<g:if test="${hostInstance?.ipAddress}">
 				<dt>
 					<g:message code="host.ipAddress.label" default="Ip Address" />
@@ -42,7 +42,7 @@
 					<g:fieldValue bean="${hostInstance}" field="ipAddress" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${hostInstance?.cname}">
 				<dt>
 					<g:message code="host.cname.label" default="Cname" />
@@ -61,6 +61,15 @@
 				</dd>
 			</g:if>
 
+		<g:if test="${hostInstance?.execZone}">
+			<dt>
+				<g:message code="host.hostname.label" default="ExecutionZone" />
+			</dt>
+			<dd>
+				${hostInstance?.execZone?.encodeAsHTML()}
+			</dd>
+		</g:if>
+
 			<g:if test="${hostInstance?.hostname}">
 				<dt>
 					<g:message code="host.hostname.label" default="Hostname" />
@@ -69,7 +78,7 @@
 					${hostInstance?.hostname?.encodeAsHTML()}
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${hostInstance?.instanceId}">
 				<dt>
 					<g:message code="host.instanceId.label" default="Instance Id" />
@@ -78,16 +87,16 @@
 					<g:fieldValue bean="${hostInstance}" field="instanceId" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${hostInstance?.state}">
 				<dt>
 					<g:message code="host.state.label" default="State" />
 				</dt>
 				<dd>
 					<g:fieldValue bean="${hostInstance}" field="state" />
-				</dd>			
+				</dd>
 			</g:if>
-			
+
 			<g:if test="${hostInstance?.creationDate}">
 				<dt>
 					<g:message code="host.creationDate.label" default="Creation Date" />
@@ -96,7 +105,7 @@
 					<g:formatDate date="${hostInstance?.creationDate}" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${hostInstance?.dnsEntries}">
 				<dt>
 					<g:message code="host.dnsEntries.label" default="Dns Entries" />
@@ -111,7 +120,7 @@
 					</g:each>
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${hostInstance?.expiryDate}">
 				<dt>
 					<g:message code="host.expiryDate.label" default="Expiry Date" />
@@ -120,7 +129,7 @@
 					<g:formatDate date="${hostInstance?.expiryDate}" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${hostInstance?.owner}">
 				<dt>
 					<g:message code="host.owner.label" default="Owner" />

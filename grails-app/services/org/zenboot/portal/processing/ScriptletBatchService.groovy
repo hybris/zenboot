@@ -31,8 +31,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
                 map[param.name] = param.value
                 return map
             })
+            processContext.execZone=action.executionZone
             ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
-
             batch.execute(processContext)
             this.synchronizeExposedProcessingParameters(batch, processContext)
         }
@@ -109,7 +109,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
         batch.save(flush:true)
         action.scriptletBatches << batch
-        action.save() 
+        action.save()
 
         this.addScriptlets(batch, action.runtimeAttributes)
 

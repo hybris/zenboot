@@ -1,5 +1,7 @@
 package org.zenboot.portal
 
+import org.zenboot.portal.processing.ExecutionZone
+
 class Host {
 
     String ipAddress
@@ -13,6 +15,8 @@ class Host {
     List dnsEntries = []
     Customer owner
     Environment environment
+
+    static belongsTo = [execZone:ExecutionZone]
 
     static hasMany = [dnsEntries:DnsEntry]
 

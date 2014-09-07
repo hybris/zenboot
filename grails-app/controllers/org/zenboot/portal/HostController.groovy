@@ -1,9 +1,10 @@
 package org.zenboot.portal
 
 import org.springframework.dao.DataIntegrityViolationException
+import org.zenboot.portal.processing.ExecutionZone
 
 class HostController {
-    
+
     static allowedMethods = [update: "POST", delete: "POST"]
 
     def index() {
@@ -12,7 +13,27 @@ class HostController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [hostInstanceList: Host.list(params), hostInstanceTotal: Host.count()]
+
+        def hostInstanceList
+        def hostInstanceTotal
+        def parameters = [:]
+        if (params.execId) {
+          def executionZoneInstance = ExecutionZone.get(params.execId)
+          if (!executionZoneInstance) {
+              flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
+              redirect(action: "list")
+              return
+          }
+            parameters.execId = params.execId
+            hostInstanceList = Host.findAllByExecZone(executionZoneInstance, params)
+            hostInstanceTotal = Host.findAllByExecZone(executionZoneInstance).size()
+        } else {
+            hostInstanceList = Host.list(params)
+            hostInstanceTotal = Host.count()
+        }
+
+
+        [hostInstanceList: hostInstanceList, hostInstanceTotal: hostInstanceTotal, parameters:parameters]
     }
 
     def show() {
@@ -90,5 +111,5 @@ class HostController {
             redirect(action: "list")
         }
     }
- 
+
 }

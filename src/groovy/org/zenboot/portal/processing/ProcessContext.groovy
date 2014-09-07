@@ -9,9 +9,10 @@ class ProcessContext {
     ParameterConverterMap parameters
     Host host
     Person user
+    ExecutionZone execZone
 
     @Override
     String toString() {
-        return "${this.class.getSimpleName()} (host=${this.host}/params=${this.parameters}/users=${this.user==null ? "null" : this.user.username})"
+        return "${this.class.getSimpleName()} (host=${this.host}/params=${this.parameters}/users=${this.user==null ? "null" : this.user.username}/ExecZone=${this.execZone})"
     }
 }

@@ -61,13 +61,14 @@ class CreateHostInstance {
         HostService hostService = grailsApplication.mainContext.getBean(HostService.class)
 
         Host host = new Host(
-                ipAddress :ctx.parameters['IP'],
-                macAddress: ctx.parameters['MAC'],
-                instanceId: ctx.parameters.getObject('HOSTNAME').id, //can be an internal id to manage this host in a cloud environment
-                hostname: ctx.parameters.getObject('HOSTNAME'),
-                owner: Customer.findByEmail(ctx.parameters['CUSTOMER_EMAIL']) ?: new Customer(email:ctx.parameters['CUSTOMER_EMAIL']).save(),
-                expiryDate: hostService.getExpiryDate(),
-                state: HostState.CREATED,
+                execZone:    ctx.execZone,
+                ipAddress :  ctx.parameters['IP'],
+                macAddress:  ctx.parameters['MAC'],
+                instanceId:  ctx.parameters.getObject('HOSTNAME').id, //can be an internal id to manage this host in a cloud environment
+                hostname:    ctx.parameters.getObject('HOSTNAME'),
+                owner:       Customer.findByEmail(ctx.parameters['CUSTOMER_EMAIL']) ?: new Customer(email:ctx.parameters['CUSTOMER_EMAIL']).save(),
+                expiryDate:  hostService.getExpiryDate(),
+                state:       HostState.CREATED,
                 environment: Environment.DEVELOPMENT
                 )
 
