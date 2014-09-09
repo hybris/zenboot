@@ -74,10 +74,10 @@
 			<pre id="${itemId}_logged" aria-labelledby="processables-log" class="hide">${q?.logged}</pre>
 		</g:if>
 		<g:if test="${q?.output}">
-			<pre id="${itemId}_output" class="alert alert-info hide" aria-labelledby="processables-output">${q?.output}</pre>
+			<pre id="${itemId}_output" class="alert alert-info hide" aria-labelledby="processables-output" <g:if test="${q?.state == ProcessState.RUNNING}">style="display: block;"</g:if>>${q?.output}</pre>
 		</g:if>
 		<g:if test="${q?.error}">
-			<pre id="${itemId}_error" class="alert alert-warning hide" aria-labelledby="processables-error">${q?.error}</pre>
+			<pre id="${itemId}_error" class="alert alert-warning hide" aria-labelledby="processables-error" <g:if test="${q?.state == ProcessState.RUNNING}">style="display: block;"</g:if>>${q?.error}</pre>
 		</g:if>
 		<g:if test="${q?.exceptionMessage}">
 			<pre id="${itemId}_exception" class="alert alert-error hide" aria-labelledby="processables-exception">${q?.exceptionMessage}</pre>

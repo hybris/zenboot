@@ -1,0 +1,18 @@
+#
+## It is possible to reference other script in other folders by adding YAML files to the scriptlet stack.
+##
+## A property "lookupPath" can be set which defines where Zenboot should look for such scripts.
+## The local script-folder is always added to the lookup path.
+## Zenboot will iterate through the lookup bath in the same order as defined and try to find the script
+## by appending the lookup path in front of the script name. First hit wins. Lookup-path values can be relative or absolute.
+##
+## The property "scripts" contains a list of scripts which will be added to the scriptlet stack. The scripts will be introduce
+## in the same order as they are listed and replace the YAML-file in the scriptlet stack.
+##
+lookupPath:
+  - ../how-to-reference-scripts
+  - ../helloworld
+scripts:
+  - run-60-secs.sh
+  - run-60-secs.sh
+
