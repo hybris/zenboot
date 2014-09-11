@@ -1,6 +1,9 @@
 <strong>
 	${element.file.name}
 </strong>
+<a class="zb-tooltip" onclick="javascript:$('#${element.file.name.replace(".","_")}_text').slideToggle()" title="${message(code:'scriptletBatch.button.showException', default:'Show Exception')}">
+	<i class="icon-eye-close"></i>
+</a>
 <g:if test="${type}">
 	<br />
 	<small>
@@ -21,3 +24,5 @@
 		</td>
 	</tr>
 </table>
+
+<pre id="${element.file.name.replace(".","_")}_text" style="display: none;">${element.file.text}</pre>
