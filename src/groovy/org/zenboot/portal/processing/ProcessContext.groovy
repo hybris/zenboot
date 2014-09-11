@@ -13,6 +13,15 @@ class ProcessContext {
 
     @Override
     String toString() {
-        return "${this.class.getSimpleName()} (host=${this.host}/params=${this.parameters}/users=${this.user==null ? "null" : this.user.username}/ExecZone=${this.execZone})"
+      return "${this.class.getSimpleName()} (host=${this.host}/params=\n${this.getParamsAsString()}/users=${this.user==null ? "null" : this.user.username}/ExecZone=${this.execZone})"
     }
+
+    String getParamsAsString() {
+      String paramsAsString=""
+      for ( key in parameters.keySet() ) {
+           paramsAsString += key +"="+parameters.get(key) +"\n"
+      }
+      return paramsAsString
+    }
+
 }
