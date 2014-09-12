@@ -1,4 +1,5 @@
 <%@ page import="org.zenboot.portal.processing.ExecutionZone"%>
+<%@ page import="org.zenboot.portal.HostState"%>
 <!doctype html>
 <html>
 <head>
@@ -41,6 +42,7 @@
 					<th style="width: 45%">
 						<g:message code="executionZone.parameters.label" default="Parameters" />
 					</th>
+					<g:sortableColumn property="hosts.size()" property="hosts" title="${message(code: 'executionZone.hosts.label', default: 'Completed Hosts')}" />
 					<g:sortableColumn property="creationDate" title="${message(code: 'executionZone.creationDate.label', default: 'Creation Date')}" />
 					<g:sortableColumn property="enabled" title="${message(code: 'executionZone.enabled.label', default: 'Enabled')}" />
 				</tr>
@@ -53,17 +55,20 @@
 								${fieldValue(bean: executionZoneInstance, field: "type")}
 							</g:link>
 						</td>
-                        <td>
-                            ${fieldValue(bean: executionZoneInstance, field: "puppetEnvironment")}
-                        </td>
-                        <td>
-                            ${fieldValue(bean: executionZoneInstance, field: "qualityStage")}
-                        </td>
+            <td>
+                ${fieldValue(bean: executionZoneInstance, field: "puppetEnvironment")}
+            </td>
+            <td>
+                ${fieldValue(bean: executionZoneInstance, field: "qualityStage")}
+            </td>
 						<td>
 							${fieldValue(bean: executionZoneInstance, field: "description")}
 						</td>
 						<td>
 							<g:render template="parametersInList" model="[parameters:executionZoneInstance.processingParameters]"></g:render>
+						</td>
+						<td>
+							${executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }.size()}
 						</td>
 						<td>
 							<g:formatDate date="${executionZoneInstance.creationDate}" />
