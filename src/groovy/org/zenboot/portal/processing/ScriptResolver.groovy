@@ -84,34 +84,40 @@ class ScriptResolver {
     }
 
     private List getScriptFilesFromYaml(File yamlFile) {
-        def yaml = Yaml.load(yamlFile)
+      log.info("Resolving yamlFile "+yamlFile)
+      def yaml = Yaml.load(yamlFile)
 
-        List lookupPath = this.getLookupPath(yamlFile.parent, yaml)
+      List lookupPath = this.getLookupPath(yamlFile.parent, yaml)
 
-        List scriptFiles = yaml.scripts.findResults { String script ->
-            lookupPath.findResult { String path ->
-                def scriptFile = new File("${path}${System.properties['file.separator']}${script}")
-                if (scriptFile.exists()) {
-                    return scriptFile
-                }
-                return null
-            }
+      List scriptFiles = []
+      for (script in yaml.scripts) {
+        def resolvedScript = lookupPath.findResult { String path ->
+          def scriptFile = new File("${path}${System.properties['file.separator']}${script}")
+          if (scriptFile.exists()) {
+            return scriptFile
+          }
+          return null
         }
-
-        return scriptFiles
+        if (resolvedScript==null) {
+          throw new ZenbootException("cannot resolve script:"+script)
+        }
+        scriptFiles << resolvedScript
+      }
+      log.info("Result:"+scriptFiles)
+      return scriptFiles
     }
 
     private List getLookupPath(String rootDir, yaml) {
-        List lookupPath = []
-        lookupPath << rootDir
-        yaml.lookupPath?.each { String path ->
-            if (path.startsWith('/')) {
-                lookupPath << path
-            } else {
-                lookupPath << "${rootDir}${System.properties['file.separator']}${path}"
-            }
+      List lookupPath = []
+      lookupPath << rootDir
+      yaml.lookupPath?.each { String path ->
+        if (path.startsWith('/')) {
+          lookupPath << path
+        } else {
+          lookupPath << "${rootDir}${System.properties['file.separator']}${path}"
         }
-        return lookupPath
+      }
+      return lookupPath
     }
 }
 
