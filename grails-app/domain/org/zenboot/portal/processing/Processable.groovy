@@ -161,6 +161,8 @@ abstract class Processable {
     int getProcessTime() {
         if (this.endDate) {
             return this.endDate.getTime() - this.startDate.getTime()
+        } else if (this.startDate) {
+            return (new Date()).getTime() - this.startDate.getTime()
         } else {
             return -1
         }
