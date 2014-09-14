@@ -54,6 +54,7 @@ class CreateHostInstance {
     @Parameters([
         @Parameter(name="CUSTOMER_EMAIL", description="The email address if the customer", type=ParameterType.CONSUME),
         @Parameter(name="HOSTNAME", description="The name of the host", type=ParameterType.CONSUME),
+        @Parameter(name="DOMAIN", description="The name of the host", type=ParameterType.CONSUME),
         @Parameter(name="MAC", description="The MAC address of the host", type=ParameterType.CONSUME),
         @Parameter(name="IP", description="The IP address of the host", type=ParameterType.CONSUME)
     ])
@@ -63,6 +64,7 @@ class CreateHostInstance {
         Host host = new Host(
                 execZone:    ctx.execZone,
                 ipAddress :  ctx.parameters['IP'],
+                cname:       ctx.parameters['NODENAME']+"."+ctx.parameters['DOMAIN'],
                 macAddress:  ctx.parameters['MAC'],
                 instanceId:  ctx.parameters.getObject('HOSTNAME').id, //can be an internal id to manage this host in a cloud environment
                 hostname:    ctx.parameters.getObject('HOSTNAME'),

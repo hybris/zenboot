@@ -21,6 +21,13 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     public void onApplicationEvent(ProcessingEvent event) {
         this.log.info("Receive application event ${event}")
 
+        // ToDo Refactor, so that not the processingEvent is a param to the closure, but
+        // user, executionZoneAction and comment
+        // This is basically
+        // * creating and populating the ProcessContext
+        // * creating and populating the Scriptletbatch
+        // * run the execute-method with the processContext
+        // * synchronizeExposedProcessingParameters ?????
         Closure execute = { ProcessingEvent processingEvent ->
             ProcessContext processContext = new ProcessContext(
             parameters:new ParameterConverterMap(parameterConverters:grailsApplication.mainContext.getBeansOfType(ParameterConverter).values()),
@@ -38,6 +45,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }
 
         if (event.processAsync && grailsApplication.config.zenboot.processing.asynchron.toBoolean()) {
+            // This leverages the grails executor-plugin
+            // https://github.com/basejump/grails-executor#examples
             runAsync { execute(event) }
         } else {
             execute(event)
