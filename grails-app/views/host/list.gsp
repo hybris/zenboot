@@ -70,7 +70,7 @@
 		</table>
 
 		<div class="pagination">
-			<g:paginate total="${hostInstanceTotal}" max="1" />
+			<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
 		</div>
 	</div>
 </body>
