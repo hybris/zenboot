@@ -36,13 +36,16 @@
 			<thead>
 				<tr>
 					<g:sortableColumn property="type.name" title="${message(code: 'executionZone.type.label', default: 'Type')}" />
-					<g:sortableColumn property="puppetEnvironment" title="${message(code: 'executionZone.puppetEnvironment.label', default: 'Puppet-Env')}" />
+<!--  		<g:sortableColumn property="puppetEnvironment" title="${message(code: 'executionZone.puppetEnvironment.label', default: 'Puppet-Env')}" />
 					<g:sortableColumn property="qualityStage" title="${message(code: 'executionZone.qualityStage.label', default: 'Quality-Stage')}" />
-					<g:sortableColumn style="width:20%" property="description" title="${message(code: 'executionZone.description.label', default: 'Description')}" />
-					<th style="width: 45%">
+--> 			<g:sortableColumn style="width:20%" property="description" title="${message(code: 'executionZone.description.label', default: 'Description')}" />
+					<th>
 						<g:message code="executionZone.parameters.label" default="Parameters" />
 					</th>
 					<g:sortableColumn property="hosts.size()" property="hosts" title="${message(code: 'executionZone.hosts.label', default: 'Completed Hosts')}" />
+					<th >
+						<g:message code="executionZone.serviceurls.label" default="ServiceUrls" />
+					</th>
 					<g:sortableColumn property="creationDate" title="${message(code: 'executionZone.creationDate.label', default: 'Creation Date')}" />
 					<g:sortableColumn property="enabled" title="${message(code: 'executionZone.enabled.label', default: 'Enabled')}" />
 				</tr>
@@ -55,13 +58,13 @@
 								${fieldValue(bean: executionZoneInstance, field: "type")}
 							</g:link>
 						</td>
-            <td>
+<!--        <td>  For now, let's disable this. Might be good to make that configurable
                 ${fieldValue(bean: executionZoneInstance, field: "puppetEnvironment")}
             </td>
             <td>
                 ${fieldValue(bean: executionZoneInstance, field: "qualityStage")}
             </td>
-						<td>
+-->					<td>
 							${fieldValue(bean: executionZoneInstance, field: "description")}
 						</td>
 						<td>
@@ -69,6 +72,9 @@
 						</td>
 						<td>
 							${executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }.size()}
+						</td>
+						<td>
+							<g:render template="serviceurlsInList" model="[serviceUrls:executionZoneInstance.getActiveServiceUrls()]"></g:render>
 						</td>
 						<td>
 							<g:formatDate date="${executionZoneInstance.creationDate}" />

@@ -1,10 +1,7 @@
-<g:if test="${parameters.isEmpty()}">
-	<g:message code="executionZone.parameters.empty" default="No parameters defined" />
-</g:if>
-<g:else>
+<g:if test="${!parameters.isEmpty()}">
 	<div class="collapsable-list">
 		<a class="collapsed" style="cursor: pointer">
-			<g:message code="executionZone.parameters.size" default="{0} parameters defined" args="[parameters.size()]" />
+			<g:message code="executionZone.parameters.size()" default="{0} parameters" args="[parameters.size()]" />
 			<i class="icon-resize-full"></i>
 		</a>
 		<ul class="unstyled hide">
@@ -15,4 +12,4 @@
 			</g:each>
 		</ul>
 	</div>
-</g:else>
+</g:if>

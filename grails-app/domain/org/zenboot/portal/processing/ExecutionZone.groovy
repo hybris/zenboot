@@ -2,6 +2,7 @@ package org.zenboot.portal.processing
 
 import org.zenboot.portal.Template;
 import org.zenboot.portal.Host
+import org.zenboot.portal.HostState
 
 class ExecutionZone {
 
@@ -73,6 +74,14 @@ class ExecutionZone {
 
     List getAuditLogEvents() {
         return ProcessingParameterLog.findAllByProcessingParameterInList(this.processingParameters, [sort: "dateCreated", order: "desc"])
+    }
+
+    List getCompletedHosts() {
+      return this.hosts.findResults() { it.state == HostState.COMPLETED ? it : null  }
+    }
+
+    List getActiveServiceUrls() {
+      this.getCompletedHosts().findResults() { it.serviceUrls }.flatten()
     }
 
 }
