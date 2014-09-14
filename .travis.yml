@@ -27,10 +27,3 @@ deploy:
     repo: hybris/zenboot
     tags: true
     all_branches: true
-after_success:
-- chmod 600 .travis/id_rsa
-- ssh-add .travis/id_rsa
-- sed -i 's/ADD http.*/ADD https:\/\/github.com\/hybris\/zenboot\/releases\/download\/v0.7.3\/zenboot.war \/home\/user\/tomcat7\/webapps\/zenboot.war/' Dockerfile
-- git add Dockerfile
-- git commit -m "Release and adapt Dockerfile"
-- git push
