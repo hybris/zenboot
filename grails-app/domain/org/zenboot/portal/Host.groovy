@@ -9,7 +9,7 @@ class Host {
     String macAddress
     Date creationDate
     Date expiryDate
-    String instanceId
+    String instanceId // can be used for the ID if the underlying IAAS-Provider
     HostState state = HostState.UNKNOWN
     Hostname hostname
     List dnsEntries = []
@@ -18,7 +18,7 @@ class Host {
 
     static belongsTo = [execZone:ExecutionZone]
 
-    static hasMany = [dnsEntries:DnsEntry]
+    static hasMany = [dnsEntries:DnsEntry,serviceUrls:ServiceUrl]
 
     static mapping = {
         dnsEntries cascade: 'all-delete-orphan'

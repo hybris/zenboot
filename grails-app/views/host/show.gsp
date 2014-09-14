@@ -61,6 +61,25 @@
 				</dd>
 			</g:if>
 
+		<g:if test="${hostInstance?.serviceUrls}">
+			<dt>
+				<g:message code="executionZone.serviceUrls.label" default="ServiceUrls" />
+			</dt>
+			<dd class="collapsable-list">
+				<a class="collapsed" style="cursor: pointer">
+					<g:message code="hostInstance.serviceUrls.size()" default="{0} serviceUrl defined" args="[hostInstance.serviceUrls.size()]" />
+					<i class="icon-resize-full"></i>
+				</a>
+				<ul class="unstyled hide">
+					<g:each in="${hostInstance.serviceUrls}" var="s" status="status">
+						<li>
+							<a href="${s.url}">${s.url}</a>
+						</li>
+					</g:each>
+				</ul>
+			</dd>
+		</g:if>
+
 		<g:if test="${hostInstance?.execZone}">
 			<dt>
 				<g:message code="host.hostname.label" default="ExecutionZone" />
