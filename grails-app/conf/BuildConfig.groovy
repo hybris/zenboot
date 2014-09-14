@@ -48,6 +48,7 @@ grails.project.dependency.resolution = {
         runtime ":spring-security-core:1.2.7.3"
         compile ":webxml:1.4.1"
         runtime ':twitter-bootstrap:2.3.2'
+        runtime ':console:1.5.0'
 
         //spring security ui specific
         runtime ":spring-security-ui:0.2"
