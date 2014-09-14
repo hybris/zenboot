@@ -80,6 +80,10 @@ class ExecutionZone {
       return this.hosts.findResults() { it.state == HostState.COMPLETED ? it : null  }
     }
 
+    List getNonDeletedHosts() {
+      return this.hosts.findResults() { it.state == HostState.DELETED ? null : it  }
+    }
+
     List getActiveServiceUrls() {
       this.getCompletedHosts().findResults() { it.serviceUrls }.flatten()
     }

@@ -42,8 +42,10 @@
 					<th>
 						<g:message code="executionZone.parameters.label" default="Parameters" />
 					</th>
-					<g:sortableColumn property="hosts.size()" property="hosts" title="${message(code: 'executionZone.hosts.label', default: 'Completed Hosts')}" />
-					<th >
+					<th>
+						<g:message code="executionZone.parameters.hosts" default="Hosts (Completed / NotDeleted)"/>
+					</th>
+					<th>
 						<g:message code="executionZone.serviceurls.label" default="ServiceUrls" />
 					</th>
 					<g:sortableColumn property="creationDate" title="${message(code: 'executionZone.creationDate.label', default: 'Creation Date')}" />
@@ -71,7 +73,7 @@
 							<g:render template="parametersInList" model="[parameters:executionZoneInstance.processingParameters]"></g:render>
 						</td>
 						<td>
-							${executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }.size()}
+							${executionZoneInstance.getCompletedHosts().size()} / ${executionZoneInstance.getNonDeletedHosts().size()}
 						</td>
 						<td>
 							<g:render template="serviceurlsInList" model="[serviceUrls:executionZoneInstance.getActiveServiceUrls()]"></g:render>
