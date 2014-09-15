@@ -21,7 +21,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
     def springSecurityService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-    
+
     def execute = { ExecuteExecutionZoneCommand cmd ->
         flash.action = 'execute'
         cmd.setParameters(params.parameters)
@@ -33,7 +33,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, params.comment))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
-        
+
         redirect(action:"show", id:cmd.execId)
     }
 
@@ -123,7 +123,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         if (!params.disabled) {
             enabled = true
         }
-        
+
         [
             executionZoneInstanceList: ExecutionZone.findAllByEnabled(enabled, params),
             executionZoneInstanceTotal: ExecutionZone.countByEnabled(enabled),
@@ -156,9 +156,21 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             redirect(action: "list")
             return
         }
+        List scriptDirs = this.executionZoneService.getScriptDirs(executionZoneInstance.type)
+        List sortedScriptDirs = [[],[]]
+        for (scriptDir in scriptDirs) {
+          log.info("processing "+scriptDir.name)
+          if (scriptDir.name..matches(/^((xx_)|(yy_)|(zz_)|(aa_)|(bb_)).*/)){
+            sortedScriptDirs[1] << scriptDir
+          } else {
+            sortedScriptDirs[0] << scriptDir
+          }
+        }
+
         [
             executionZoneInstance: executionZoneInstance,
-            scriptDirs: this.executionZoneService.getScriptDirs(executionZoneInstance.type)
+            scriptDirs: scriptDirs,
+            sortedScriptDirs: sortedScriptDirs
         ]
     }
 
@@ -201,7 +213,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             render(view: "show", model: [executionZoneInstance: executionZoneInstance])
             return
         }
-        
+
         flash.action = 'update'
         flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
@@ -226,7 +238,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             redirect(action: "show", id: params.execId)
         }
     }
-    
+
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.applicationEventPublisher = eventPublisher
@@ -301,7 +313,7 @@ class GetReadmeCommand {
 
     File scriptDir
     String editorId
-    
+
     protected File readme
 
     static constraints = {
@@ -324,12 +336,12 @@ class GetReadmeCommand {
         }
         return this.readme
     }
-    
+
     String getReadmeMarkdown() {
         File readme = this.getReadmeFile()
         return readme.getText()
     }
-    
+
     String getReadmeChecksum() {
         return this.getReadmeMarkdown().encodeAsMD5()
     }
