@@ -22,6 +22,6 @@ sleep 60
 sudo docker build -t k9ert/zenboot .
 echo -n "about to tag the Dockerimage"
 sudo docker tag k9ert/zenboot:latest $1
-sudo docker push k9ert/zenboot:lastest
+sudo docker push k9ert/zenboot:latest
 sudo docker push k9ert/zenboot:${1}
 
