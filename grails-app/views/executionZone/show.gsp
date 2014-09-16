@@ -196,17 +196,28 @@
 								<g:set value="${scriptDirs.iterator().next()}" var="selectedScriptDir" />
 							</g:elseif>
 
+							<ul class="nav nav-tabs" role="tablist">
+							  <li class="active"><a href="#sd-create" data-toggle="tab">Create</a></li>
+							  <li><a href="#sd-update" data-toggle="tab">Update</a></li>
+							  <li><a href="#sd-delete" data-toggle="tab">Delete</a></li>
+								<li><a href="#sd-misc" data-toggle="tab">Misc</a></li>
+							</ul>
 
-							<g:render template="scriptDirs" model="['scriptDirs':sortedScriptDirs[0]]"/>
-
-							<div class="collapsable-list">
-								<a class="collapsed" data-toggle="collapse" data-target="#xxscripts"  >
-									hidden scripts <i class="icon-resize-full"></i>
-								</a>
-								<div class="collapse" id="xxscripts">
-									<g:render template="scriptDirs" model="['scriptDirs':sortedScriptDirs[1]]"/>
+							<div class="tab-content">
+							  <div class="tab-pane active" id="sd-create">
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.create, type:'create']"/>
+								</div>
+							  <div class="tab-pane" id="sd-update">
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.update, type:'update']"/>
+								</div>
+							  <div class="tab-pane" id="sd-delete">
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.delete, type:'delete']"/>
+								</div>
+							  <div class="tab-pane" id="sd-misc">
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.misc, type:'misc']"/>
 								</div>
 							</div>
+
 
 							<h3>
 								<g:message code="executionZone.parameters.label" default="Parameters" />

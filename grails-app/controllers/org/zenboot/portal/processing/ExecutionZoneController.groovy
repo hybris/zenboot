@@ -157,20 +157,17 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             return
         }
         List scriptDirs = this.executionZoneService.getScriptDirs(executionZoneInstance.type)
-        List sortedScriptDirs = [[],[]]
-        for (scriptDir in scriptDirs) {
-          log.info("processing "+scriptDir.name)
-          if (scriptDir.name.matches(/^((xx_)|(yy_)|(zz_)|(aa_)|(bb_)).*/)){
-            sortedScriptDirs[1] << scriptDir
-          } else {
-            sortedScriptDirs[0] << scriptDir
-          }
-        }
+
+        def structuredScriptDirs = [:]
+        structuredScriptDirs["create"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"create")
+        structuredScriptDirs["update"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"update")
+        structuredScriptDirs["delete"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"delete")
+        structuredScriptDirs["misc"]   = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"misc")
 
         [
             executionZoneInstance: executionZoneInstance,
             scriptDirs: scriptDirs,
-            sortedScriptDirs: sortedScriptDirs
+            structuredScriptDirs: structuredScriptDirs
         ]
     }
 

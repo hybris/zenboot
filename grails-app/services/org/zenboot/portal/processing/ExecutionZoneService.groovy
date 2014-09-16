@@ -5,12 +5,13 @@ import org.zenboot.portal.PathResolver
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
+import org.ho.yaml.Yaml
 
 class ExecutionZoneService {
 
-    
-    
-    
+
+
+
     static final String SCRIPTS_DIR = 'scripts'
     static final String JOBS_DIR = 'jobs'
     static final String PLUGINS_DIR = 'plugins'
@@ -25,7 +26,7 @@ class ExecutionZoneService {
         }
 
         //track the enabled execution zone types in a separate list to be able to find non-existing types later
-        Set enabledTypes = this.getEnabledExecutionZoneTypes(execZoneTypes)      
+        Set enabledTypes = this.getEnabledExecutionZoneTypes(execZoneTypes)
 
         //disable all types which no longer exist by comparing enabled types with previously defined types
         this.disableExcutionZoneTypes(execZoneTypes, enabledTypes)
@@ -33,7 +34,7 @@ class ExecutionZoneService {
 
     private Set getEnabledExecutionZoneTypes(Map execZoneTypes) {
         Set enabledTypes = []
-        
+
         File scriptDir = this.getZenbootScriptsDir()
         scriptDir.eachDir { File directory ->
 
@@ -55,10 +56,10 @@ class ExecutionZoneService {
 
             enabledTypes << execZoneTypes[directory.name]
         }
-        
+
         return enabledTypes
     }
-    
+
 	private void disableExcutionZoneTypes(Map execZoneTypes, Set enabledTypes) {
 		def disabledTypes = execZoneTypes.values()
 		disabledTypes.removeAll(enabledTypes)
@@ -73,7 +74,7 @@ class ExecutionZoneService {
     List getRuntimeAttributes() {
         return this.normalizeRuntimeAttributes(grailsApplication.config.zenboot.processing.attributes.toString().split(",").asType(List))
     }
-    
+
     private List normalizeRuntimeAttributes(List attributes) {
         return attributes*.trim()*.toLowerCase()
     }
@@ -145,6 +146,31 @@ class ExecutionZoneService {
         return scriptDirs.sort()
     }
 
+    /**
+     * returns a List of Directories
+     */
+    List getScriptDirs(ExecutionZoneType type, String filter) {
+      List scriptDirs = []
+      File scriptDir = this.getScriptDir(ExecutionZoneType.findAll()[2])
+      if (scriptDir.exists()) {
+        scriptDir.eachDir {
+          File metaFile = new File(it, ".meta.yaml")
+          if (metaFile.exists()) {
+            def yaml = Yaml.load(metaFile)
+            if (yaml['ui-script-types'].contains(filter)) {
+              scriptDirs << it
+            }
+          } else {
+            if (filter.equals("misc")) {
+              scriptDirs << it
+            }
+          }
+        }
+
+      }
+      return scriptDirs.sort()
+    }
+
     private File getDir(ExecutionZoneType type, String subDir) {
         String path = "${this.getZenbootScriptsDir()}${System.properties['file.separator']}${type.name}"
         if (!subDir.isEmpty()) {
@@ -186,7 +212,7 @@ class ExecutionZoneService {
 		return parameters
 	}
 
-    def resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction, Map parameters) {      
+    def resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction, Map parameters) {
         def result = new Expando()
         result.missingParameters = []
         result.resolvedParameters = [:]
