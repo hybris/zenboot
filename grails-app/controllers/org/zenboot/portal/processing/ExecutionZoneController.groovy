@@ -160,7 +160,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         List sortedScriptDirs = [[],[]]
         for (scriptDir in scriptDirs) {
           log.info("processing "+scriptDir.name)
-          if (scriptDir.name..matches(/^((xx_)|(yy_)|(zz_)|(aa_)|(bb_)).*/)){
+          if (scriptDir.name.matches(/^((xx_)|(yy_)|(zz_)|(aa_)|(bb_)).*/)){
             sortedScriptDirs[1] << scriptDir
           } else {
             sortedScriptDirs[0] << scriptDir
