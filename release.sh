@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Check whether travis finished the build, something like:
+# TODO: Check whether travis finished the build, something like:
 # curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r '.[0].state'
+
+# ToDo updating the number through the Grails Application Version Update Plugin 
+# http://grails.org/plugin/version-update
+
+# ./grailsw version-update
 
 echo "Will now release $1"
 git add application.properties
