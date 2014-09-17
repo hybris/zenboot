@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# TODO: Check whether travis finished the build, something like:
-# curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r '.[0].state'
+# Check whether travis finished the build, something like:
+[ `curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r '.[0].state'` == "finished" ] || exit 2
 
 # ToDo updating the number through the Grails Application Version Update Plugin 
 # http://grails.org/plugin/version-update
 
 # ./grailsw version-update
 
+date
 echo "Will now release $1"
 git add application.properties
 git add Dockerfile
@@ -29,9 +30,10 @@ echo -n "another 2 minutes ..."
 sleep 60
 echo -n "another minute ..."
 sleep 60
-sudo docker build -t k9ert/zenboot .
+sudo docker build -t k9ert/zenboot:${1} .
 echo -n "about to tag the Dockerimage"
-sudo docker tag k9ert/zenboot:latest k9ert/zenboot:$1
+sudo docker tag k9ert/zenboot:${1} k9ert/zenboot:latest
 sudo docker push k9ert/zenboot:latest
 sudo docker push k9ert/zenboot:${1}
+date
 
