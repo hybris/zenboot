@@ -1,4 +1,6 @@
 <%@ page import="org.zenboot.portal.processing.Processable.ProcessState"%>
+<%@ page import="org.joda.time.Duration"%>
+
 <li class="property-value scriptlet-item-detail" aria-labelledby="processables-label">
 	<strong>
 		${q?.description}
@@ -6,26 +8,19 @@
 	<table class="table table-bordered" style="margin-top: 10px;">
 		<thead>
 			<tr>
-				<th>Result</th>
-				<th>Execution Time</th>
-				<th style="width: 15%">Return Code</th>
-				<th style="width: 15%">Log</th>
+				<th style="width: 19%">Result &nbsp;&nbsp; / &nbsp;&nbsp;Return Code</th>
+				<th style="width: 17%">Execution Time</th>
+				<th style="width: 10%">Log</th>
 				<th style="width: 15%">Process Output</th>
 				<th style="width: 15%">Process Error</th>
-				<th style="width: 15%">Exception</th>
+				<th style="width: 10%">Exception</th>
 			</tr>
 		<thead>
 		<tbody>
 			<tr>
 				<td>
 					<g:render template="/scriptletBatch/state" model="[scriptletBatchInstance:q]" />
-				</td>
-				<td>
-					<g:formatNumber number="${q?.getProcessTime()/1000}" groupingUsed="true" minFractionDigits="3" />
-					sec
-				</td>
-				<td>
-					<g:if test="${q?.exitCode >= 0}">
+					&nbsp;<g:if test="${q?.exitCode >= 0}">
 						<g:if test="${q?.exitCode == 0}">
 							<span class="badge">0</span>
 						</g:if>
@@ -36,6 +31,9 @@
 							<span class="badge badge-important">2</span>
 						</g:elseif>
 					</g:if>
+				</td>
+				<td>
+					<small><joda:formatPeriod value="${new Duration(q?.getProcessTime())}" fields="hours,minutes, seconds" /></small>
 				</td>
 				<td>
 					<g:if test="${q?.logged}">

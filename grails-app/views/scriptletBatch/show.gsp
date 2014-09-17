@@ -24,8 +24,8 @@
 			<i class="icon-list"></i>
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
-		
-		
+
+
 		<dl class="dl-horizontal">
 			<g:if test="${scriptletBatchInstance?.state}">
 				<dt>
@@ -35,7 +35,7 @@
 					<g:render template="state" model="[scriptletBatchInstance:scriptletBatchInstance]" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance?.user.username}">
 				<dt>
 					<g:message code="scriptletBatch.user.label" default="Started by user" />
@@ -44,7 +44,7 @@
 					<g:fieldValue bean="${scriptletBatchInstance?.user}" field="username" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance.getProcessTime() >= 0}">
 				<dt>
 					<g:message code="scriptletBatch.executiontime.label" default="Execution Time" />
@@ -54,7 +54,7 @@
 					sec
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance?.description}">
 				<dt>
 					<g:message code="scriptletBatch.description.label" default="Description" />
@@ -63,7 +63,7 @@
 					<g:fieldValue bean="${scriptletBatchInstance}" field="description" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance?.startDate}">
 				<dt>
 					<g:message code="scriptletBatch.startDate.label" default="Start Date" />
@@ -72,7 +72,7 @@
 					<g:formatDate date="${scriptletBatchInstance?.startDate}" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance?.endDate}">
 				<dt>
 					<g:message code="scriptletBatch.endDate.label" default="End Date" />
@@ -88,9 +88,9 @@
 			  <dd>
 			    <g:checkBox name="autorefresh" value="${true}" />
 			  </dd>
-			  
+
 			</g:else>
-			
+
 			<g:if test="${scriptletBatchInstance?.comment}">
 			  <hr />
 			  <dt>
@@ -99,10 +99,10 @@
 			  <dd>
 			    <g:fieldValue bean="${scriptletBatchInstance}" field="comment" />
 			  </dd>
-			  
+
 			</g:if>
-			
-			
+
+
 			<g:if test="${scriptletBatchInstance?.executionZoneAction.executionZone}">
 				<hr />
 				<dt>
@@ -117,7 +117,7 @@
 					</g:link>
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance?.executionZoneAction}">
 				<dt>
 					<g:message code="scriptletBatch.executionZoneAction.label" default="Execution Zone Action" />
@@ -128,7 +128,7 @@
 					</g:link>
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance?.exceptionClass}">
 				<hr />
 				<dt>
@@ -145,17 +145,15 @@
 					</g:if>
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${scriptletBatchInstance?.processables}">
 				<hr />
-				<dt>
-					<g:message code="scriptletBatch.processables.label" default="Steps" />
-				</dt>
-				<dd>
+
+				<div style="padding-left:5%; border:thin">
 					<ul class="unstyled" id="steps">
 						<g:render template="steps" model="[steps:scriptletBatchInstance.processables]" />
 					</ul>
-				</dd>
+				</div>
 				<g:if test="${scriptletBatchInstance?.isRunning()}">
 					<span id="stepsSpinner" class="property-value">
 						<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
@@ -170,14 +168,14 @@
 			                }).success(function(data) {
                         if($('#autorefresh').is(':checked')){
 			                     var steps = $("#steps li")
-			                  
+
 			                     if (steps.size() != data.length) {
 			                         alert("Not able to update process list. Different number of steps between server-managed list and the shown list!")
 			                         clearInterval(interval);
 			                         return;
 			                     }
 				                     for (i = 0; i < data.length; i++) {
-			                         //update running steps  
+			                         //update running steps
 			                         if ($(steps[i]).find("span.label").hasClass("label-info") || data[i].status == "RUNNING") {
 			                             $(steps[i]).replaceWith(data[i].markup);
 			                         }
@@ -192,15 +190,16 @@
 				    </g:javascript>
 				</g:if>
 			</g:if>
-			
-		</dl>
 
-		<g:form>
-			<fieldset class="buttons">
-				<g:hiddenField name="id" value="${scriptletBatchInstance?.id}" />
-				<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-			</fieldset>
-		</g:form>
+		</dl>
+		<div style="padding-left:5%; border:thin">
+			<g:form>
+				<fieldset class="buttons">
+					<g:hiddenField name="id" value="${scriptletBatchInstance?.id}" />
+					<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+				</fieldset>
+			</g:form>
+		</div>
 	</div>
 
 	<g:javascript>

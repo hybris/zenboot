@@ -1,6 +1,9 @@
 <%@ page import="org.zenboot.portal.processing.ScriptletBatch"%>
 <%@ page import="org.zenboot.portal.processing.Processable.ProcessState"%>
 <%@ page import="org.zenboot.portal.security.Role"%>
+<%@ page import="org.joda.time.Duration"%>
+
+
 <table class="table table-bordered">
 	<thead>
 		<tr>
@@ -15,8 +18,9 @@
 				<td>
 					<div>
 						<g:render template="state" model="[scriptletBatchInstance:scriptletBatchInstance]" />
-						&nbsp;&nbsp;(<g:formatDate type="time" style="MEDIUM" date="${scriptletBatchInstance.creationDate}" />
-						<g:message code="scriptletBatch.queue.time" default="h" />)
+
+						<small>&nbsp;&nbsp;<g:formatDate type="time" style="SHORT" date="${scriptletBatchInstance.creationDate}" class=".h6"/>
+						(<joda:formatPeriod value="${new Duration(scriptletBatchInstance.getProcessTime())}" fields="hours,minutes, seconds" />)</small>
 					</div>
 					<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 						<g:link action="show" id="${scriptletBatchInstance.id}">
