@@ -151,7 +151,7 @@ class ExecutionZoneService {
      */
     List getScriptDirs(ExecutionZoneType type, String filter) {
       List scriptDirs = []
-      File scriptDir = this.getScriptDir(ExecutionZoneType.findAll()[2])
+      File scriptDir = this.getScriptDir(type)
       if (scriptDir.exists()) {
         scriptDir.eachDir {
           File metaFile = new File(it, ".meta.yaml")
