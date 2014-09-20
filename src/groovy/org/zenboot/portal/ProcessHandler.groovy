@@ -1,9 +1,10 @@
 package org.zenboot.portal
+import java.lang.AbstractStringBuilder
 
 class ProcessHandler {
 
-    private error = new StringBuilder()
-    private output = new StringBuilder()
+    private error = new ObservableStringBuilder("error")
+    private output = new ObservableStringBuilder("output")
     private processListener = []
 
     boolean newLine = true
@@ -12,6 +13,10 @@ class ProcessHandler {
     File workingDirectory
     int exitValue
 
+    int getExitValue() {
+      return exitValue
+    }
+
     ProcessHandler(String command, long timeout, File workingDirectory=null) {
         this.command = command
         this.timeout = timeout
@@ -19,11 +24,13 @@ class ProcessHandler {
     }
 
     def addProcessListener(ProcessListener procListener) {
-        this.processListener.add(procListener)
+        this.error.addProcessListener(procListener)
+        this.output.addProcessListener(procListener)
     }
 
     def removeProcessListener(ProcessListener procListener) {
-        this.processListener.remove(procListener)
+        this.error.removeProcessListener(procListener)
+        this.output.removeProcessListener(procListener)
     }
 
     def execute(def envParams=null) {
@@ -49,13 +56,11 @@ class ProcessHandler {
         }
 
         Process proc = processBuilder.start()
-        proc.inputStream.eachLine {
-            this.appendOutput(it)
-        }
-        proc.errorStream.eachLine {
-            this.appendError(it)
-        }
+
+        proc.consumeProcessOutput(output,error)
         proc.waitForOrKill(this.timeout)
+        Thread.sleep(1000)
+
         this.setExitValue(proc.exitValue())
         proc.destroy()
     }
@@ -64,28 +69,6 @@ class ProcessHandler {
         this.exitValue = exitValue
         this.processListener.each {
             it.onFinish(exitValue)
-        }
-    }
-
-    private appendError(String errorStr) {
-        this.log.warn(errorStr)
-        if (this.newLine) {
-            errorStr += "\n"
-        }
-        this.error << errorStr
-        this.processListener.each {
-            it.onError(errorStr)
-        }
-    }
-
-    private appendOutput(String outputStr) {
-        this.log.debug(outputStr)
-        if (this.newLine) {
-            outputStr += "\n"
-        }
-        this.output << outputStr
-        this.processListener.each {
-            it.onOutput(outputStr)
         }
     }
 
@@ -100,4 +83,65 @@ class ProcessHandler {
     def hasError() {
         return (this.exitValue >= 2)
     }
+}
+
+class ObservableStringBuilder implements Appendable {
+
+  String notificationType
+  StringBuilder wrappedStringBuilder = new StringBuilder()
+  StringBuilder oneLineBuilder = new StringBuilder()
+  private processListener = []
+
+  ObservableStringBuilder(String notificationType) {
+    this.notificationType = notificationType
+  }
+
+  def addProcessListener(ProcessListener procListener) {
+      this.processListener.add(procListener)
+  }
+
+  def removeProcessListener(ProcessListener procListener) {
+      this.processListener.remove(procListener)
+  }
+
+  Appendable append(char c) {
+    wrappedStringBuilder.append(c)
+    oneLineBuilder.append(c)
+    if (c == "\n") {
+      notifyThem()
+      oneLineBuilder = new StringBuilder()
+    }
+    return this
+  }
+
+  Appendable append(CharSequence csq) {
+    wrappedStringBuilder.append(csq)
+    oneLineBuilder.append(csq)
+    notifyThem()
+    oneLineBuilder = new StringBuilder()
+    return this
+  }
+
+  Appendable append(CharSequence csq, int start, int end) {
+    wrappedStringBuilder.append(csq,start,end)
+    return this
+  }
+
+  String toString() {
+    return wrappedStringBuilder.toString()
+  }
+
+  void notifyThem() {
+    this.processListener.each {
+        if (notificationType.equals("error")) {
+          it.onError(oneLineBuilder.toString())
+        }
+
+        if (notificationType.equals("output")) {
+          it.onOutput(oneLineBuilder.toString())
+        }
+    }
+  }
+
+
 }

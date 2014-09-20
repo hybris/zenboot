@@ -14,7 +14,13 @@ import org.zenboot.portal.processing.ScriptletBatch
 class ProcessHandlerTests {
 
     private outputScript = new File("test/resources/${this.class.getPackage().getName()}/processHandler_testOutput.sh")
-    
+
+    File getScript(String scriptName) {
+      File script = new File("test/resources/${this.class.getPackage().getName()}/${scriptName}")
+      script.setExecutable(true)
+      return script
+    }
+
     @Before
     void setUp() {
         outputScript.setExecutable(true)
@@ -22,17 +28,17 @@ class ProcessHandlerTests {
 
     @Test
     void testExecute() {
-        ProcessHandler processHandler = new ProcessHandler("echo hello world", 1000)
-        processHandler.newLine = false
+        ProcessHandler processHandler = new ProcessHandler("echo hello world", 5000)
+        processHandler.newLine = true
         processHandler.execute()
-        assertEquals("Output is wrong", "hello world", processHandler.output)
+        assertEquals("Output is wrong", "hello world\n", processHandler.output)
         assertEquals("Return code is wrong", 0, processHandler.exitValue)
         assertFalse("No error expected", processHandler.hasError())
     }
 
     @Test
     void testExecuteNoNewline() {
-        ProcessHandler processHandler = new ProcessHandler("echo hello world", 1000)
+        ProcessHandler processHandler = new ProcessHandler("echo hello world", 5000)
         processHandler.execute()
         assertEquals("Output is wrong", "hello world\n", processHandler.output)
         assertEquals("Return code is wrong", 0, processHandler.exitValue)
@@ -41,12 +47,33 @@ class ProcessHandlerTests {
 
     @Test
     void testOutput() {
-        ProcessHandler processHandler = new ProcessHandler("${this.outputScript} hello world exit2", 1000)
+        ProcessHandler processHandler = new ProcessHandler("${this.outputScript} hello world exit2", 5000)
         processHandler.execute()
         assertEquals("Std-Output is wrong", "hello\nworld\nexit2\n", processHandler.output)
         assertEquals("Err-Output is wrong", "hello\nworld\nexit2\n", processHandler.error)
         assertFalse("No error expected", processHandler.hasError())
     }
+
+    @Test
+    void testExitWithError() {
+        ProcessHandler processHandler = new ProcessHandler("${this.getScript("failingScript.sh")}", 1000)
+        processHandler.execute()
+        // 143 seems to be the exit-Value for a killed process
+        assertEquals("exit-value is wrong", 14, processHandler.exitValue)
+        assertTrue("Error expected", processHandler.hasError())
+        assertEquals("Std-Output is wrong", "now, i'm failing\n", processHandler.output)
+    }
+
+    @Test
+    void testTimeout() {
+        ProcessHandler processHandler = new ProcessHandler("${this.getScript("long-running-script.sh")}", 10)
+        processHandler.execute()
+        // 143 seems to be the exit-Value for a killed process
+        assertEquals("exit-value is wrong", 143, processHandler.exitValue)
+        assertTrue("Error expected", processHandler.hasError())
+        assertEquals("Std-Output is wrong", "test\n", processHandler.output)
+    }
+
 
     @Test
     void testListener() {
@@ -67,6 +94,7 @@ class ProcessHandlerTests {
         assertEquals("Std-Output is wrong", "hello\nworld\nhello\nworld\n", processHandler.output)
         assertEquals("Err-Output is wrong", "hello\nworld\nhello\nworld\n", processHandler.error)
     }
+
 }
 
 class TestProcessListener implements ProcessListener {

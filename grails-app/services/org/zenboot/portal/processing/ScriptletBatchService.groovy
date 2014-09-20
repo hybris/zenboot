@@ -201,7 +201,12 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             procHandler.addProcessListener(owner)
             procHandler.execute(ctx.parameters)
             if (procHandler.hasError()) {
-                throw new ScriptExecutionException("Execution of script '${procHandler.command}' failed with return code '${procHandler.exitValue}'", procHandler.exitValue)
+                if (procHandler.exitValue == 143) {
+                  // seems to be some kind of magicValue for a process which get killed
+                  throw new ScriptExecutionException("Execution of script '${procHandler.command}' took too long. Timeout is currently "+ this.grailsApplication.config.zenboot.process.timeout.toInteger()+"seconds.", procHandler.exitValue)
+                } else {
+                  throw new ScriptExecutionException("Execution of script '${procHandler.command}' failed with return code '${procHandler.exitValue}'", procHandler.exitValue)
+                }
             } else {
                 def result = owner.getProcessOutputAsMap()
                 if (!result.empty) {
