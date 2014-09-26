@@ -3,8 +3,13 @@ import java.lang.AbstractStringBuilder
 
 class ProcessHandler {
 
+    // For onError
     private error = new ObservableStringBuilder("error")
+
+    // For onOutput
     private output = new ObservableStringBuilder("output")
+
+    // For onExecute and onFinish
     private processListener = []
 
     boolean newLine = true
@@ -26,9 +31,11 @@ class ProcessHandler {
     def addProcessListener(ProcessListener procListener) {
         this.error.addProcessListener(procListener)
         this.output.addProcessListener(procListener)
+        this.processListener.add(procListener)
     }
 
     def removeProcessListener(ProcessListener procListener) {
+        this.processListener.remove(procListener)
         this.error.removeProcessListener(procListener)
         this.output.removeProcessListener(procListener)
     }
