@@ -17,7 +17,7 @@ dataSource {
       testOnBorrow=true
       testWhileIdle=true
       testOnReturn=true
-      validationQuery="SELECT 1"
+      validationQuery="SELECT username FROM person WHERE id=1" // probably need a real query here should be "admin"
     }
 }
 
