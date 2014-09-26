@@ -1,5 +1,5 @@
 <%@ page import="org.zenboot.portal.processing.Processable.ProcessState"%>
-<%@ page import="org.joda.time.Duration"%>
+<%@ page import="org.joda.time.Period"%>
 
 <li class="property-value scriptlet-item-detail" aria-labelledby="processables-label">
 	<strong>
@@ -33,7 +33,7 @@
 					</g:if>
 				</td>
 				<td>
-					<small><joda:formatPeriod value="${new Duration(q?.getProcessTime())}" fields="hours,minutes, seconds" /></small>
+					<small><tpf:formatPeriod value="${new Period(q?.getProcessTime())}" /></small>
 				</td>
 				<td>
 					<g:if test="${q?.logged}">
