@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Check whether travis finished the build, something like:
-[ `curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r '.[0].state'` == "finished" ] || exit 2
+while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .[0].state`XX" == "finishedXX" ]; do
+  echo "build is not finished ... waiting ..."
+  sleep 20
+done
 
 # ToDo updating the number through the Grails Application Version Update Plugin 
 # http://grails.org/plugin/version-update
@@ -20,16 +23,12 @@ echo -n "about to push tag ... [enter]" && read
 git push origin $1
 # enforce to type in sudo-password
 sudo ls -l > /dev/null
-echo -n "after push, we'll sleep for 5 mins and afterwards build  the Dockerimage ...[enter]" && read
-sleep 60
-echo -n "another 4 minutes ..."
-sleep 60
-echo -n "another 3 minutes ..."
-sleep 60
-echo -n "another 2 minutes ..."
-sleep 60
-echo -n "another minute ..."
-sleep 60
+echo "waiting for at last 5 mins ..."
+sleep 300
+while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .[0].state`XX" == "finishedXX" ]; do
+  echo "build is till ot finished ... waiting ..."
+  sleep 60
+done
 sudo docker build -t k9ert/zenboot:${1} .
 echo -n "about to tag the Dockerimage"
 sudo docker tag k9ert/zenboot:${1} k9ert/zenboot:latest
