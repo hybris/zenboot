@@ -197,14 +197,14 @@
 							</g:elseif>
 
 							<ul class="nav nav-tabs" role="tablist">
-							  <li class="active"><a href="#sd-create" data-toggle="tab">Create</a></li>
+							  <li class="<g:if test="${structuredScriptDirs.create.size() > 0}">active</g:if>"><a href="#sd-create" data-toggle="tab">Create</a></li>
 							  <li><a href="#sd-update" data-toggle="tab">Update</a></li>
 							  <li><a href="#sd-delete" data-toggle="tab">Delete</a></li>
-								<li><a href="#sd-misc" data-toggle="tab">Misc</a></li>
+								<li class="<g:if test="${structuredScriptDirs.create.size() == 0}">active</g:if>"><a href="#sd-misc" data-toggle="tab">Misc</a></li>
 							</ul>
 
 							<div class="tab-content">
-							  <div class="tab-pane active" id="sd-create">
+							  <div class="tab-pane <g:if test="${structuredScriptDirs.create.size() > 0}">active</g:if>" id="sd-create">
 									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.create, type:'create']"/>
 								</div>
 							  <div class="tab-pane" id="sd-update">
@@ -213,7 +213,7 @@
 							  <div class="tab-pane" id="sd-delete">
 									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.delete, type:'delete']"/>
 								</div>
-							  <div class="tab-pane" id="sd-misc">
+							  <div class="tab-pane <g:if test="${structuredScriptDirs.create.size() == 0}">active</g:if>" id="sd-misc">
 									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.misc, type:'misc']"/>
 								</div>
 							</div>
