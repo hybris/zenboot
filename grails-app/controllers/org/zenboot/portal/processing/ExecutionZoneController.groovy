@@ -45,8 +45,14 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             def metadataParams = cmd.getExecutionZoneParameters()
             [
                 executionZoneParameters: metadataParams,
+                executionZoneParametersEmpty: metadataParams.findAll { ParameterMetadata metadataParam ->
+                  metadataParam.value == ""
+                },
+                executionZoneParametersNonempty: metadataParams.findAll { ParameterMetadata metadataParam ->
+                  metadataParam.value != ""
+                },
                 containsInvisibleParameters: metadataParams.any { ParameterMetadata metadataParam ->
-                    !metadataParam.visible
+                  !metadataParam.visible
                 }
             ]
         } catch (MultipleCompilationErrorsException exc) {
@@ -282,7 +288,6 @@ class GetExecutionZoneParametersCommand {
         def execZnParams = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.execId), this.scriptDir).asType(ParameterMetadata[])
         execZnParams.sort(true, new MetadataParameterComparator())
     }
-
 }
 
 class GetScriptletBatchFlow {
