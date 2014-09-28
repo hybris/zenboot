@@ -6,14 +6,22 @@
 			<th></th>
 		</tr>
 	</thead>
-	<tbody>
-		<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersEmpty]" />
-		<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersNonempty]" />
-	</tbody>
 </table>
 
-<g:field type="hidden" value="${containsInvisibleParameters}" name="containsInvisibleParameters" />
+<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersEmpty]" />
 
-<span title="Add parameter" class="btn btn-mini add-exec-parameter-button">
-	<i class="icon-plus-sign"></i>
-</span>
+<!-- Show Non-empty parameters only if needed -->
+<a class="collapsed" style="cursor: pointer" data-toggle="collapse" data-target="#nonempty">
+	<g:message code="executionZoneParametersNonempty.size()" default="{0} non-empty parameters" args="[executionZoneParametersNonempty.size()]" />
+	<i class="icon-resize-full" onclick="$(this).toggleClass('icon-resize-full').toggleClass('icon-resize-small');"></i>
+</a>
+
+<div id="nonempty" class="collapse">
+	<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersNonempty]" />
+
+	<g:field type="hidden" value="${containsInvisibleParameters}" name="containsInvisibleParameters" />
+
+	<span title="Add parameter" class="btn btn-mini add-exec-parameter-button">
+		<i class="icon-plus-sign"></i>
+	</span>
+</div>

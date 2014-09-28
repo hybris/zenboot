@@ -1,9 +1,10 @@
+<table class="table exec-parameters-table">
 <g:each in="${executionZoneParameters}" var="entry" status="i">
   <tr>
-    <td>
+    <td style="width: 45%">
       <g:textField name="parameters.key" value="${entry.name}" />
     </td>
-    <td>
+    <td style="width: 45%">
       <div class="control-group ${entry.overlay ? 'info' : entry.value ? 'success' : ''}">
         <g:if test="${entry.visible || (!entry.visible && entry.value.empty)}">
           <g:textField name="parameters.value" value="${entry.value}" />
@@ -32,3 +33,4 @@
     </td>
   </tr>
 </g:each>
+</table>
