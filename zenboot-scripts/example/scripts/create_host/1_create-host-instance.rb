@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/bin/sh
 
 #@Scriptlet(author="Tobias Schuhmacher (tschuhmacher@nemeses.de)", description="Create a host instance (FAKE!)")
 #@Parameters([
