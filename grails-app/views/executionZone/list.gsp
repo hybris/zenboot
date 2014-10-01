@@ -1,4 +1,5 @@
 <%@ page import="org.zenboot.portal.processing.ExecutionZone"%>
+<%@ page import="org.zenboot.portal.security.Role"%>
 <%@ page import="org.zenboot.portal.HostState"%>
 <!doctype html>
 <html>
@@ -19,18 +20,20 @@
 		</g:if>
 
 
-    <div class="row-fluid">
-      <g:if test="${!params.disabled}">
-        <g:link action="list" params="[disabled: 'show']" class="btn btn-submit pull-right">
-          <g:message code="executionZone.show.disabled" default="Show disabled" />
-        </g:link>
-      </g:if>
-      <g:else>
-        <g:link action="list" class="btn btn-submit pull-right">
-          <g:message code="executionZone.show.enabled" default="Show enabled" />
-        </g:link>
-      </g:else>
-    </div>
+		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+	    <div class="row-fluid">
+	      <g:if test="${!params.disabled}">
+	        <g:link action="list" params="[disabled: 'show']" class="btn btn-submit pull-right">
+	          <g:message code="executionZone.show.disabled" default="Show disabled" />
+	        </g:link>
+	      </g:if>
+	      <g:else>
+	        <g:link action="list" class="btn btn-submit pull-right">
+	          <g:message code="executionZone.show.enabled" default="Show enabled" />
+	        </g:link>
+	      </g:else>
+	    </div>
+		</sec:ifAllGranted>	
 
 		<table class="table table-striped">
 			<thead>
@@ -39,9 +42,11 @@
 <!--  		<g:sortableColumn property="puppetEnvironment" title="${message(code: 'executionZone.puppetEnvironment.label', default: 'Puppet-Env')}" />
 					<g:sortableColumn property="qualityStage" title="${message(code: 'executionZone.qualityStage.label', default: 'Quality-Stage')}" />
 --> 			<g:sortableColumn style="width:20%" property="description" title="${message(code: 'executionZone.description.label', default: 'Description')}" />
-					<th>
-						<g:message code="executionZone.parameters.label" default="Parameters" />
-					</th>
+					<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+						<th>
+							<g:message code="executionZone.parameters.label" default="Parameters" />
+						</th>
+					</sec:ifAllGranted>
 					<th>
 						<g:message code="executionZone.parameters.hosts" default="Hosts (Completed / NotDeleted)"/>
 					</th>
@@ -69,9 +74,11 @@
 -->					<td>
 							${fieldValue(bean: executionZoneInstance, field: "description")}
 						</td>
-						<td>
-							<g:render template="parametersInList" model="[parameters:executionZoneInstance.processingParameters]"></g:render>
-						</td>
+						<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+							<td>
+								<g:render template="parametersInList" model="[parameters:executionZoneInstance.processingParameters]"></g:render>
+							</td>
+						</sec:ifAllGranted>
 						<td>
 							${executionZoneInstance.getCompletedHosts().size()} / ${executionZoneInstance.getNonDeletedHosts().size()}
 						</td>
@@ -94,11 +101,13 @@
 			</tbody>
 		</table>
 
-		<fieldset class="buttons spacer">
-			<g:link class="btn btn-primary" action="create">
-				${message(code: 'default.button.create.label', default: 'Cancel')}
-			</g:link>
-		</fieldset>
+		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+			<fieldset class="buttons spacer">
+				<g:link class="btn btn-primary" action="create">
+					${message(code: 'default.button.create.label', default: 'Cancel')}
+				</g:link>
+			</fieldset>
+		</sec:ifAllGranted>>
 
 		<div class="pagination">
 			<g:paginate total="${executionZoneInstanceTotal}" />

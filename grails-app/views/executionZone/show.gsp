@@ -162,6 +162,21 @@
 
 								</g:if>
 
+								<g:if test="${executionZoneInstance?.execRoles}">
+									<dt>
+										<g:message code="executionZoneAction.execRoles.label" default="Executionable Roles" />
+									</dt>
+									<dd>
+										<ol class="property-value unstyled" aria-labelledby="roles-label">
+											<g:each in="${executionZoneInstance.execRoles}" var="ezi">
+												<li>
+													${ezi?.encodeAsHTML()}
+												</li>
+											</g:each>
+										</ol>
+									</dd>
+								</g:if>
+
 							</dl>
 
 							<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
@@ -249,51 +264,57 @@
 				 	</div>
 				 </div>
 			</div>
-			<div class="accordion-group">
-				<div class="accordion-heading">
-					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#editExecZone">
-        				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
-      				</a>
+
+			<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#editExecZone">
+	        				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
+	      				</a>
+					</div>
+					 <div id="editExecZone" class="accordion-body collapse ${flash.action == 'update' ? 'in' : ''}">
+					 	<div class="accordion-inner">
+							<g:form method="post">
+								<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
+								<g:hiddenField name="version" value="${executionZoneInstance?.version}" />
+								<fieldset class="form-horizontal">
+									<g:render template="form" />
+								</fieldset>
+								<fieldset class="buttons spacer">
+									<g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+								</fieldset>
+							</g:form>
+					 	</div>
+					 </div>
 				</div>
-				 <div id="editExecZone" class="accordion-body collapse ${flash.action == 'update' ? 'in' : ''}">
-				 	<div class="accordion-inner">
-						<g:form method="post">
-							<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
-							<g:hiddenField name="version" value="${executionZoneInstance?.version}" />
-							<fieldset class="form-horizontal">
-								<g:render template="form" />
-							</fieldset>
-							<fieldset class="buttons spacer">
-								<g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-							</fieldset>
-						</g:form>
-				 	</div>
-				 </div>
-			</div>
-			<div class="accordion-group">
-				<div class="accordion-heading">
-					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#manageTemplates">
-        				<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
-		      		</a>
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#manageTemplates">
+	        				<g:message code="executionZone.manageTemplates.label" default="Manage Templates" />
+			      		</a>
+					</div>
+					 <div id="manageTemplates" class="accordion-body collapse ${flash.action == 'template' ? 'in' : ''}">
+					 	<div class="accordion-inner">
+							<g:render template="templateView"></g:render>
+					 	</div>
+					 </div>
 				</div>
-				 <div id="manageTemplates" class="accordion-body collapse ${flash.action == 'template' ? 'in' : ''}">
-				 	<div class="accordion-inner">
-						<g:render template="templateView"></g:render>
-				 	</div>
-				 </div>
-			</div>
-			<div class="accordion-group">
-				<div class="accordion-heading">
-					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#parameterLogData">
-        				<g:message code="executionZone.ParametersLogs.label" default="Parameters Change Logs" />
-		      		</a>
+
+
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#parameterLogData">
+	        				<g:message code="executionZone.ParametersLogs.label" default="Parameters Change Logs" />
+			      		</a>
+					</div>
+					<div id="parameterLogData" class="accordion-body collapse">
+						<div class="accordion-inner">
+							<g:render template="parameterLogDataView" model="[auditLogEvents:executionZoneInstance?.getAuditLogEvents()]"></g:render>
+					 	</div>
+					</div>
 				</div>
-				<div id="parameterLogData" class="accordion-body collapse">
-					<div class="accordion-inner">
-						<g:render template="parameterLogDataView" model="[auditLogEvents:executionZoneInstance?.getAuditLogEvents()]"></g:render>
-				 	</div>
-				</div>
-			</div>
+			</sec:ifAllGranted>
+
 		</div>
 	</div>
 

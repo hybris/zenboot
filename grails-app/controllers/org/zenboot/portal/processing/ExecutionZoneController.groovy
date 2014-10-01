@@ -3,6 +3,7 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.converters.XML
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
@@ -10,9 +11,11 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.RestResult
+import org.zenboot.portal.processing.ExecutionZoneService
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.MetadataParameterComparator
 import org.zenboot.portal.processing.meta.ParameterMetadata
+import org.zenboot.portal.security.Role
 
 class ExecutionZoneController implements ApplicationEventPublisherAware {
 
@@ -22,7 +25,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def execute = { ExecuteExecutionZoneCommand cmd ->
+    def execute(ExecuteExecutionZoneCommand cmd) {
         flash.action = 'execute'
         cmd.setParameters(params.parameters)
         if (cmd.hasErrors()) {
@@ -43,8 +46,10 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         }
         try {
             def metadataParams = cmd.getExecutionZoneParameters()
+            log.info("metadataParams: " +metadataParams )
             [
                 executionZoneParameters: metadataParams,
+                // We'll show empty/nonEmpty seperated for UI-convenience
                 executionZoneParametersEmpty: metadataParams.findAll { ParameterMetadata metadataParam ->
                   metadataParam.value == ""
                 },
@@ -130,9 +135,26 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             enabled = true
         }
 
+        def executionZoneInstanceList
+
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
+        } else {
+            executionZoneInstanceList = ExecutionZone.createCriteria().list(params) {
+                execRoles {
+                    or {
+                        springSecurityService.currentUser.getAuthorities()*.authority.each { auth ->
+                            eq('authority', auth)
+                        }
+                    }
+
+                }
+            }
+        }
+
         [
-            executionZoneInstanceList: ExecutionZone.findAllByEnabled(enabled, params),
-            executionZoneInstanceTotal: ExecutionZone.countByEnabled(enabled),
+            executionZoneInstanceList: executionZoneInstanceList,
+            executionZoneInstanceTotal: executionZoneInstanceList.size(),
             executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list()
         ]
     }
@@ -160,6 +182,11 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         if (!executionZoneInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.id])
             redirect(action: "list")
+            return
+        }
+        //check user roles
+        if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) && !SpringSecurityUtils.ifAnyGranted(executionZoneInstance.execRoles*.authority.join(','))) {
+            render(view: "/login/denied")
             return
         }
         List scriptDirs = this.executionZoneService.getScriptDirs(executionZoneInstance.type)
@@ -250,6 +277,13 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
 
 class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
 
+    def executionZoneService
+
+    @Override
+    ExecutionZoneService getExecutionZoneService() {
+        return executionZoneService
+    }
+
     @Override
     ExecutionZoneAction getExecutionZoneAction() {
         return executionZoneService.createExecutionZoneAction(ExecutionZone.get(this.execId), this.scriptDir, this.execZoneParameters)
@@ -258,6 +292,13 @@ class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
 }
 
 class ExposeExecutionZoneCommand extends AbstractExecutionZoneCommand {
+
+    def executionZoneService
+
+    @Override
+    ExecutionZoneService getExecutionZoneService() {
+        return executionZoneService
+    }
 
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {

@@ -3,6 +3,7 @@ package org.zenboot.portal.processing
 import org.zenboot.portal.Template;
 import org.zenboot.portal.Host
 import org.zenboot.portal.HostState
+import org.zenboot.portal.security.Role
 
 class ExecutionZone {
 
@@ -16,9 +17,17 @@ class ExecutionZone {
     boolean enabled = true
     boolean enableExposedProcessingParameters = true
 
+    // another ExecutionZone which might be used for inheriting execRoles
+    ExecutionZone authParent
+
     SortedSet templates
 
-    static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter, templates:Template, hosts:Host]
+    static hasMany = [
+      actions:ExecutionZoneAction,
+      processingParameters:ProcessingParameter,
+      templates:Template,
+      hosts:Host,
+      execRoles: Role]
 
     static constraints = {
         type nullable:false

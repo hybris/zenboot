@@ -88,3 +88,12 @@
 		<g:render template="showParameters" model="[parameters:executionZoneInstance.processingParameters]" />
 	</div>
 </div>
+
+<div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'execRoles', 'error')} ">
+	<label class="control-label" for="execRoles">
+		<g:message code="ExecutionZone.execRoles.label" default="Executable Roles" />
+	</label>
+	<div class="controls">
+		<g:select name="execRoles" from="${org.zenboot.portal.security.Role.list()}" multiple="multiple" optionKey="id" optionValue="authority" size="5" value="${executionZoneInstance?.execRoles*.id}" opclass="many-to-many" />
+	</div>
+</div>

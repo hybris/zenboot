@@ -61,7 +61,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
         resolvedParams.missingParameters.each { paramName ->
            cmd.errors.reject('executionZone.parameters.emptyValue', [paramName].asType(Object[]), 'Mandatory parameter is empty')
         }
-        
+
         if (cmd.hasErrors()) {
             chain(action:'show', id:cmd.execId, model:[cmd:cmd])
             return
@@ -86,11 +86,11 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
             executionZones = ExposedExecutionZoneAction.createCriteria().list(params) {
                 roles {
                     or {
-                        springSecurityService.currentUser.getAuthorities()*.authority.each { auth ->                        
+                        springSecurityService.currentUser.getAuthorities()*.authority.each { auth ->
                             eq('authority', auth)
                         }
                     }
-                    
+
                 }
             }
         }
@@ -212,6 +212,13 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
 class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand {
 
+    def executionZoneService
+
+    @Override
+    ExecutionZoneService getExecutionZoneService() {
+        return executionZoneService
+    }
+
     def grailsLinkGenerator
     def params
 
@@ -280,7 +287,7 @@ class UpdateExposedExecutionZoneActionCommand extends SaveExposedExecutionZoneAc
 class ExecuteExposedExecutionZoneActionCommand {
 
     def executionZoneService
-    
+
     Long execId
     Map exposedExecutionZoneActionParameters
     Map parameters
@@ -288,7 +295,7 @@ class ExecuteExposedExecutionZoneActionCommand {
     static constraints = {
         execId nullable:false
     }
-    
+
 
 
     /*boolean validate() {
