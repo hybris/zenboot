@@ -80,6 +80,34 @@
 	</div>
 </div>
 
+<div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'hostLimit', 'error')} ">
+		<label class="control-label" for="hostLimit">
+				<g:message code="executionZone.hostLimit.label" default="Host Limit" />
+		</label>
+		<div class="controls">
+				<g:textField name="hostLimit" value="${executionZoneInstance?.hostLimit}" />
+		</div>
+</div>
+
+<div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'enableAutodeletion', 'error')} ">
+	<label class="control-label" for="enableAutodeletion">
+		<g:message code="executionZone.enableAutodeletion.label" default="Enable Autodeletion" />
+	</label>
+	<div class="controls">
+		<g:checkBox name="enableAutodeletion" value="${Boolean.FALSE}" checked="${executionZoneInstance?.enableAutodeletion}" />
+	</div>
+</div>
+
+<div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'defaultLifetime', 'error')} ">
+		<label class="control-label" for="defaultLifetime">
+				<g:message code="executionZone.defaultLifetime.label" default="Default Lifetime (mins)" />
+		</label>
+		<div class="controls">
+				<g:textField name="defaultLifetime" value="${executionZoneInstance?.defaultLifetime}" />
+				1 day = 1440 , 1 week = 10080 , 1 month = 40320, 6 month = 241929
+		</div>
+</div>
+
 <div class="control-group fieldcontain ${hasErrors(bean: executionZoneInstance, field: 'processingParameters', 'error')} ">
 	<label class="control-label" for="parameters">
 		<g:message code="executionZone.parameters.label" default="Parameters" />

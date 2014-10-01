@@ -15,6 +15,9 @@ class ExecutionZone {
     Set actions = []
     boolean enabled = true
     boolean enableExposedProcessingParameters = true
+    Long hostLimit
+    Long defaultLifetime // in minutes
+    boolean enableAutodeletion
 
     SortedSet templates
 

@@ -7,10 +7,10 @@ import org.zenboot.portal.processing.JobContext
  *
  * Jobs can define how often the exposed action should be executed. This is done by defining the "before" closure and
  * to fill the jobContext with action object.
- * 
+ *
  * The method ExecutionZoneService.createExecutionZoneAction will create an action for you using the exposed action object as template.
  * Parameters which will be used for this particular action are passed in the second method parameter.
- * 
+ *
  * If needed, an "after" closure can also be defined in a Job class. This hook will be called after all actions are executed.
  */
 class DeleteHost {
@@ -33,7 +33,12 @@ class DeleteHost {
         }
 
         this.hosts.each { host ->
+          if (host.execZone.enableAutodeletion) {
+            log.info("DELETING " + host)
             jobCtx.actions << this.grailsApplication.mainContext.getBean('executionZoneService').createExecutionZoneAction(this.exposedAction, ['HOSTNAME': host.hostname.name])
+          } else {
+            log.info("not deleting" + host)
+          }
         }
     }
 

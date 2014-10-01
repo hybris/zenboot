@@ -47,7 +47,14 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         if (event.processAsync && grailsApplication.config.zenboot.processing.asynchron.toBoolean()) {
             // This leverages the grails executor-plugin
             // https://github.com/basejump/grails-executor#examples
-            runAsync { execute(event) }
+            runAsync {
+              try {
+                execute(event)
+              } catch (Exception e) {
+                log.error("Catched Exception: "+e)
+                e.printStackTrace()
+              }
+            }
         } else {
             execute(event)
         }
@@ -104,21 +111,19 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         if (this.log.debugEnabled) {
             this.log.debug("Build scriptlet batch for action ${action}")
         }
-        ScriptletBatch batch = new ScriptletBatch(description: "${user.username} : ${action.executionZone.type} : ${action.scriptDir.name} ${action.executionZone.description? action.executionZone.description : "" }", executionZoneAction:action, user:user, comment:comment)
+        ScriptletBatch batch = new ScriptletBatch(description: "${user?.username} : ${action.executionZone.type} : ${action.scriptDir.name} ${action.executionZone.description? action.executionZone.description : "" }", executionZoneAction:action, user:user, comment:comment)
 
         PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(action.executionZone.type))
         File pluginFile = pluginResolver.resolveScriptletBatchPlugin(batch, action.runtimeAttributes)
         if (pluginFile) {
             this.injectPlugins(pluginFile, batch)
         }
-
         if (batch.hasErrors()) {
             throw new ProcessingException("Failure while building ${batch}: ${batch.errors}")
         }
-
-        batch.save(flush:true)
+        batch.save(flush:true, failOnError: true);
         action.scriptletBatches << batch
-        action.save()
+        action.save(flush:true, failOnError: true);
 
         this.addScriptlets(batch, action.runtimeAttributes)
 

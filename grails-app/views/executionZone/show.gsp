@@ -2,6 +2,8 @@
 <%@ page import="org.zenboot.portal.processing.ExecutionZone"%>
 <%@ page import="org.zenboot.portal.security.Role"%>
 <%@ page import="org.zenboot.portal.HostState"%>
+<%@ page import="org.joda.time.Period"%>
+
 <!doctype html>
 <html>
 <head>
@@ -160,6 +162,28 @@
 										<g:checkBox name="enableExposedProcessingParameters" checked="${executionZoneInstance.enableExposedProcessingParameters}" disabled="true" />
 									</dd>
 
+								</g:if>
+
+								<dt>
+									<g:message code="executionZone.hostLimit.label" default="Host Limit" />
+								</dt>
+								<dd>
+									<g:fieldValue bean="${executionZoneInstance}" field="hostLimit" />
+								</dd>
+
+								<g:if test="${executionZoneInstance?.enableAutodeletion}">
+									<dt>
+										<g:message code="executionZone.enableAutodeletion.label" default="Enable Autodeletion" />
+									</dt>
+									<dd>
+										<g:checkBox name="enableAutodeletion" checked="${executionZoneInstance.enableAutodeletion}" disabled="true" />
+									</dd>
+									<dt>
+										<g:message code="executionZone.defaultLifetime.label" default="Default Lifetime" />
+									</dt>
+									<dd>
+										<joda:formatPeriod value="${new Period(executionZoneInstance.defaultLifetime*1000*60)}" fields="months,weeks,days,hours,minutes" />
+									</dd>
 								</g:if>
 
 							</dl>
