@@ -16,6 +16,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     def grailsApplication
     def executionZoneService
+    def executionService
 
     @Override
     public void onApplicationEvent(ProcessingEvent event) {
@@ -116,7 +117,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(action.executionZone.type))
         File pluginFile = pluginResolver.resolveScriptletBatchPlugin(batch, action.runtimeAttributes)
         if (pluginFile) {
-            this.injectPlugins(pluginFile, batch)
+            executionService.injectPlugins(pluginFile, batch)
         }
         if (batch.hasErrors()) {
             throw new ProcessingException("Failure while building ${batch}: ${batch.errors}")
@@ -138,11 +139,11 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             Scriptlet scriptlet = new Scriptlet(description:file.name, file:file)
 
             file.setExecutable(true)
-            scriptlet.process = this.getScriptProcess(file, scriptlet)
+            scriptlet.process = executionService.createProcessClosure(file, scriptlet)
 
             File pluginFile = pluginResolver.resolveScriptletPlugin(scriptlet, batch.executionZoneAction.runtimeAttributes)
             if (pluginFile) {
-                this.injectPlugins(pluginFile, scriptlet)
+                executionService.injectPlugins(pluginFile, scriptlet)
             }
 
             batch.processables << scriptlet
@@ -152,74 +153,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }
     }
 
-    private void injectPlugins(File pluginFile, Processable processable) {
-        GroovyClassLoader gcl = new GroovyClassLoader(this.class.classLoader)
-        Class clazz = gcl.parseClass(pluginFile)
 
-        def plugin = clazz.newInstance()
-        def properties = plugin.metaClass.properties*.name
-        if (properties.contains('grailsApplication')) {
-            plugin.grailsApplication = grailsApplication
-        }
-        if (properties.contains('scriptlet')) {
-            switch (processable.class) {
-                case Scriptlet:
-                plugin.scriptlet = processable
-                break
-                case ScriptletBatch:
-                plugin.scriptlet = processable.processables
-                break
-            }
-            plugin.scriptlet = processable
-        }
-        if (properties.contains('scriptletBatch')) {
-            switch (processable.class) {
-                case Scriptlet:
-                plugin.scriptletBatch = processable.scriptletBatch
-                break
-                case ScriptletBatch:
-                plugin.scriptletBatch = processable
-                break
-            }
-        }
-        properties.each { String propName ->
-            if (propName.startsWith("on")) {
-                processable.metaClass."$propName" = { ctx ->
-                    try {
-                        plugin."${propName}".delegate = this
-                        plugin."${propName}"(ctx)
-                    } catch (Exception exc) {
-                        throw new PluginExecutionException("Execution of plugin '${clazz.name}' failed in hook '${propName}': ${exc.getMessage()}", exc)
-                    }
-                }
-            }
-        }
-    }
-
-    private Closure getScriptProcess(File file, Scriptlet owner) {
-        return { ProcessContext ctx ->
-            ProcessHandler procHandler = new ProcessHandler(
-                file.toString(),
-                this.grailsApplication.config.zenboot.process.timeout.toInteger() * 1000,
-                new File(file.getParent())
-            )
-            procHandler.addProcessListener(owner)
-            procHandler.execute(ctx.parameters)
-            if (procHandler.hasError()) {
-                if (procHandler.exitValue == 143) {
-                  // seems to be some kind of magicValue for a process which get killed
-                  throw new ScriptExecutionException("Execution of script '${procHandler.command}' took too long. Timeout is currently "+ this.grailsApplication.config.zenboot.process.timeout.toInteger()+"seconds.", procHandler.exitValue)
-                } else {
-                  throw new ScriptExecutionException("Execution of script '${procHandler.command}' failed with return code '${procHandler.exitValue}'", procHandler.exitValue)
-                }
-            } else {
-                def result = owner.getProcessOutputAsMap()
-                if (!result.empty) {
-                    ctx.parameters.putAll(result)
-                }
-            }
-        }
-    }
 
     ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, List runtimeAttributes) {
         ScriptResolver scriptResolver = new ScriptResolver(scriptDir)

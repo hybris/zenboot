@@ -41,7 +41,12 @@ class ScriptletAnnotationReader {
 
     private Script getGroovyScript(File script) {
         GroovyShell shell = new GroovyShell(this.class.classLoader)
-        String groovySrc = this.convertBashToGroovyCode(script)
+        String groovySrc
+        /*if (script.getName().split(/\./)[-1] == "groovy") {
+          return shell.parse(script)
+        } else { */
+          groovySrc = this.convertBashToGroovyCode(script)
+        //}
         return shell.parse(groovySrc)
     }
 
