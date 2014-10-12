@@ -21,7 +21,36 @@ class ScriptletAnnotationReader {
         this.pattern = ~"(#+|/{2,})\\s*@(${PARAMETER}|${SCRIPTLET})\\s*\\("
     }
 
+
+    public Set getParameters(File script) {
+      Class scriptletClass = this.getScriptletClass(script)
+
+      def annotations = []
+      if (scriptletClass.getAnnotation(Parameter)) {
+        annotations << scriptletClass.getAnnotation(Parameter)
+      }
+      if (scriptletClass.getAnnotation(Parameters)) {
+        annotations.addAll(scriptletClass.getAnnotation(Parameters).value())
+      }
+
+      /** Iterating through the annotationslist, transforming it to a HashSet */
+      return annotations.inject(new HashSet()) { Set params, Parameter annotation ->
+        params << new ParameterMetadata(
+            description:annotation.description(),
+            name:annotation.name(),
+            defaultValue:annotation.defaultValue(),
+            type:annotation.type(),
+            script:script,
+            visible:annotation.visible()
+        )
+      }
+    }
+
     private Class getScriptletClass(File script) {
+      if (script.getName().split(/\./)[-1] == "groovy") {
+        GroovyClassLoader gcl = new GroovyClassLoader(this.class.classLoader)
+        return gcl.parseClass(script)
+      } else {
         Class scriptletClass
         Script groovyScript = this.getGroovyScript(script)
         Set loadedClasses = groovyScript.class.classLoader.parent.classCache.values().asType(Set)
@@ -37,6 +66,7 @@ class ScriptletAnnotationReader {
             break
         }
         return scriptletClass
+      }
     }
 
     private Script getGroovyScript(File script) {
@@ -99,28 +129,6 @@ class ScriptletAnnotationReader {
         ])
     }
 
-    Set getParameters(File script) {
-        Class scriptletClass = this.getScriptletClass(script)
-
-        def annotations = []
-        if (scriptletClass.getAnnotation(Parameter)) {
-            annotations << scriptletClass.getAnnotation(Parameter)
-        }
-        if (scriptletClass.getAnnotation(Parameters)) {
-            annotations.addAll(scriptletClass.getAnnotation(Parameters).value())
-        }
-
-        return annotations.inject(new HashSet()) { Set params, Parameter annotation ->
-            params << new ParameterMetadata(
-                description:annotation.description(),
-                name:annotation.name(),
-                defaultValue:annotation.defaultValue(),
-                type:annotation.type(),
-                script:script,
-                visible:annotation.visible()
-            )
-        }
-    }
 
     ScriptletMetadata getScriptlet(File script) {
         Class scriptletClass = this.getScriptletClass(script)

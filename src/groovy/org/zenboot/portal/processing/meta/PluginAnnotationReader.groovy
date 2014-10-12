@@ -40,6 +40,7 @@ class PluginAnnotationReader {
 			}
 		}
 
+		/** Iterating through the annotationslist, transforming it to a HashSet */
 		return annotations.inject(new HashSet()) { Set params, Parameter annotation ->
 			params << new ParameterMetadata(
 				description:annotation.description(),

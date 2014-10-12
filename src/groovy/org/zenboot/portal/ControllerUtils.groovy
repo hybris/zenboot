@@ -29,7 +29,6 @@ class ControllerUtils {
     }
 
     static Map getParameterMap(def params, String paramKey="parameters.key", String paramValue="parameters.value") {
-        print("Parameters " + params.toString())
         def parameters = [:]
         def keys = params[paramKey]
         def values = params[paramValue]
@@ -44,8 +43,12 @@ class ControllerUtils {
             } else {
                 parameters[keys] = values
             }
+        } else {
+          // probably edge-case
+          if (keys) {
+            parameters[keys] = values
+          }
         }
-        
         return parameters
     }
 

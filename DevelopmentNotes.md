@@ -3,6 +3,11 @@ Development Notes
 
 These are some notes to understand the code.
 
+#### some general hints
+to run a specific test-class:
+./grailsw test-app -unit Foo
+
+
 #### The Execution Framework
 
 zenboot seems to use the spring-events although the plugin does not seem to be installed. The Execution seem to be the only ApplicationEvent.

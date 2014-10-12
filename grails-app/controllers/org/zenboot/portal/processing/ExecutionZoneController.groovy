@@ -25,6 +25,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
     def execute = { ExecuteExecutionZoneCommand cmd ->
         flash.action = 'execute'
         cmd.setParameters(params.parameters)
+        log.info("cmd setParameters:" + params.inspect())
         if (cmd.hasErrors()) {
             chain(action:"show", id:cmd.execId, model:[cmd:cmd])
             return
