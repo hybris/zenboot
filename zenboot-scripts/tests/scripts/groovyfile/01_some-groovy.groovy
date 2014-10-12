@@ -18,22 +18,24 @@ import org.zenboot.portal.processing.ProcessContext
  *
  * If needed, an "after" closure can also be defined in a Job class. This hook will be called after all actions are executed.
  */
+@Parameters([
+    @Parameter(name="SOMEVAR", description="Some Variable to consume", type=ParameterType.CONSUME),
+    @Parameter(name="SOMEVAR2", description="Some Variable to consume", type=ParameterType.CONSUME)
+])
 class Groovytestclass {
 
     def grailsApplication
     def exposedAction
     def hosts
 
-  @Parameters([
-      @Parameter(name="SOMEVAR", description="Some Variable to consume", type=ParameterType.CONSUME)
-  ])
   def execute = { ProcessContext ctx ->
-      this.otherMethod()
+      this.otherMethod(ctx)
   }
 
-  void otherMethod() {
+  void otherMethod(ProcessContext ctx) {
     print "hello world! (output)\n"
     System.err << "Want this to go to stderr\n"
+    print "and here is SOMEVAR: " + ctx.parameters['SOMEVAR']
     print grailsApplication.inspect()
   }
 
