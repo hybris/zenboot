@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#@Scriptlet(author="Tobias Schuhmacher (tschuhmacher@nemeses.de)", description="Create a host instance (FAKE!)")
+#@Scriptlet(author="Kim Neunert (kim.neunert@hybris.com)", description="list the droplets")
 #@Parameters([
 #  @Parameter(name="DO_API_KEY", type=ParameterType.CONSUME, description="Digital Occean API key"),
 #])

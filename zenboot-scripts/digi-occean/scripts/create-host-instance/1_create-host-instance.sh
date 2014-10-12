@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#@Scriptlet(author="Tobias Schuhmacher (tschuhmacher@nemeses.de)", description="Create a host instance (FAKE!)")
+#@Scriptlet(author="Kim Neunert (kim.neunert@hybris.com)", description="Create a host instance")
 #@Parameters([
 #  @Parameter(name="IP",       type=ParameterType.EMIT,    description="A random IP address"),
 #  @Parameter(name="ID",       type=ParameterType.EMIT,    description="A random IP address"),
