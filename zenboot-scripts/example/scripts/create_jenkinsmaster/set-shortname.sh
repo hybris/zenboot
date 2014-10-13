@@ -5,4 +5,4 @@
 #  @Parameter(name="SHORTNAME",     type=ParameterType.EMIT),
 #])
 
-echo "SHORTNAME=jenkinsmaster"
+echo "SHORTNAME=jkm"

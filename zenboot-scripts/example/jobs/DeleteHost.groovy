@@ -20,6 +20,10 @@ class DeleteHost {
     def hosts
 
     def before = { JobContext jobCtx ->
+
+        def cancel = false
+
+        // Searching for hosts exceeded their lifetime
         this.hosts = Host.withCriteria {
             le ("expiryDate", new Date())
             not {
@@ -29,25 +33,60 @@ class DeleteHost {
 
         }
 
+        if (this.hosts.empty) {
+            log.info("Found no hosts which exceeded their time-to-life")
+            cancel = true
+        } else {
+            log.info("First search: Following hosts exceeded their time-to-life: ${this.hosts}")
+        }
+
+        // Defining Additional Criterial via the host
         def filterExpression = exposedAction.executionZone.processingParameters.find(){
           it.name == "DELETEHOSTJOB_HOST_FILTER"
         }.value
-
-        print "filterEx"+filterExpression
-
+        // example: !( host.cname.startsWith('chefserver') )
         if (filterExpression) {
           this.hosts = this.hosts.findAll() { host ->
             Eval.me("host",host,filterExpression)
           }
         }
 
+        // Defining Minimum numbers of hosts per role
+        def minimumHashExpression = exposedAction.executionZone.processingParameters.find(){
+          it.name == "DELETEHOSTJOB_ROLES_MINIMUM"
+        }.value
+        // example: ["jks":3,"jkm":1]
+        if (minimumHashExpression) {
+          def minimumHash = Eval.me(minimumHashExpression)
+          minimumHash.each() { role, minInstances ->
+            def toBeDeletedHostsSliceWithRole = this.hosts.findAll() { host ->
+              host.cname.startsWith(role)
+            }
+            def allHostsWithRole = Host.withCriteria {
+                not {
+                    'in'("state", [HostState.DELETED, HostState.DISABLED, HostState.BROKEN])
+                }
+                eq("execZone", exposedAction.executionZone)
+                like("cname", "${role}%")
+            }
+            if (allHostsWithRole.size() - toBeDeletedHostsSliceWithRole.size() < minInstances ) {
+              log.info("minimum ${minInstances} reached for ${role} (all: ${allHostsWithRole.size()} / exceeded: ${toBeDeletedHostsSliceWithRole.size()} )!! ")
+              def willDelete =  allHostsWithRole.size() - minInstances
+
+              log.info("will Delete ${willDelete} from ${toBeDeletedHostsSliceWithRole.size()}")
+              this.hosts = this.hosts - toBeDeletedHostsSliceWithRole.drop(willDelete)
+            }
+          }
+        }
+
+
         if (this.hosts.empty) {
             log.info("Found no hosts which exceeded their time-to-life")
-            return
+            cancel = true
         }
 
         this.hosts.each { host ->
-          if (host.execZone.enableAutodeletion) {
+          if (host.execZone.enableAutodeletion && !cancel) {
             log.info("DELETING " + host)
             jobCtx.actions << this.grailsApplication.mainContext.getBean('executionZoneService').createExecutionZoneAction(this.exposedAction, ['HOSTNAME': host.hostname.name])
           } else {
