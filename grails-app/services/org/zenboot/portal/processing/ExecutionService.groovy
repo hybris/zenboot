@@ -91,7 +91,7 @@ class ExecutionService {
             plugin."${propName}".delegate = this
             plugin."${propName}"(ctx)
           } catch (Exception exc) {
-            throw new PluginExecutionException("Execution of plugin '${clazz.name}' failed in hook '${propName}': ${exc.getMessage()}", exc)
+            throw new PluginExecutionException("Execution of plugin '${pluginFile}' failed in hook '${propName}': ${exc.getMessage()}", exc)
           }
         }
       }
