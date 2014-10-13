@@ -37,9 +37,17 @@ class CreateHostInstance {
         int existingHosts = Host.countByStateNotEqual(HostState.DELETED)
         int poolsize = 15 // could be something like: railsApplication.config.zenboot.host.instances.poolSize.toInteger()
 
-        if (poolsize - existingHosts <= 0) {
+        if (poolsize <= existingHosts) {
             throw new InstancePoolExhaustedException("Can not create host because host pool is exhausted")
         }
+        
+        // Not set means "no limit"
+        if (ctx.execZone.hostLimit) {
+          if (ctx.execZone.hostLimit <= ctx.execZone.getNonDeletedHosts().size()) {
+              throw new InstancePoolExhaustedException("Can not create host because execZones's hostLimit is exhausted")
+          }
+        }
+
 
         // We could do it here but for convenience, we have something in the code:
         Hostname hostname = hostService.nextHostName()

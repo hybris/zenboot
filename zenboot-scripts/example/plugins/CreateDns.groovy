@@ -41,6 +41,7 @@ class CreateDns {
 
         ctx.host.addToDnsEntries(dnsEntry)
         ctx.host.state = HostState.ACCESSIBLE  //mark the host as accessible (can be resolved via DNS)
+        ctx.host.cname =ctx.parameters['SHORTNAME']+"."+ctx.parameters['DOMAIN']
         ctx.host.save(flush:true)
 
         log.info("Dns entry '${dnsEntry}' created for host ${ctx.host}")

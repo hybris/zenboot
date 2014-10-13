@@ -25,6 +25,20 @@ class DeleteHost {
             not {
                 'in'("state", [HostState.DELETED, HostState.DISABLED, HostState.BROKEN])
             }
+            eq("execZone", exposedAction.executionZone)
+
+        }
+
+        def filterExpression = exposedAction.executionZone.processingParameters.find(){
+          it.name == "DELETEHOSTJOB_HOST_FILTER"
+        }.value
+
+        print "filterEx"+filterExpression
+
+        if (filterExpression) {
+          this.hosts = this.hosts.findAll() { host ->
+            Eval.me("host",host,filterExpression)
+          }
         }
 
         if (this.hosts.empty) {

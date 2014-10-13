@@ -13,5 +13,5 @@ lookupPath:
   - ../create_host
 scripts:
   - create-host-instance.rb
-  - set-shortname.sh
   - create-dns.pl
+  - write-env-parameters.sh
