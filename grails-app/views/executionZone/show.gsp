@@ -44,7 +44,7 @@
 			<div class="accordion-group">
 				<div class="accordion-heading">
       		<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#showZone">
-        		<g:message code="default.show.label" args="[entityName]" /> (${executionZoneInstance?.type})
+        		<g:message code="default.show.label" args="[entityName]" /> (${executionZoneInstance?.type} : ${executionZoneInstance?.description} )
       		</a>
     		</div>
     		<div id="showZone" class="accordion-body collapse">
@@ -182,7 +182,7 @@
 										<g:message code="executionZone.defaultLifetime.label" default="Default Lifetime" />
 									</dt>
 									<dd>
-										<joda:formatPeriod value="${new Period(executionZoneInstance.defaultLifetime*1000*60)}" fields="months,weeks,days,hours,minutes" />
+										<joda:formatPeriod value="${new Period(executionZoneInstance.defaultLifetime == null ? 0 : executionZoneInstance.defaultLifetime*1000*60)}" fields="months,weeks,days,hours,minutes" />
 									</dd>
 								</g:if>
 
