@@ -8,6 +8,8 @@ class Role {
 
     String authority
 
+    String executionZoneAccessExpression
+
     static mapping = { cache true }
 
     static constraints = {
