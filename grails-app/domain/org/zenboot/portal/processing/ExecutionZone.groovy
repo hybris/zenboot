@@ -75,6 +75,16 @@ class ExecutionZone {
         }
     }
 
+    /* convenience-method for script-usage
+       return "" in case ob not existing
+    */
+    String param(String name) {
+      def param = this.processingParameters.find(){
+        it.name == name
+      }
+      return param == null ? "" : param.value
+    }
+
     List getAuditLogEvents() {
         return ProcessingParameterLog.findAllByProcessingParameterInList(this.processingParameters, [sort: "dateCreated", order: "desc"])
     }

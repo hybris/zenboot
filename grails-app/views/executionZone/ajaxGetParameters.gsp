@@ -8,7 +8,7 @@
 	</thead>
 </table>
 
-<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersEmpty]" />
+<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersEmpty,readonly:false]" />
 
 <!-- Show Non-empty parameters only if needed -->
 <a class="collapsed" style="cursor: pointer" data-toggle="collapse" data-target="#nonempty">
@@ -17,7 +17,7 @@
 </a>
 
 <div id="nonempty" class="collapse">
-	<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersNonempty]" />
+	<g:render template="parameterList" model="[executionZoneParameters:executionZoneParametersNonempty,readonly:true]" />
 
 	<g:field type="hidden" value="${containsInvisibleParameters}" name="containsInvisibleParameters" />
 

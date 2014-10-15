@@ -273,27 +273,29 @@
 				 	</div>
 				 </div>
 			</div>
-			<div class="accordion-group">
-				<div class="accordion-heading">
-					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#editExecZone">
-        				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
-      				</a>
+			<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#editExecZone">
+	        				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
+	      				</a>
+					</div>
+					 <div id="editExecZone" class="accordion-body collapse ${flash.action == 'update' ? 'in' : ''}">
+					 	<div class="accordion-inner">
+							<g:form method="post">
+								<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
+								<g:hiddenField name="version" value="${executionZoneInstance?.version}" />
+								<fieldset class="form-horizontal">
+									<g:render template="form" />
+								</fieldset>
+								<fieldset class="buttons spacer">
+									<g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+								</fieldset>
+							</g:form>
+					 	</div>
+					 </div>
 				</div>
-				 <div id="editExecZone" class="accordion-body collapse ${flash.action == 'update' ? 'in' : ''}">
-				 	<div class="accordion-inner">
-						<g:form method="post">
-							<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
-							<g:hiddenField name="version" value="${executionZoneInstance?.version}" />
-							<fieldset class="form-horizontal">
-								<g:render template="form" />
-							</fieldset>
-							<fieldset class="buttons spacer">
-								<g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-							</fieldset>
-						</g:form>
-				 	</div>
-				 </div>
-			</div>
+			</sec:ifAllGranted>
 			<div class="accordion-group">
 				<div class="accordion-heading">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#manageTemplates">

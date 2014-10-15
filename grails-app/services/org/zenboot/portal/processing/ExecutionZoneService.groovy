@@ -1,5 +1,6 @@
 package org.zenboot.portal.processing
 
+import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.PathResolver
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
@@ -234,4 +235,19 @@ class ExecutionZoneService {
 
         return result
     }
+
+    boolean hasAccess(Role role, ExecutionZone executionZone) {
+      def expression = role.executionZoneAccessExpression
+      return Eval.me("executionZone",executionZone,expression == null ? "" : expression)
+    }
+
+    boolean hasAccess(Set roles, ExecutionZone zone) {
+      for ( role in roles) {
+        if (hasAccess(role,zone)) {
+          return true
+        }
+      }
+      return false
+    }
+
 }

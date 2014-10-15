@@ -1,3 +1,4 @@
+<%@ page import="org.zenboot.portal.security.Role"%>
 <table class="table exec-parameters-table">
 <g:each in="${executionZoneParameters}" var="entry" status="i">
   <tr>
@@ -7,7 +8,12 @@
     <td style="width: 45%">
       <div class="control-group ${entry.overlay ? 'info' : entry.value ? 'success' : ''}">
         <g:if test="${entry.visible || (!entry.visible && entry.value.empty)}">
-          <g:textField name="parameters.value" value="${entry.value}" />
+          <sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+            <g:textField name="parameters.value" value="${entry.value}" />
+          </sec:ifAllGranted>
+          <sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+            <g:textField name="parameters.value" value="${entry.value}" readonly="${readonly}"/>
+          </sec:ifNotGranted>
         </g:if>
         <g:else>
           <g:field type="password" name="parameters.value" placeholder="${message(code:'executionZone.scriptletMetadata.secretValue', default:"Secret value")}" />

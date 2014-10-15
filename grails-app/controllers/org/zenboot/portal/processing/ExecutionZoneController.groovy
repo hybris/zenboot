@@ -3,11 +3,13 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.converters.XML
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
+import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.RestResult
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
@@ -22,7 +24,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def execute = { ExecuteExecutionZoneCommand cmd ->
+    def execute(ExecuteExecutionZoneCommand cmd) {
         flash.action = 'execute'
         cmd.setParameters(params.parameters)
         log.info("cmd setParameters:" + params.inspect())
@@ -131,9 +133,23 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             enabled = true
         }
 
+        def executionZoneInstanceList
+        def filteredExecutionZoneInstanceList = []
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+          executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
+        } else {
+
+          executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
+
+          filteredExecutionZoneInstanceList.addAll(executionZoneInstanceList.findAll() { executionZone ->
+            executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
+          })
+          executionZoneInstanceList = filteredExecutionZoneInstanceList
+        }
+
         [
-            executionZoneInstanceList: ExecutionZone.findAllByEnabled(enabled, params),
-            executionZoneInstanceTotal: ExecutionZone.countByEnabled(enabled),
+            executionZoneInstanceList: executionZoneInstanceList,
+            executionZoneInstanceTotal: executionZoneInstanceList.size(),
             executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list()
         ]
     }
@@ -163,6 +179,13 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             redirect(action: "list")
             return
         }
+
+        if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) &&
+              !executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZoneInstance)) {
+          render(view: "/login/denied")
+          return
+        }
+
         List scriptDirs = this.executionZoneService.getScriptDirs(executionZoneInstance.type)
 
         def structuredScriptDirs = [:]
