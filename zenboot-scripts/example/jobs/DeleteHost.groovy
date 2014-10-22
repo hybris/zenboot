@@ -43,21 +43,21 @@ class DeleteHost {
         // Defining Additional Criterial via the host
         def filterExpression = exposedAction.executionZone.processingParameters.find(){
           it.name == "DELETEHOSTJOB_HOST_FILTER"
-        }.value
+        }
         // example: !( host.cname.startsWith('chefserver') )
         if (filterExpression) {
           this.hosts = this.hosts.findAll() { host ->
-            Eval.me("host",host,filterExpression)
+            Eval.me("host",host,filterExpression.value)
           }
         }
 
         // Defining Minimum numbers of hosts per role
         def minimumHashExpression = exposedAction.executionZone.processingParameters.find(){
           it.name == "DELETEHOSTJOB_ROLES_MINIMUM"
-        }.value
+        }
         // example: ["jks":3,"jkm":1]
         if (minimumHashExpression) {
-          def minimumHash = Eval.me(minimumHashExpression)
+          def minimumHash = Eval.me(minimumHashExpression.value)
           minimumHash.each() { role, minInstances ->
             def toBeDeletedHostsSliceWithRole = this.hosts.findAll() { host ->
               host.cname.startsWith(role)

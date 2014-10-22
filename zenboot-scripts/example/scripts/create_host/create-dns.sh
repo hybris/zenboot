@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/bin/bash
 
 #@Scriptlet(author="Tobias Schuhmacher (tschuhmacher@nemeses.de)", description="Generate a DNS entry (FAKE)")
 #@Parameters([
@@ -9,8 +9,8 @@
 
 
 
-print "# I'm creating a fake DNS entry for IP address $ENV{'IP'}\n";
+echo "# I'm creating a fake DNS entry for IP address ${IP}\n";
 
-print "FQDN=$ENV{'HOSTNAME'}.$ENV{'DOMAIN'}\n";
+echo "FQDN=${HOSTNAME}.${DOMAIN}\n";
 
-sleep(1);
+sleep 1

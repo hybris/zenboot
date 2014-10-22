@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/bin/bash
 
 #@Scriptlet(author="Tobias Schuhmacher (tschuhmacher@nemeses.de)", description="Create a host instance (FAKE!)")
 #@Parameters([
@@ -7,8 +7,9 @@
 #  @Parameter(name="HOSTNAME", type=ParameterType.CONSUME, description="The name of the host which will be set"),
 #])
 
-sleep(1)
+sleep 1
 
-puts "#These random values will be available as env-parameters in all following scripts"
-puts "IP=#{Array.new(4){rand(256)}.join('.')}"
-puts "MAC=#{(1..6).map{"%0.2X"%rand(256)}.join(":")}"
+
+echo "#These random values will be available as env-parameters in all following scripts"
+echo "IP=123.456.789.123"
+echo "MAC=ab:12:cd:34:ef:56"

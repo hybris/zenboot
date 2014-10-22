@@ -12,6 +12,6 @@
 lookupPath:
   - ../create_host
 scripts:
-  - create-host-instance.rb
-  - create-dns.pl
+  - create-host-instance.sh
+  - create-dns.sh
   - write-env-parameters.sh
