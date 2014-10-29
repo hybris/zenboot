@@ -44,6 +44,40 @@ cd zenboot
 * Go again to the execution-zone, "edit" and add a key-value WHAT_TO_SAY -> "zenboot is cool!", update
 * choose helloworld again, consider how the value has now been changed, execute
 
+## use and understand the example-type
+The example-type should show you the abilities of booting machines and the functionality
+of zenboot without doing the actual job. So nothing get really created, eventually.
+* ./docker-run.sh
+* login at http://localhost:8080/zenboot with admin/zenboot
+* Create a example-execution-zone: Processsing -> ExecutionZone -> Create
+* Check enabled, create
+* Processing -> example -> create-domain -> DOMAIN = testdomain.com ->
+* This job might have setup your DNS-server for that domain and as sideeffect it created
+a DOMAIN key in the key-value-list (Processing -> example -> edit_execution_zone)
+* Processing -> example -> create_chefserver -> CUSTOMER_EMAIL = yourmail@testdomain.com
+* This will might have created a chefserver and it created a a DB-entry for that server
+(Data_Management -> hosts -> with your mail as a customer of that machine)
+* For each machine to boot, you have to type in CUSTOMER_EMAIL which might be inappropriate
+for your usecase, so let's fix that by setting it as a kind of default
+* Processing -> example -> edit_execution_zone -> click "+" -> CUSTOMER_EMAIL = yourmail@testdomain.com -> click "update"
+* Spinup a jenkinsmaster: Processing -> example -> create_jenkinsmaster -> execute
+* spinup a couple of slaves as well
+* now let's configure an autopurge of machines, so that:
+ * we never want to delete the chefserver
+ * we want to keep the jenkins-master and 2 slaves
+* Processing -> example -> edit_execution_zone -> click "+" -> DELETEHOSTJOB_HOST_FILTER = !( host.cname.startsWith('chefserver') )
+* Add another key-value -> DELETEHOSTJOB_ROLES_MINIMUM = ["jks":2,"jkm":1]
+* tick "enable_autodeletion" and "update"
+* Tab "delete" ->  delete_host -> click "-" so that the key HOSTNAME disappears -> "expose"
+* choose "25 * * * * ?" which will run that job every minute
+* Accessible by -> ROLE_ADMIN
+* set a REST-url like "delete-host" and "create"
+* Your jenkins-slaves which have exceeded their lifetime (default is zenboot.host.instances.lifetime=60 (seconds))
+will get deleted automatically
+[WorkInProgress]
+
+## DISCLAIMER ##
+Don't use zenboot in production with Docker, because security!
 
 ## License ##
 Copyright 2013 hybris GmbH
