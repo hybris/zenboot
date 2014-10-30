@@ -7,10 +7,10 @@ import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.ho.yaml.Yaml
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.ApplicationEventPublisherAware
 
-class ExecutionZoneService {
-
-
+class ExecutionZoneService implements ApplicationEventPublisherAware {
 
 
     static final String SCRIPTS_DIR = 'scripts'
@@ -19,6 +19,8 @@ class ExecutionZoneService {
 
     def grailsApplication
     def scriptletBatchService
+    def applicationEventPublisher
+    def springSecurityService
 
     void synchronizeExecutionZoneTypes() {
         //type name is the key to be able to resolve a type by name quickly
@@ -78,6 +80,16 @@ class ExecutionZoneService {
 
     private List normalizeRuntimeAttributes(List attributes) {
         return attributes*.trim()*.toLowerCase()
+    }
+
+    void createAndPublishExecutionZoneAction(ExecutionZone execZone, String stackName, Map processParameters=null, List runtimeAttributes=null) {
+      File stackDir = new File(getZenbootScriptsDir().getAbsolutePath() + "/"+ execZone.type.name + "/scripts/"+stackName)
+      createAndPublishExecutionZoneAction(execZone, stackDir, processParameters, runtimeAttributes)
+    }
+
+    void createAndPublishExecutionZoneAction(ExecutionZone execZone, File scriptDir, Map processParameters=null, List runtimeAttributes=null) {
+      ExecutionZoneAction action = createExecutionZoneAction(execZone, scriptDir, processParameters, runtimeAttributes)
+      this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
     }
 
     ExecutionZoneAction createExecutionZoneAction(ExposedExecutionZoneAction exposedAction, Map processParameters=null, List runtimeAttributes=null) {
@@ -250,4 +262,8 @@ class ExecutionZoneService {
       return false
     }
 
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.applicationEventPublisher = eventPublisher
+    }
 }

@@ -36,7 +36,7 @@
 				</dd>
 			</g:if>
 
-			<g:if test="${scriptletBatchInstance?.user.username}">
+			<g:if test="${scriptletBatchInstance?.user?.username}">
 				<dt>
 					<g:message code="scriptletBatch.user.label" default="Started by user" />
 				</dt>
