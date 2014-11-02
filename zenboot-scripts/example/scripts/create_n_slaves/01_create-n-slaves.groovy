@@ -12,7 +12,7 @@ import org.zenboot.portal.processing.ProcessContext
 
  @Parameters([
      @Parameter(name="HOWMANY", description="the number of slaves to create", type=ParameterType.CONSUME),
-     @Parameter(name="WAIT", description="seconds to wait", type=ParameterType.CONSUME)
+     @Parameter(name="SLEEP", description="seconds to wait", type=ParameterType.CONSUME)
  ])
 class CreateNumberHosts {
 
@@ -23,7 +23,7 @@ class CreateNumberHosts {
     executionZoneService = this.grailsApplication.mainContext.getBean('executionZoneService')
     for ( i in 1..ctx.parameters['HOWMANY'].toInteger() ) {
       this.grailsApplication.mainContext.getBean('executionZoneService').createAndPublishExecutionZoneAction(ctx.execZone, "create_jenkinsslave")
-      Thread.sleep(ctx.parameters['HOWMANY'].toInteger()*1000);
+      Thread.sleep(ctx.parameters['SLEEP'].toInteger()*1000);
     }
 
 
