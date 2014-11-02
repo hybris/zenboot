@@ -85,7 +85,9 @@
 				<g:message code="host.hostname.label" default="ExecutionZone" />
 			</dt>
 			<dd>
-				${hostInstance?.execZone?.encodeAsHTML()}
+				<g:link controller="executionZone" action="show" id="${hostInstance?.execZone?.id}">
+					${hostInstance?.execZone?.encodeAsHTML()}
+				</g:link>
 			</dd>
 		</g:if>
 
