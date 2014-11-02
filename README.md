@@ -6,17 +6,18 @@ Zenboot - orchestrate your scripts
 * A kind of slim RunDeck with better Environment-support
 * executing exactly the same in each environment just with another configuration
 * Running scripts in chains, reuse scripts and maintain the configuration in key-value pairs
-* Use it e.g. to provision manually, bootstrap your complete environment (puppet apply example coming soon)
+* Use it e.g. to provision manually, bootstrap all your environments, storing
+all the servers in the DB
 * or fullfill your orchestration-needs, expose scripts via REST
-* grails based 2.0.3
+* based on grails 2.3.1
 
 ## Go with Docker
 
 ``` bash
 ./run-docker.sh
 # login at localhost:8080 with admin/zenboot
-mkdir -p zenboot-scripts/test/scriots
-mkdir -p zenboot-scripts/test/plugins
+mkdir -p zenboot-scripts/mytest/scripts
+mkdir -p zenboot-scripts/mytest/plugins
 # create your scripts and have fun
 # modify zenboot.properties.Docker for e.g. DB-connection
 ```
@@ -32,19 +33,7 @@ cd zenboot
 ./grailsw run-app
 ```
 
-## Usage in a nutshell
-* login at http://localhost:8080/zenboot with admin/zenboot
-* Create a example-execution-zone: Processsing -> ExecutionZone -> Create
-* Check enabled, create
-* choose "helloworld" scriptdir, execute!
-* Click the appeared Process on the left-hand-side
-* Click on the callout in the Process-Output-column to see the output of the script
-* Go again to the execution-zone, choose helloworld again, modify the value of "WHAT_TO_SAY", execute
-* Examine the Output again
-* Go again to the execution-zone, "edit" and add a key-value WHAT_TO_SAY -> "zenboot is cool!", update
-* choose helloworld again, consider how the value has now been changed, execute
-
-## use and understand the example-type
+## Use and understand the example-type
 The example-type should show you the abilities of booting machines and the functionality
 of zenboot without doing the actual job. So nothing get really created, eventually.
 * ./docker-run.sh
