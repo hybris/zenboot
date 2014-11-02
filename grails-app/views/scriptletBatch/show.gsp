@@ -103,7 +103,7 @@
 			</g:if>
 
 
-			<g:if test="${scriptletBatchInstance?.executionZoneAction.executionZone}">
+			<g:if test="${scriptletBatchInstance?.executionZoneAction?.executionZone}">
 				<hr />
 				<dt>
 					<g:message code="scriptletBatch.executionZone.label" default="Execution Zone" />
@@ -125,6 +125,17 @@
 				<dd>
 					<g:link controller="executionZoneAction" action="show" id="${scriptletBatchInstance?.executionZoneAction.id}">
 						${scriptletBatchInstance?.executionZoneAction.scriptDir.name} (<g:formatDate date="${scriptletBatchInstance?.executionZoneAction.creationDate}" type="datetime" timeStyle="SHORT" dateStyle="SHORT" />)
+					</g:link>
+				</dd>
+			</g:if>
+
+			<g:if test="${scriptletBatchInstance?.host}">
+				<dt>
+					<g:message code="scriptletBatch.host.label" default="Host" />
+				</dt>
+				<dd>
+					<g:link controller="Host" action="show" id="${scriptletBatchInstance?.host?.id}">
+						${scriptletBatchInstance?.host.encodeAsHTML()}
 					</g:link>
 				</dd>
 			</g:if>

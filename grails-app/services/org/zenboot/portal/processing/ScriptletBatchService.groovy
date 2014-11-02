@@ -42,7 +42,15 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             processContext.execZone=action.executionZone
             ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
             processContext.scriptletBatch=batch
-            batch.execute(processContext)
+            try {
+              batch.execute(processContext)
+            } catch (Exception e) {
+              log.error("Catched Exception: ",e)
+              batch.exceptionMessage = e.getMessage()
+              batch.exceptionClass = e.getClass()
+              batch.cancel()
+            }
+
             this.synchronizeExposedProcessingParameters(batch, processContext)
         }
 
@@ -53,8 +61,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
               try {
                 execute(event)
               } catch (Exception e) {
-                log.error("Catched Exception: "+e)
-                e.printStackTrace()
+                log.error("Catched Exception: ",e)
               }
             }
         } else {
@@ -109,7 +116,16 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             " (${model.id}) denies parameter updates [Stored:${procParam.value} != New:${newValue}]")
     }
 
-    private ScriptletBatch buildScriptletBatch(ExecutionZoneAction action, Person user, String comment) {
+    /**
+      * Method is synchronized because we got exceptions like this:
+      * org.springframework.orm.hibernate3.HibernateSystemException: Don't change the reference to a collection with
+      * cascade="all-delete-orphan": org.zenboot.portal.processing.AbstractExecutionZoneAction.processingParameters;
+      * nested exception is org.hibernate.HibernateException: Don't change the reference to a collection with cascade="all-delete-orphan":
+      * org.zenboot.portal.processing.AbstractExecutionZoneAction.processingParameters
+	    * at org.zenboot.portal.processing.ScriptletBatchService.buildScriptletBatch(ScriptletBatchService.groovy:125) (135)
+      *
+      */
+    synchronized private ScriptletBatch buildScriptletBatch(ExecutionZoneAction action, Person user, String comment) {
         if (this.log.debugEnabled) {
             this.log.debug("Build scriptlet batch for action ${action}")
         }
