@@ -82,12 +82,33 @@
 
 		<g:if test="${hostInstance?.execZone}">
 			<dt>
-				<g:message code="host.hostname.label" default="ExecutionZone" />
+				<g:message code="host.execZone.label" default="ExecutionZone" />
 			</dt>
 			<dd>
 				<g:link controller="executionZone" action="show" id="${hostInstance?.execZone?.id}">
 					${hostInstance?.execZone?.encodeAsHTML()}
 				</g:link>
+			</dd>
+		</g:if>
+
+		<g:if test="${hostInstance?.scriptletBatches}">
+			<dt>
+				<g:message code="host.scriptletBatches.label" default="ScriptletBatches" />
+			</dt>
+			<dd class="collapsable-list">
+				<a class="collapsed" style="cursor: pointer">
+					<g:message code="hostInstance.scriptletBatches.size()" default="{0} scriptletBatches defined" args="[hostInstance.scriptletBatches.size()]" />
+					<i class="icon-resize-full"></i>
+				</a>
+				<ul class="unstyled hide">
+					<g:each in="${hostInstance.scriptletBatches}" var="scriptletBatch" status="status">
+						<li>
+							<g:link controller="scriptletBatch" action="show" id="${scriptletBatch?.id}">
+								${scriptletBatch.encodeAsHTML()}
+							</g:link>
+						</li>
+					</g:each>
+				</ul>
 			</dd>
 		</g:if>
 

@@ -40,7 +40,7 @@ class CreateHostInstance {
         if (poolsize <= existingHosts) {
             throw new InstancePoolExhaustedException("Can not create host because host pool is exhausted")
         }
-        
+
         // Not set means "no limit"
         if (ctx.execZone.hostLimit) {
           if (ctx.execZone.hostLimit <= ctx.execZone.getNonDeletedHosts().size()) {
@@ -87,6 +87,8 @@ class CreateHostInstance {
         }
 
         host.save(flush:true)
+        host.addToScriptletBatches(ctx.scriptletBatch)
+        println("context: " + ctx)
         ctx.host = host
 
         log.info("Host created: ${host}")

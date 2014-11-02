@@ -3,6 +3,7 @@ package org.zenboot.portal.processing
 import org.apache.log4j.*
 import org.zenboot.portal.processing.Processable.ProcessState
 import org.zenboot.portal.security.Person
+import org.zenboot.portal.Host
 
 
 /**  a Domain-class to Stores the result of a complete Stack-run in the DB
@@ -16,7 +17,7 @@ class ScriptletBatch extends Processable {
 
     static hasMany = [processables: Processable]
 
-    static belongsTo = [executionZoneAction: ExecutionZoneAction, user:Person]
+    static belongsTo = [executionZoneAction: ExecutionZoneAction, user:Person, host: Host]
 
     static constraints = {
         processables(nullable:false)

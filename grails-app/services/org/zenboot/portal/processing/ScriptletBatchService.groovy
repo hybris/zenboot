@@ -41,6 +41,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             })
             processContext.execZone=action.executionZone
             ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
+            processContext.scriptletBatch=batch
             batch.execute(processContext)
             this.synchronizeExposedProcessingParameters(batch, processContext)
         }

@@ -1,6 +1,7 @@
 package org.zenboot.portal
 
 import org.zenboot.portal.processing.ExecutionZone
+import org.zenboot.portal.processing.ScriptletBatch
 
 class Host {
 
@@ -18,7 +19,7 @@ class Host {
 
     static belongsTo = [execZone:ExecutionZone]
 
-    static hasMany = [dnsEntries:DnsEntry,serviceUrls:ServiceUrl]
+    static hasMany = [dnsEntries:DnsEntry,serviceUrls:ServiceUrl,scriptletBatches: ScriptletBatch]
 
     static mapping = {
         dnsEntries cascade: 'all-delete-orphan'

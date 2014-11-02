@@ -25,10 +25,12 @@ class DeleteHostInstance {
         if (!ctx.host) {
             throw new PluginException("Could not find a host with the name '${ctx.parameters['HOSTNAME']}'")
         }
+        ctx.host.addToScriptletBatches(ctx.scriptletBatch)
     }
 
     def onSuccess = { ProcessContext ctx ->
         ctx.host.state = HostState.DELETED
         ctx.host.save(flush:true)
+
     }
 }
