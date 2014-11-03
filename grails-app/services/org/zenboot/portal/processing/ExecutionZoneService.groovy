@@ -3,6 +3,7 @@ package org.zenboot.portal.processing
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.PathResolver
+import org.zenboot.portal.ZenbootException
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
@@ -80,6 +81,17 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     private List normalizeRuntimeAttributes(List attributes) {
         return attributes*.trim()*.toLowerCase()
+    }
+
+    /** convenience-method for creating ExecutionZones
+      * meant to be called in scripts
+      */
+    ExecutionZone createExecutionZone(HashMap params) {
+      ExecutionZone executionZoneInstance = new ExecutionZone(params)
+      if (!executionZoneInstance.save(flush: true)) {
+          throw new ZenbootException("could not save ExecutionZone")
+      }
+      return executionZoneInstance
     }
 
     void createAndPublishExecutionZoneAction(ExecutionZone execZone, String stackName, Map processParameters=null, List runtimeAttributes=null) {
@@ -260,6 +272,10 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         }
       }
       return false
+    }
+
+    List findByParameter(String key, String value) {
+      return ExecutionZone.findAll().findAll() { it.param(key) == value }
     }
 
     @Override

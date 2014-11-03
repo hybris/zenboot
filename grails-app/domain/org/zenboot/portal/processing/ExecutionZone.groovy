@@ -61,6 +61,16 @@ class ExecutionZone {
         }
     }
 
+    void addProcessingParameter(String key, String value) {
+      ProcessingParameter pp = new ProcessingParameter(
+        ["name":key,
+         "value":value,
+         "dateCreated": new Date(),
+         "published": false,
+         "exposed": false])
+      pp.save()
+      addProcessingParameter(pp)
+    }
     void addProcessingParameter(ProcessingParameter param) {
         ProcessingParameter existingParam = this.getProcessingParameter(param.name)
         if (existingParam) {
