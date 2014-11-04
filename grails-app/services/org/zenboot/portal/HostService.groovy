@@ -19,6 +19,8 @@ class HostService {
         return (grailsApplication.config.zenboot.host.instances.poolSize.toInteger() - existingHosts)
     }
 
+    /** see also ExecutionZoneService.getExpiryDate()
+      */
     Date getExpiryDate() {
         int lifetime = grailsApplication.config.zenboot.host.instances.lifetime.toInteger()
         if (lifetime > 0) {

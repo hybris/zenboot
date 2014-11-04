@@ -22,6 +22,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     def scriptletBatchService
     def applicationEventPublisher
     def springSecurityService
+    def hostService
 
     void synchronizeExecutionZoneTypes() {
         //type name is the key to be able to resolve a type by name quickly
@@ -276,6 +277,20 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     List findByParameter(String key, String value) {
       return ExecutionZone.findAll().findAll() { it.param(key) == value }
+    }
+
+    /** see also HostService.getExpiryDate()
+      */
+    Date getExpiryDate(ExecutionZone execZone) {
+      if (execZone.defaultLifetime) {
+        int lifetime = execZone.defaultLifetime
+        if (lifetime > 0) {
+          GregorianCalendar calendar = GregorianCalendar.getInstance()
+          calendar.add(GregorianCalendar.MINUTE, lifetime)
+          return calendar.getTime()
+        }
+      }
+      return hostService.getExpiryDate()
     }
 
     @Override
