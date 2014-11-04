@@ -135,6 +135,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
 
         def executionZoneInstanceList
         def filteredExecutionZoneInstanceList = []
+        def parameters = [:]
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
           executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
         } else {
@@ -149,7 +150,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
 
         [
             executionZoneInstanceList: executionZoneInstanceList,
-            executionZoneInstanceTotal: executionZoneInstanceList.size(),
+            executionZoneInstanceTotal: ExecutionZone.findAllByEnabled(enabled).size(),
             executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list()
         ]
     }

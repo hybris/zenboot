@@ -101,7 +101,7 @@
 		</fieldset>
 
 		<div class="pagination">
-			<g:paginate total="${executionZoneInstanceTotal}" />
+			<g:paginate total="${executionZoneInstanceTotal}" max="1" params="${parameters}"/>
 		</div>
 	</div>
 </body>
