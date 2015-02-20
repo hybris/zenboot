@@ -76,11 +76,11 @@
 												<li>
 													<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 														<g:link controller="executionZoneAction" action="show" id="${a.id}">
-															${a.scriptDir.name} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
+															${a.scriptletBatches[0].description} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
 														</g:link>
 													</sec:ifAllGranted>
 													<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-														${a.scriptDir.name} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
+														${a.scriptletBatches[0].description} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
 													</sec:ifNotGranted>
 												</li>
 											</g:each>
@@ -102,11 +102,11 @@
 												<li>
 													<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 														<g:link controller="host" action="show" id="${h.id}">
-															${h.cname} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
+															${h.cname} (${h.hostname} : <g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
 														</g:link>
 													</sec:ifAllGranted>
 													<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-														${h.cname} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
+														${h.cname} ( ${h.hostname} : <g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
 													</sec:ifNotGranted>
 												</li>
 											</g:each>
