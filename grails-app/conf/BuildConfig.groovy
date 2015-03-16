@@ -37,23 +37,24 @@ grails.project.dependency.resolution = {
         compile ":hibernate:3.6.10.2"
         compile ":version-update:1.2.0"
         compile ":joda-time:1.5"
-        runtime ":jquery:1.7.1"
+        runtime ":jquery:1.11.1"
         //runtime ":zipped-resources:1.0"
         //runtime ":cached-resources:1.0"
         //runtime ":yui-minify-resources:0.1.5"
         //compile ":cache-headers:1.1.5"
         runtime ":executor:0.3"
-        runtime ":mail:1.0"
-        runtime ":navigation:1.3.2"
+        runtime ":mail:1.0.7"
+        //runtime ":navigation:1.3.2"
+        compile ":platform-core:1.0.0"
         runtime ":quartz2:0.2.3"
-        runtime ":resources:1.2.1"
-        runtime ":spring-security-core:1.2.7.3"
+        runtime ":resources:1.2.14"
+        runtime ":spring-security-core:2.0-RC4"
         compile ":webxml:1.4.1"
         runtime ':twitter-bootstrap:2.3.2'
         runtime ':console:1.5.0'
 
         //spring security ui specific
-        runtime ":spring-security-ui:0.2"
+        runtime ":spring-security-ui:1.0-RC2"
         runtime ":famfamfam:1.0.1"
         runtime ":jquery-ui:1.8.15"
 
