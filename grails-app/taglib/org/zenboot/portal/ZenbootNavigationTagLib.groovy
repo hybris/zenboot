@@ -1,7 +1,8 @@
 package org.zenboot.portal
 
-import org.springframework.security.web.util.AntUrlPathMatcher
+
 import org.zenboot.portal.security.Role
+import org.codehaus.groovy.grails.io.support.AntPathMatcher
 
 class ZenbootNavigationTagLib {
 
@@ -53,7 +54,7 @@ class ZenbootNavigationTagLib {
     private def getVisibleSubitem(def item) {
         def items = navigationService.byGroup['*']
         items.find {
-            it.path[0] == item.path[0] && this.isVisible(it) 
+            it.path[0] == item.path[0] && this.isVisible(it)
         }
     }
 
@@ -69,7 +70,7 @@ class ZenbootNavigationTagLib {
                 return !springSecurityService.authentication.authorities.intersect(requiredRoles).empty
             } else {
                 def urlPatterns = grailsApplication.config.grails.plugins.springsecurity.controllerAnnotations.staticRules
-                AntUrlPathMatcher urlMatcher = new AntUrlPathMatcher(false)
+                AntPathMatcher urlMatcher = new AntPathMatcher(false)
                 return urlPatterns.any { String urlPattern, List roles ->
                     def compiledPattern = urlMatcher.compile(urlPattern)
                     def target = "/${item.controller}/${item.action}"

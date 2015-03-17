@@ -34,7 +34,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        compile ":hibernate:3.6.10.2"
+        compile ":hibernate:3.6.10.14"
         compile ":version-update:1.2.0"
         compile ":joda-time:1.5"
         runtime ":jquery:1.11.1"
@@ -48,17 +48,18 @@ grails.project.dependency.resolution = {
         compile ":platform-core:1.0.0"
         runtime ":quartz2:0.2.3"
         runtime ":resources:1.2.14"
+        runtime ":lesscss-resources:1.3.3"
         runtime ":spring-security-core:2.0-RC4"
         compile ":webxml:1.4.1"
-        runtime ':twitter-bootstrap:2.3.2'
+        runtime ':twitter-bootstrap:2.3.2.2'
         runtime ':console:1.5.0'
 
         //spring security ui specific
         runtime ":spring-security-ui:1.0-RC2"
         runtime ":famfamfam:1.0.1"
-        runtime ":jquery-ui:1.8.15"
+        runtime ":jquery-ui:1.10.4"
 
-        build ':tomcat:7.0.42'
+        build ':tomcat:7.0.52.1'
     }
 }
 

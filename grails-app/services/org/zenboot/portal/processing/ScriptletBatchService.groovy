@@ -3,75 +3,25 @@ package org.zenboot.portal.processing
 import org.springframework.context.ApplicationListener
 import org.zenboot.portal.ProcessHandler
 import org.zenboot.portal.processing.converter.ParameterConverter
-import org.zenboot.portal.processing.converter.ParameterConverterMap
+
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.zenboot.portal.security.Person
 
-class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
+class ScriptletBatchService {
 
     static transactional = false //necessary to avoid duplicate event listener registration
 
     def grailsApplication
-    def executionZoneService
     def executionService
 
-    @Override
-    public void onApplicationEvent(ProcessingEvent event) {
-        this.log.info("Receive application event ${event}")
 
-        // ToDo Refactor, so that not the processingEvent is a param to the closure, but
-        // user, executionZoneAction and comment
-        // This is basically
-        // * creating and populating the ProcessContext
-        // * creating and populating the Scriptletbatch
-        // * run the execute-method with the processContext
-        // * synchronizeExposedProcessingParameters ?????
-        Closure execute = { ProcessingEvent processingEvent ->
-            ProcessContext processContext = new ProcessContext(
-            parameters:new ParameterConverterMap(parameterConverters:grailsApplication.mainContext.getBeansOfType(ParameterConverter).values()),
-            user:processingEvent.user
-            )
-            ExecutionZoneAction action = processingEvent.executionZoneAction.merge()
-            processContext.parameters.putAll(action.processingParameters.inject([:]) { map, param ->
-                map[param.name] = param.value
-                return map
-            })
-            processContext.execZone=action.executionZone
-            ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
-            processContext.scriptletBatch=batch
-            try {
-              batch.execute(processContext)
-            } catch (Exception e) {
-              log.error("Catched Exception: ",e)
-              batch.exceptionMessage = e.getMessage()
-              batch.exceptionClass = e.getClass()
-              batch.cancel()
-            }
-
-            this.synchronizeExposedProcessingParameters(batch, processContext)
-        }
-
-        if (event.processAsync && grailsApplication.config.zenboot.processing.asynchron.toBoolean()) {
-            // This leverages the grails executor-plugin
-            // https://github.com/basejump/grails-executor#examples
-            runAsync {
-              try {
-                execute(event)
-              } catch (Exception e) {
-                log.error("Catched Exception: ",e)
-              }
-            }
-        } else {
-            execute(event)
-        }
-    }
 
 	private void synchronizeExposedProcessingParameters(ScriptletBatch batch, ProcessContext processContext) {
         ExecutionZoneAction action = batch.executionZoneAction
-        ScriptletBatchFlow flow = executionZoneService.getScriptletBatchFlow(action.scriptDir)
+        ScriptletBatchFlow flow = getScriptletBatchFlow(action.scriptDir)
 		ParameterMetadataList paramList = flow.getParameterMetadataList()
 
 		def exposedPublishedMetaParams = paramList.parameters.findAll { ParameterMetadata paramMeta ->
@@ -125,13 +75,13 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 	    * at org.zenboot.portal.processing.ScriptletBatchService.buildScriptletBatch(ScriptletBatchService.groovy:125) (135)
       *
       */
-    synchronized private ScriptletBatch buildScriptletBatch(ExecutionZoneAction action, Person user, String comment) {
+    synchronized private ScriptletBatch buildScriptletBatch(ExecutionZoneAction action, Person user, String comment, File pluginDir) {
         if (this.log.debugEnabled) {
             this.log.debug("Build scriptlet batch for action ${action}")
         }
         ScriptletBatch batch = new ScriptletBatch(description: "${user?.username} : ${action.executionZone.type} : ${action.scriptDir.name} ${action.executionZone.description? action.executionZone.description : "" }", executionZoneAction:action, user:user, comment:comment)
 
-        PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(action.executionZone.type))
+        PluginResolver pluginResolver = new PluginResolver(pluginDir)
         File pluginFile = pluginResolver.resolveScriptletBatchPlugin(batch, action.runtimeAttributes)
         if (pluginFile) {
             executionService.injectPlugins(pluginFile, batch)
@@ -148,9 +98,9 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         return batch
     }
 
-    private List<Scriptlet> addScriptlets(ScriptletBatch batch, List runtimeAttributes) {
+    private List<Scriptlet> addScriptlets(ScriptletBatch batch, List runtimeAttributes, File pluginDir) {
         ScriptResolver scriptsResolver = new ScriptResolver(batch.executionZoneAction.scriptDir)
-        PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(batch.executionZoneAction.executionZone.type))
+        PluginResolver pluginResolver = new PluginResolver(pluginDir)
 
         scriptsResolver.resolve(runtimeAttributes).each { File file ->
             Scriptlet scriptlet = new Scriptlet(description:file.name, file:file)

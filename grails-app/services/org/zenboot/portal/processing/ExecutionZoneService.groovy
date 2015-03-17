@@ -11,7 +11,10 @@ import org.ho.yaml.Yaml
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 
-class ExecutionZoneService implements ApplicationEventPublisherAware {
+import org.springframework.context.ApplicationListener
+import org.zenboot.portal.processing.converter.ParameterConverterMap
+
+class ExecutionZoneService implements ApplicationEventPublisherAware, ApplicationListener<ProcessingEvent> {
 
 
     static final String SCRIPTS_DIR = 'scripts'
@@ -19,10 +22,61 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     static final String PLUGINS_DIR = 'plugins'
 
     def grailsApplication
-    def scriptletBatchService
+    //def scriptletBatchService
     def applicationEventPublisher
     def springSecurityService
     def hostService
+
+
+    public void onApplicationEvent(ProcessingEvent event) {
+        this.log.info("Receive application event ${event}")
+
+        // ToDo Refactor, so that not the processingEvent is a param to the closure, but
+        // user, executionZoneAction and comment
+        // This is basically
+        // * creating and populating the ProcessContext
+        // * creating and populating the Scriptletbatch
+        // * run the execute-method with the processContext
+        // * synchronizeExposedProcessingParameters ?????
+        Closure execute = { ProcessingEvent processingEvent ->
+            ProcessContext processContext = new ProcessContext(
+            parameters:new ParameterConverterMap(parameterConverters:grailsApplication.mainContext.getBeansOfType(ParameterConverter).values()),
+            user:processingEvent.user
+            )
+            ExecutionZoneAction action = processingEvent.executionZoneAction.merge()
+            processContext.parameters.putAll(action.processingParameters.inject([:]) { map, param ->
+                map[param.name] = param.value
+                return map
+            })
+            processContext.execZone=action.executionZone
+            ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment, getPluginDir(action.executionZone.type))
+            processContext.scriptletBatch=batch
+            try {
+              batch.execute(processContext)
+            } catch (Exception e) {
+              log.error("Catched Exception: ",e)
+              batch.exceptionMessage = e.getMessage()
+              batch.exceptionClass = e.getClass()
+              batch.cancel()
+            }
+
+            this.synchronizeExposedProcessingParameters(batch, processContext)
+        }
+
+        if (event.processAsync && grailsApplication.config.zenboot.processing.asynchron.toBoolean()) {
+            // This leverages the grails executor-plugin
+            // https://github.com/basejump/grails-executor#examples
+            runAsync {
+              try {
+                execute(event)
+              } catch (Exception e) {
+                log.error("Catched Exception: ",e)
+              }
+            }
+        } else {
+            execute(event)
+        }
+    }
 
     void synchronizeExecutionZoneTypes() {
         //type name is the key to be able to resolve a type by name quickly
