@@ -76,11 +76,11 @@
 												<li>
 													<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 														<g:link controller="executionZoneAction" action="show" id="${a.id}">
-															${a.scriptletBatches[0].description} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
+															${a.toString()}
 														</g:link>
 													</sec:ifAllGranted>
 													<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-														${a.scriptletBatches[0].description} (<g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${a.creationDate}"/>)
+														${a.toString()}
 													</sec:ifNotGranted>
 												</li>
 											</g:each>

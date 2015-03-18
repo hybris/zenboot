@@ -137,6 +137,7 @@ class ScriptletBatchController {
           if (!executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), scriptletBatchInstance.executionZoneAction.executionZone)) {
             flash.message = message(code: 'default.no.access.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
             redirect(action: "list")
+            return
           }
 
         }

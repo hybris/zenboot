@@ -11,4 +11,11 @@ class ExecutionZoneAction extends AbstractExecutionZoneAction {
         runtimeAttributes type: 'text', cascade: 'all'
         scriptletBatches cascade: 'all-delete-orphan'
     }
+
+
+    String toString() {
+        if (scriptletBatches != null && scriptletBatches[0]!=null) {
+          return scriptletBatches[0].description +"(" + this.creationDate + ")"
+        }
+    }
 }
