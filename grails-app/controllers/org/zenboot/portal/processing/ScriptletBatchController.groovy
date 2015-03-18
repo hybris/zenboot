@@ -3,13 +3,20 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.zenboot.portal.security.Role
+
+
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
 class ScriptletBatchController {
 
     def PageRenderer groovyPageRenderer
-    
+    def executionZoneService
+    def springSecurityService
+
+
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
@@ -24,8 +31,8 @@ class ScriptletBatchController {
         if (!params.order) {
             params.order = "desc"
         }
-        
-        
+
+
         def batchInstanceList
         def batchInstanceCount
         def parameters = [:]
@@ -43,11 +50,23 @@ class ScriptletBatchController {
             batchInstanceList = ScriptletBatch.list(params)
             batchInstanceCount = ScriptletBatch.count()
         }
-        
-        
-        [scriptletBatchInstanceList: batchInstanceList, scriptletBatchInstanceTotal: batchInstanceCount, parameters:parameters]
+
+        def filteredBatchInstanceList = []
+        def filteredBatchInstanceCount
+
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+          filteredBatchInstanceList = batchInstanceList
+        } else {
+          filteredBatchInstanceList.addAll(batchInstanceList.findAll() { scriptletBatch ->
+            executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), scriptletBatch.executionZoneAction.executionZone)
+          })
+        }
+        filteredBatchInstanceCount = filteredBatchInstanceList.size()
+
+
+        [scriptletBatchInstanceList: filteredBatchInstanceList, scriptletBatchInstanceTotal: filteredBatchInstanceCount, parameters:parameters]
     }
-    
+
     def ajaxList() {
         params.max = 6
         params.sort = 'id'
@@ -55,7 +74,7 @@ class ScriptletBatchController {
         params.offset = 0
 
         def result = ScriptletBatch.list(params)
-                
+
         request.withFormat {
             json {
                 def output = [queue:[]]
@@ -111,10 +130,17 @@ class ScriptletBatchController {
     def show() {
         def scriptletBatchInstance = ScriptletBatch.get(params.id)
         if (!scriptletBatchInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+			    flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+          redirect(action: "list")
+          return
+        } else if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+          if (!executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), scriptletBatchInstance.executionZoneAction.executionZone)) {
+            flash.message = message(code: 'default.no.access.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
             redirect(action: "list")
-            return
+          }
+
         }
+
 
         [scriptletBatchInstance: scriptletBatchInstance]
     }
@@ -127,14 +153,21 @@ class ScriptletBatchController {
             return
         }
 
-        try {
-            scriptletBatchInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
-            redirect(action: "show", id: params.id)
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+
+          try {
+              scriptletBatchInstance.delete(flush: true)
+  			      flash.message = message(code: 'default.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+              redirect(action: "list")
+          }
+          catch (DataIntegrityViolationException e) {
+  			       flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+              redirect(action: "show", id: params.id)
+          }
+        } else {
+          flash.message = message(code: 'default.not.allowed.message')
+          redirect(action: "list")
+          return
         }
     }
 }

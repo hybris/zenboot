@@ -1,4 +1,5 @@
 <%@ page import="org.zenboot.portal.processing.Processable.ProcessState"%>
+<%@ page import="org.zenboot.portal.security.Role"%>
 <%@ page import="org.joda.time.Period"%>
 
 <li class="property-value scriptlet-item-detail" aria-labelledby="processables-label">
@@ -37,9 +38,11 @@
 				</td>
 				<td>
 					<g:if test="${q?.logged}">
-						<a class="zb-tooltip" onclick="javascript:$('#${itemId}_logged').slideToggle()" title="${message(code:'scriptletBatch.button.showLog', default:'Show Log')}">
-							<i class="icon-bullhorn"></i>
-						</a>
+						<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+							<a class="zb-tooltip" onclick="javascript:$('#${itemId}_logged').slideToggle()" title="${message(code:'scriptletBatch.button.showLog', default:'Show Log')}">
+								<i class="icon-bullhorn"></i>
+							</a>
+						</sec:ifAllGranted >
 					</g:if>
 				</td>
 				<td>
