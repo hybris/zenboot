@@ -16,6 +16,8 @@ class ExecutionZoneAction extends AbstractExecutionZoneAction {
     String toString() {
         if (scriptletBatches != null && scriptletBatches[0]!=null) {
           return scriptletBatches[0].description +"(" + this.creationDate + ")"
+        } else {
+          return "Failed ExecutionZone"
         }
     }
 }
