@@ -1,11 +1,15 @@
+<%@ page import="org.zenboot.portal.security.Role"%>
+
 <table class="table table-striped parameters-table">
 	<thead>
 		<tr>
 			<th style="width: 30%">Key</th>
 			<th style="width: 30%">Value</th>
 			<th style="width: 30%">Description</th>
-			<th style="width: 5%">Expose</th>
-			<th style="width: 5">Publish</th>
+			<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+				<th style="width: 5%">Expose</th>
+				<th style="width: 5%">Publish</th>
+		  </sec:ifAllGranted>
 			<th></th>
 		</tr>
 	</thead>
@@ -21,88 +25,92 @@
 				<td>
 					<g:textField name="parameters.description" value="${entry.description}" readonly="${readonly}" />
 				</td>
-				<td>
-					<g:hiddenField name="parameters.exposed" value="${entry.exposed}" />
-					<input type="checkBox" name="exposed" ${entry.exposed ? 'checked="checked"' : '' } />
-				</td>
-				<td>
-					<g:hiddenField name="parameters.published" value="${entry.published}" />
-					<input type="checkBox" name="published" ${entry.published ? 'checked="checked"' : '' } />
-				</td>
-				<td>
-					<span title="Remove parameter" class="btn btn-mini remove-parameter-button">
-						<i class="icon-minus-sign"></i>
-					</span>
-				</td>
+				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+					<td>
+						<g:hiddenField name="parameters.exposed" value="${entry.exposed}" />
+						<input type="checkBox" name="exposed" ${entry.exposed ? 'checked="checked"' : '' } />
+					</td>
+					<td>
+						<g:hiddenField name="parameters.published" value="${entry.published}" />
+						<input type="checkBox" name="published" ${entry.published ? 'checked="checked"' : '' } />
+					</td>
+					<td>
+						<span title="Remove parameter" class="btn btn-mini remove-parameter-button">
+							<i class="icon-minus-sign"></i>
+						</span>
+					</td>
+				</sec:ifAllGranted>
 			</tr>
 		</g:each>
 	</tbody>
 </table>
 
-<div class="spacer">
-    <span title="Add parameter" class="btn btn-mini add-parameter-button">
-        <i class="icon-plus-sign"></i>
-    </span>
+<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+	<div class="spacer">
+	    <span title="Add parameter" class="btn btn-mini add-parameter-button">
+	        <i class="icon-plus-sign"></i>
+	    </span>
 
-	<span title="Export parameter" class="btn btn-mini export-button">
-		<i class="icon-share"></i>
-	</span>
+		<span title="Export parameter" class="btn btn-mini export-button">
+			<i class="icon-share"></i>
+		</span>
 
-	<span title="Import parameter" class="btn btn-mini import-button">
-		<i class="icon-edit"></i>
-	</span>
+		<span title="Import parameter" class="btn btn-mini import-button">
+			<i class="icon-edit"></i>
+		</span>
 
-	<div id="parameters-import" class="modal hide fade">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h3>Import</h3>
+		<div id="parameters-import" class="modal hide fade">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3>Import</h3>
+			</div>
+			<div class="modal-body">
+				<p>
+					<g:message code="executionZone.parameters.exportCopy" default="Please enter the parameters (key=value list)" />
+				</p>
+				<g:textArea name="parameters-import" style="width:98%; height:100%;" rows="7"></g:textArea>
+			</div>
+			<div class="modal-footer">
+				<a class="btn modal-close-button">
+					<g:message code="default.button.cancel.label" default="Cancel" />
+				</a>
+				<a class="btn btn-primary modal-import-button">
+					<g:message code="default.button.import.label" default="Import" />
+				</a>
+			</div>
 		</div>
-		<div class="modal-body">
-			<p>
-				<g:message code="executionZone.parameters.exportCopy" default="Please enter the parameters (key=value list)" />
-			</p>
-			<g:textArea name="parameters-import" style="width:98%; height:100%;" rows="7"></g:textArea>
-		</div>
-		<div class="modal-footer">
-			<a class="btn modal-close-button">
-				<g:message code="default.button.cancel.label" default="Cancel" />
-			</a>
-			<a class="btn btn-primary modal-import-button">
-				<g:message code="default.button.import.label" default="Import" />
-			</a>
+
+		<div id="parameters-export" class="modal hide fade">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3>Export</h3>
+			</div>
+			<div class="modal-body">
+				<p>
+					<g:message code="executionZone.parameters.importCopy" default="Please copy the parameters." />
+				</p>
+				<g:textArea name="parameters-export" escapeHtml="false" style="width:98%; height:100%;" rows="7">
+	{
+	"parameters" : [
+		<g:set var="last" value="${ parameters ? parameters.size() - 1 : 0 }" />
+	  <g:each in="${parameters}" var="entry" status="i">
+	  {
+		   "name": "${ entry.name }",
+		   "value": "${ entry.value }",
+		   "description": "${ entry.description }"
+	  } <g:if test="${ i != last }">,</g:if>
+					</g:each>
+	]}
+				</g:textArea>
+			</div>
+			<div class="modal-footer">
+				<a class="btn modal-close-button" data-dismiss="modal">
+					<g:message code="default.button.close.label" default="Close" />
+				</a>
+			</div>
 		</div>
 	</div>
-	
-	<div id="parameters-export" class="modal hide fade">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h3>Export</h3>
-		</div>
-		<div class="modal-body">
-			<p>
-				<g:message code="executionZone.parameters.importCopy" default="Please copy the parameters." />
-			</p>
-			<g:textArea name="parameters-export" escapeHtml="false" style="width:98%; height:100%;" rows="7">
-{
-"parameters" : [
-	<g:set var="last" value="${ parameters ? parameters.size() - 1 : 0 }" />
-  <g:each in="${parameters}" var="entry" status="i">
-  {
-	   "name": "${ entry.name }",
-	   "value": "${ entry.value }",
-	   "description": "${ entry.description }"
-  } <g:if test="${ i != last }">,</g:if>
-				</g:each>
-]}
-			</g:textArea>
-		</div>
-		<div class="modal-footer">
-			<a class="btn modal-close-button" data-dismiss="modal">
-				<g:message code="default.button.close.label" default="Close" />
-			</a>
-		</div>
-	</div>
-</div>
+</sec:ifAllGranted>
 
 <hr />
 <div class="row-fluid">

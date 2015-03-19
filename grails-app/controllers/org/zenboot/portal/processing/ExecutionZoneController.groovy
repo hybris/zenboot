@@ -195,8 +195,17 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         structuredScriptDirs["delete"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"delete")
         structuredScriptDirs["misc"]   = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"misc")
 
+        def userEditableFilteredParameters = []
+
+        userEditableFilteredParameters.addAll(executionZoneInstance.processingParameters.findAll() { processingParameter ->
+          executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),processingParameter.name)
+
+        })
+
+
         [
             executionZoneInstance: executionZoneInstance,
+            userEditableFilteredParameters: userEditableFilteredParameters,
             scriptDirs: scriptDirs,
             structuredScriptDirs: structuredScriptDirs
         ]

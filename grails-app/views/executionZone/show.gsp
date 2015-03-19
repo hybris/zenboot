@@ -296,6 +296,29 @@
 					 </div>
 				</div>
 			</sec:ifAllGranted>
+			<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+				<div class="accordion-group">
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#userEditParams">
+									<g:message code="executionZone.userEditParams.label" default="Editing Execution Zone Parameters" />
+								</a>
+					</div>
+					<div id="userEditParams" class="accordion-body collapse ${flash.action == 'update' ? 'in' : ''}">
+						<div class="accordion-inner">
+							<g:form method="post">
+								<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
+								<g:hiddenField name="version" value="${executionZoneInstance?.version}" />
+								<fieldset class="form-horizontal">
+									<g:render template="showUserEditParams" />
+								</fieldset>
+								<fieldset class="buttons spacer">
+									<g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+								</fieldset>
+							</g:form>
+						</div>
+					</div>
+				</div>
+			</sec:ifNotGranted>
 			<div class="accordion-group">
 				<div class="accordion-heading">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#manageTemplates">

@@ -275,6 +275,20 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
       return false
     }
 
+    boolean canEdit(Role role, String parameterKey) {
+      def expression = role.parameterEditExpression
+      return Eval.me("parameterKey",parameterKey, expression == null ? "" : expression)
+    }
+
+    boolean canEdit(Set roles, String parameterKey) {
+      for ( role in roles) {
+        if (canEdit(role,parameterKey)) {
+          return true
+        }
+      }
+      return false
+    }
+
     List findByParameter(String key, String value) {
       return ExecutionZone.findAll().findAll() { it.param(key) == value }
     }

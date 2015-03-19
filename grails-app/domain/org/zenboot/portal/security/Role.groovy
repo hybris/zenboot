@@ -10,6 +10,10 @@ class Role {
 
     String executionZoneAccessExpression
 
+    // passing in the name of the parameter and if evaluates to true, the principal
+    // is allowed to edit that parameter
+    String parameterEditExpression
+
     static mapping = { cache true }
 
     static constraints = {

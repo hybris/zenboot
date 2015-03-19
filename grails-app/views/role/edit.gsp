@@ -29,6 +29,8 @@ tabData << [name: 'users',    icon: 'icon_users', messageCode: 'spring.security.
                             labelCodeDefault='Authority' value="${role?.authority}"/>
 			<s2ui:textFieldRow size='75' style="height:100px;" name='executionZoneAccessExpression' labelCode='executionZoneAccessExpression.authority.label' bean="${role}"
 														labelCodeDefault='zoneAccessExpression' value="${role?.executionZoneAccessExpression}"/>
+			<s2ui:textFieldRow size='75' style="height:100px;" name='parameterEditExpression' labelCode='parameterEditExpression.authority.label' bean="${role}"
+														labelCodeDefault='parameterEditExpression' value="${role?.parameterEditExpression}"/>
 		</tbody>
 		</table>
 	</s2ui:tab>
