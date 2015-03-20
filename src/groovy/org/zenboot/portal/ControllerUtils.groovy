@@ -8,10 +8,14 @@ class ControllerUtils {
         Set procParameters = []
         def keys = params[paramName]
         def values = params[paramValue]
-        def descriptions = params[paramDescription]
-        def comments = params[paramComment]
-        def exposed = params[paramExposed]
-        def published = params[paramPublished]
+
+        // several views only incorporate these values for ADMIN-Users
+        // in fact this security-feature make it unusable for Admins because if an Admin
+        // use one of the flags it might get unchecked by a User again :-(
+        def descriptions = params[paramDescription] != null ? params[paramDescription] : createArray(keys.length, "")
+        def comments = params[paramComment] != null ? params[paramComment] :  createArray(keys.length, "")
+        def exposed = params[paramExposed] != null ? params[paramExposed] : createArray(keys.length, false)
+        def published = params[paramPublished] != null ? params[paramPublished] : createArray(keys.length, false)
         if (keys && values && descriptions != null && exposed && published) {
             if (keys.class.isArray() && values.class.isArray() && descriptions.class.isArray() && exposed.class.isArray() && published.class.isArray()) {
                 if (keys.length == values.length && keys.length == descriptions.length && keys.length == exposed.length  && keys.length == published.length) {
@@ -26,6 +30,15 @@ class ControllerUtils {
             }
         }
         return procParameters
+    }
+
+    static Object[] createArray(int times, def value) {
+      def myArray = []
+      // Classic for loop.
+      for (def i = 0; i < times; i++) {
+        myArray << value
+      }
+      return myArray
     }
 
     static Map getParameterMap(def params, String paramKey="parameters.key", String paramValue="parameters.value") {

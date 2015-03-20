@@ -196,9 +196,15 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         structuredScriptDirs["misc"]   = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"misc")
 
         def userEditableFilteredParameters = []
+        def userNonEditableFilteredParameters = []
 
         userEditableFilteredParameters.addAll(executionZoneInstance.processingParameters.findAll() { processingParameter ->
           executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),processingParameter.name)
+
+        })
+
+        userNonEditableFilteredParameters.addAll(executionZoneInstance.processingParameters.findAll() { processingParameter ->
+          !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),processingParameter.name)
 
         })
 
@@ -206,6 +212,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         [
             executionZoneInstance: executionZoneInstance,
             userEditableFilteredParameters: userEditableFilteredParameters,
+            userNonEditableFilteredParameters: userNonEditableFilteredParameters,
             scriptDirs: scriptDirs,
             structuredScriptDirs: structuredScriptDirs
         ]
@@ -241,8 +248,14 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
             }
         }
 
-        executionZoneInstance.properties = params
-        executionZoneInstance.enableExposedProcessingParameters = (params.enableExposedProcessingParameters != null)
+        // Admin is the only one who can update different things than params
+        if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            executionZoneInstance.properties = params
+            executionZoneInstance.enableExposedProcessingParameters = (params.enableExposedProcessingParameters != null)
+        }
+
+
+
         ControllerUtils.synchronizeProcessingParameters(ControllerUtils.getProcessingParameters(params), executionZoneInstance)
 
         if (!executionZoneInstance.save(flush: true)) {

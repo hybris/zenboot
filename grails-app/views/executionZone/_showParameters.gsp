@@ -25,21 +25,21 @@
 				<td>
 					<g:textField name="parameters.description" value="${entry.description}" readonly="${readonly}" />
 				</td>
-				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-					<td>
-						<g:hiddenField name="parameters.exposed" value="${entry.exposed}" />
-						<input type="checkBox" name="exposed" ${entry.exposed ? 'checked="checked"' : '' } />
-					</td>
-					<td>
-						<g:hiddenField name="parameters.published" value="${entry.published}" />
-						<input type="checkBox" name="published" ${entry.published ? 'checked="checked"' : '' } />
-					</td>
-					<td>
+				<td>
+					<g:hiddenField name="parameters.exposed" value="${entry.exposed}" />
+					<input type="checkBox" name="exposed" ${entry.exposed ? 'checked="checked"' : '' } <sec:ifNotGranted roles="${Role.ROLE_ADMIN}"> readonly="true" </sec:ifNotGranted> />
+				</td>
+				<td>
+					<g:hiddenField name="parameters.published" value="${entry.published}" />
+					<input type="checkBox" name="published" ${entry.published ? 'checked="checked"' : '' } <sec:ifNotGranted roles="${Role.ROLE_ADMIN}"> readonly="true" </sec:ifNotGranted> />
+				</td>
+				<td>
+					<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 						<span title="Remove parameter" class="btn btn-mini remove-parameter-button">
 							<i class="icon-minus-sign"></i>
 						</span>
-					</td>
 				</sec:ifAllGranted>
+				</td>
 			</tr>
 		</g:each>
 	</tbody>
@@ -112,10 +112,13 @@
 	</div>
 </sec:ifAllGranted>
 
-<hr />
-<div class="row-fluid">
-    <g:textArea name="parameters.comments" value="" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;"  placeholder="${message(code: 'processingParameter.changeComment.label', default: 'Parameter Changes Comment')}" />
-</div>
+
+<g:if test="${readonly=='false'}">
+	<hr />
+	<div class="row-fluid">
+	    <g:textArea name="parameters.comments" value="" style="height: 150px; width: 100%; white-space: nowrap; overflow: auto;"  placeholder="${message(code: 'processingParameter.changeComment.label', default: 'Parameter Changes Comment')}" />
+	</div>
+</g:if>
 
 
 <g:javascript>

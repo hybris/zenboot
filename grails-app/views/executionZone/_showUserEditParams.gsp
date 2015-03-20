@@ -5,6 +5,7 @@
     <g:message code="executionZone.parameters.label" default="Parameters" />
   </label>
   <div class="controls">
-    <g:render template="showParameters" model="[parameters:userEditableFilteredParameters]" />
+    <g:render template="showParameters" model="[parameters:userEditableFilteredParameters, readonly:'false']" />
+    <g:render template="showParameters" model="[parameters:userNonEditableFilteredParameters, readonly:'true']" />
   </div>
 </div>
