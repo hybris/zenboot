@@ -17,13 +17,24 @@
 		<g:each in="${parameters}" var="entry">
 			<tr>
 				<td>
-					<g:textField name="parameters.key" value="${entry.name}" readonly="${readonly}" />
+					<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+						<g:textField name="parameters.key" value="${entry.name}" readonly="true" />
+					</sec:ifNotGranted>
+					<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+						<g:textField name="parameters.key" value="${entry.name}" />
+					</sec:ifAllGranted>
+
 				</td>
 				<td>
 					<g:textField name="parameters.value" value="${entry.value}" readonly="${readonly}" />
 				</td>
 				<td>
-					<g:textField name="parameters.description" value="${entry.description}" readonly="${readonly}" />
+					<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+						<g:textField name="parameters.description" value="${entry.description}" readonly="true" />
+					</sec:ifNotGranted>
+					<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+						<g:textField name="parameters.description" value="${entry.description}" />
+					</sec:ifAllGranted>
 				</td>
 				<td>
 					<g:hiddenField name="parameters.exposed" value="${entry.exposed}" />

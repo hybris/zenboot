@@ -199,12 +199,12 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         def userNonEditableFilteredParameters = []
 
         userEditableFilteredParameters.addAll(executionZoneInstance.processingParameters.findAll() { processingParameter ->
-          executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),processingParameter.name)
+          executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),processingParameter)
 
         })
 
         userNonEditableFilteredParameters.addAll(executionZoneInstance.processingParameters.findAll() { processingParameter ->
-          !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),processingParameter.name)
+          !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),processingParameter)
 
         })
 

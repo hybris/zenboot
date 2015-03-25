@@ -4,6 +4,7 @@ import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.PathResolver
 import org.zenboot.portal.ZenbootException
+import org.zenboot.portal.processing.ProcessingParameter
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
@@ -263,7 +264,12 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     boolean hasAccess(Role role, ExecutionZone executionZone) {
       def expression = role.executionZoneAccessExpression
-      return Eval.me("executionZone",executionZone,expression == null ? "" : expression)
+      try {
+        return Eval.me("executionZone",executionZone,expression == null ? "" : expression)
+      } catch (Exception e) {
+        this.log.error("executionZoneAccessExpression for role '"+ role + " with " + expression +"' is throwing an exception", e)
+        return false
+      }
     }
 
     boolean hasAccess(Set roles, ExecutionZone zone) {
@@ -275,14 +281,30 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
       return false
     }
 
-    boolean canEdit(Role role, String parameterKey) {
+    boolean canEdit(Role role, ProcessingParameter parameter) {
       def expression = role.parameterEditExpression
-      return Eval.me("parameterKey",parameterKey, expression == null ? "" : expression)
+
+      try {
+
+        def sharedData = new Binding()
+        def shell = new GroovyShell(sharedData)
+
+        sharedData.setProperty('parameterKey', parameter.name)
+        sharedData.setProperty('parameter', parameter)
+
+        return shell.evaluate(expression == null ? "" : expression)
+
+      } catch (Exception e) {
+        this.log.error("parameterEditExpression for role '"+ role + " with " + expression +"' is throwing an exception", e)
+        return false
+      }
+
+
     }
 
-    boolean canEdit(Set roles, String parameterKey) {
+    boolean canEdit(Set roles, ProcessingParameter parameter) {
       for ( role in roles) {
-        if (canEdit(role,parameterKey)) {
+        if (canEdit(role,parameter)) {
           return true
         }
       }
