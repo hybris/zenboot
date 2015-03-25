@@ -6,7 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException
 class ExecutionZoneTypeController {
 
     def executionZoneService
-    
+    def springSecurityService
+
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
@@ -23,7 +24,7 @@ class ExecutionZoneTypeController {
         flash.message = message(code:"executionZoneType.list.synchronize", default:"List is synchronized")
         redirect(action:'list')
     }
-    
+
     def create() {
         [executionZoneTypeInstance: new ExecutionZoneType(params)]
     }
@@ -81,6 +82,7 @@ class ExecutionZoneTypeController {
         }
 
         executionZoneTypeInstance.properties = params
+        executionZoneTypeInstance.description = "lastly set devMode to "+ executionZoneTypeInstance.devMode + " by " + springSecurityService.currentUser.username + " at " + new Date()
 
         if (!executionZoneTypeInstance.save(flush: true)) {
             render(view: "edit", model: [executionZoneTypeInstance: executionZoneTypeInstance])

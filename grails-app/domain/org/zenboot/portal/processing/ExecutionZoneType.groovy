@@ -7,6 +7,7 @@ class ExecutionZoneType {
     String name
     String description
     boolean enabled = true
+    boolean devMode = false
 
     static constraints = {
         name blank:false, unique:true

@@ -26,6 +26,7 @@
 					<g:sortableColumn property="name" title="${message(code: 'executionZoneType.name.label', default: 'Name')}" />
 					<g:sortableColumn property="description" title="${message(code: 'executionZoneType.description.label', default: 'Description')}" />
 					<g:sortableColumn property="enabled" title="${message(code: 'executionZoneType.enabled.label', default: 'Enabled')}" />
+					<g:sortableColumn property="devMode" title="${message(code: 'executionZoneType.devMode.label', default: 'DevMode')}" />
 				</tr>
 			</thead>
 			<tbody>
@@ -41,6 +42,13 @@
 						</td>
 						<td>
 							<g:if test="${executionZoneTypeInstance.enabled}">
+								<i class="icon-ok"></i>
+							</g:if>
+							<g:else>
+								<i class="icon-remove"></i></</g:else>
+						</td>
+						<td>
+							<g:if test="${executionZoneTypeInstance.devMode}">
 								<i class="icon-ok"></i>
 							</g:if>
 							<g:else>

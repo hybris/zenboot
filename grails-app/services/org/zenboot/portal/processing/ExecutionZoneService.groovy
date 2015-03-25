@@ -206,19 +206,19 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return new File(path)
     }
 
-    def getScriptletBatchFlow(File scriptDir) {
-        return scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes())
+    def getScriptletBatchFlow(File scriptDir, ExecutionZoneType type) {
+        return scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), type)
     }
 
     Set getExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction) {
-        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, this.getRuntimeAttributes())
+        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, this.getRuntimeAttributes(), exposedAction.executionZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
         Set parameters = overlayExecutionZoneParameters(paramMetaList, exposedAction.processingParameters)
         return parameters
     }
 
     Set getExecutionZoneParameters(ExecutionZone execZone, File scriptDir) {
-        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes())
+        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), execZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
         Set parameters = overlayExecutionZoneParameters(paramMetaList, execZone.processingParameters)
         return parameters

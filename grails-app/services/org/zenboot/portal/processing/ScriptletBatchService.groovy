@@ -18,6 +18,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     def executionZoneService
     def executionService
 
+    def ScriptletFlowCache
+
     @Override
     public void onApplicationEvent(ProcessingEvent event) {
         this.log.info("Receive application event ${event}")
@@ -71,7 +73,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
 	private void synchronizeExposedProcessingParameters(ScriptletBatch batch, ProcessContext processContext) {
         ExecutionZoneAction action = batch.executionZoneAction
-        ScriptletBatchFlow flow = executionZoneService.getScriptletBatchFlow(action.scriptDir)
+        ScriptletBatchFlow flow = executionZoneService.getScriptletBatchFlow(action.scriptDir, batch.executionZoneAction.executionZone.type)
 		ParameterMetadataList paramList = flow.getParameterMetadataList()
 
 		def exposedPublishedMetaParams = paramList.parameters.findAll { ParameterMetadata paramMeta ->
@@ -172,19 +174,29 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
 
 
-    ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, List runtimeAttributes) {
-        ScriptResolver scriptResolver = new ScriptResolver(scriptDir)
-        String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ExecutionZoneService.PLUGINS_DIR}"
-        PluginResolver pluginResolver = new PluginResolver(new File(pathPluginDir))
-
-        ScriptletBatchFlow flow = new ScriptletBatchFlow()
-        flow.batchPlugin = pluginResolver.resolveScriptletBatchPlugin(scriptDir, runtimeAttributes)
-
-        def scriptFiles = scriptResolver.resolve(runtimeAttributes)
-        scriptFiles.each { File script ->
-            File plugin = pluginResolver.resolveScriptletPlugin(script, runtimeAttributes)
-            flow.addFlowElement(script, plugin)
+    ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, List runtimeAttributes, ExecutionZoneType type) {
+        if (scriptletFlowCache == null) {
+          scriptletFlowCache = [:]
         }
-        return flow.build()
+
+        if (scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()] == null || type.devMode ) {
+          ScriptResolver scriptResolver = new ScriptResolver(scriptDir)
+          String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ExecutionZoneService.PLUGINS_DIR}"
+          PluginResolver pluginResolver = new PluginResolver(new File(pathPluginDir))
+
+          ScriptletBatchFlow flow = new ScriptletBatchFlow()
+          flow.batchPlugin = pluginResolver.resolveScriptletBatchPlugin(scriptDir, runtimeAttributes)
+
+          def scriptFiles = scriptResolver.resolve(runtimeAttributes)
+          scriptFiles.each { File script ->
+              File plugin = pluginResolver.resolveScriptletPlugin(script, runtimeAttributes)
+              flow.addFlowElement(script, plugin)
+          }
+          scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()] = flow.build()
+          return scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()]
+        } else {
+          return scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()]
+        }
+
     }
 }

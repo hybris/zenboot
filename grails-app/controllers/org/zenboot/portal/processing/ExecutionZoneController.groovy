@@ -187,6 +187,11 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
           return
         }
 
+        if ( executionZoneInstance.type.devMode ) {
+            flash.message = message(code: 'executionZone.in.devMode.message', args: [executionZoneInstance.type.description])
+        }
+
+
         List scriptDirs = this.executionZoneService.getScriptDirs(executionZoneInstance.type)
 
         def structuredScriptDirs = [:]
@@ -341,6 +346,7 @@ class GetScriptletBatchFlow {
 
     def executionZoneService
 
+    Long execId
     File scriptDir
 
     static constraints = {
@@ -352,7 +358,7 @@ class GetScriptletBatchFlow {
     }
 
     ScriptletBatchFlow getScriptletBatchFlow() {
-        this.executionZoneService.getScriptletBatchFlow(this.scriptDir)
+        this.executionZoneService.getScriptletBatchFlow(this.scriptDir, ExecutionZone.get(execId).type)
     }
 }
 

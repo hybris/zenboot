@@ -24,7 +24,7 @@
 			<i class="icon-list"></i>
 			<g:message code="default.button.list.label" default="Back to overview" />
 		</g:link>
-		
+
 		<dl class="dl-horizontal">
 			<dt>
 				<g:message code="executionZoneType.enabled.label" default="Enabled" />
@@ -32,7 +32,7 @@
 			<dd>
 				<g:fieldValue bean="${executionZoneTypeInstance}" field="enabled" />
 			</dd>
-			
+
 			<g:if test="${executionZoneTypeInstance?.name}">
 				<dt>
 					<g:message code="executionZoneType.name.label" default="Name" />
@@ -41,7 +41,7 @@
 					<g:fieldValue bean="${executionZoneTypeInstance}" field="name" />
 				</dd>
 			</g:if>
-			
+
 			<g:if test="${executionZoneTypeInstance?.description}">
 				<dt>
 					<g:message code="executionZoneType.description.label" default="Description" />
@@ -50,6 +50,12 @@
 					<g:fieldValue bean="${executionZoneTypeInstance}" field="description" />
 				</dd>
 			</g:if>
+			<dt>
+				<g:message code="executionZoneType.devMode.label" default="DevMode" />
+			</dt>
+			<dd>
+				<g:fieldValue bean="${executionZoneTypeInstance}" field="devMode" />
+			</dd>
 		</dl>
 
 

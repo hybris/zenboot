@@ -23,6 +23,15 @@
 		<g:message code="executionZoneType.description.label" default="Description" />
 	</label>
 	<div class="controls">
-		<g:textField name="description" value="${executionZoneTypeInstance?.description}" />
+		<g:textField name="description" value="${executionZoneTypeInstance?.description}" readonly="true"/>
+	</div>
+</div>
+
+<div class="control-group fieldcontain ${hasErrors(bean: executionZoneTypeInstance, field: 'name', 'error')} ">
+	<label class="control-label" for="devMode">
+		<g:message code="executionZoneType.devMode.label" default="DevMode" />
+	</label>
+	<div class="controls">
+		<g:select name="devMode" from="${[Boolean.FALSE, Boolean.TRUE]}" value="${executionZoneTypeInstance.devMode}" />
 	</div>
 </div>
