@@ -225,18 +225,22 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     }
 
     private Set overlayExecutionZoneParameters(ParameterMetadataList paramMetaList, Set overlayParameters) {
-		Set parameters = paramMetaList.unsatisfiedParameters
-		parameters.each { ParameterMetadata paramMetaData ->
-            ProcessingParameter param = overlayParameters.find { it.name == paramMetaData.name }
-			if (param) {
-				paramMetaData.metaClass.value = param.value
-				paramMetaData.metaClass.overlay = true
-			} else {
-				paramMetaData.metaClass.value = paramMetaData.defaultValue
-				paramMetaData.metaClass.overlay = false
-			}
-		}
-		return parameters
+        log.debug("Entering overlayExecutionZoneParameters")
+		    Set parameters = paramMetaList.unsatisfiedParameters
+        log.debug("yet unsatisfied parameters: " + parameters)
+        parameters.each { ParameterMetadata paramMetaData ->
+          ProcessingParameter param = overlayParameters.find { it.name == paramMetaData.name }
+  			  if (param) {
+            log.debug("filling param "+ paramMetaData.name + " with "+ param.value)
+            paramMetaData.metaClass.value = param.value
+            paramMetaData.metaClass.overlay = true
+          } else {
+            log.debug("defaulting param "+ paramMetaData.name + " with " + paramMetaData.defaultValue)
+            paramMetaData.metaClass.value = paramMetaData.defaultValue
+  				  paramMetaData.metaClass.overlay = false
+  			  }
+		    }
+		    return parameters
 	}
 
     def resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction, Map parameters) {

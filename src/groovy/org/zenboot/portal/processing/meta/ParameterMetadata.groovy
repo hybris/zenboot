@@ -9,6 +9,20 @@ class ParameterMetadata extends ScriptMetadata {
     ParameterType type
     boolean visible
 
+    // Below constructor will cause the empty constructor to disappear
+    // so i'll add it explicitely
+    public ParameterMetadata(){}
+
+    public ParameterMetadata(ParameterMetadata pm) {
+      super(pm)
+      this.name = pm.name
+      this.defaultValue = pm.defaultValue
+      this.type = pm.type
+      this.visible = pm.visible
+
+    }
+
+
     @Override
     public int hashCode() {
         final int prime = 31
@@ -46,5 +60,9 @@ class ParameterMetadata extends ScriptMetadata {
     @Override
     String toString() {
         return "${this.type}: ${this.name}=${this.defaultValue} / ${this.description} / visible=${this.visible}"
+    }
+
+    ParameterMetadata clone() {
+      return new ParameterMetadata(this)
     }
 }
