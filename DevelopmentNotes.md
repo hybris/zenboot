@@ -8,11 +8,15 @@ to run a specific test-class:
 ./grailsw test-app -unit Foo
 
 #### the log4j-setup
-This [event-definition)[http://grails.github.io/grails-doc/2.3.x/guide/commandLine.html#events] 
+This [event-definition)[http://grails.github.io/grails-doc/2.3.x/guide/commandLine.html#events]
 in [_Events.groovy](https://github.com/hybris/zenboot/blob/master/scripts/_Events.groovy#L6-L10)
 takes care that the log4j.properties on the root-dir gets copied in the classpath
 This definition in [resources.groovy:6-11](https://github.com/hybris/zenboot/blob/master/grails-app/conf/spring/resources.groovy#L6-L11)
 takes care that the a log4j.properties in the classpath is recognized.
+
+Important is the difference between grail-specific-stuff and everything else. See
+the log4j.properties. To switch to debug-logging, change
+log4j.appender.console.threshold to debug
 
 
 
