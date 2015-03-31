@@ -5,6 +5,17 @@ import org.zenboot.portal.processing.meta.annotation.ParameterType
 
 class ParameterMetadataList {
 
+	/** a helper-method to convert the ouput of getParameters()
+	 * or one of the two more specific methods to a simple map
+	 */
+	static Map convertToMap(Set parameters) {
+		def myMap = [:]
+		parameters.each {
+			myMap.put(it.name,it.value)
+		}
+		return myMap
+	}
+
 	private Set satisfiedParameters = []
 	private Set unsatisfiedParameters = []
 
@@ -15,7 +26,7 @@ class ParameterMetadataList {
 	// the parameters stored in the execZone with the ones coming from the
 	// scripts. Therefore, we're returning cloned versions of the parameters
 	// which enables proper caching
-	
+
 	Set getSatisfiedParameters() {
 		Set parameters = []
 		this.satisfiedParameters.each {
@@ -45,6 +56,16 @@ class ParameterMetadataList {
 		//parameters.addAll(this.satisfiedParameters)
 		//parameters.addAll(this.unsatisfiedParameters)
 		return parameters
+	}
+
+	Map getParametersAsMap() {
+		def myMap = [:]
+		this.satisfiedParameters.each {
+			myMap << [it.name,it.value]
+		}
+		this.unsatisfiedParameters.each {
+			pmyMap << [it.name,it.value]
+		}
 	}
 
 	void addParameters(Collection parameters) {

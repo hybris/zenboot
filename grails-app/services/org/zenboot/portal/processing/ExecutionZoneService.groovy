@@ -96,16 +96,29 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
       return executionZoneInstance
     }
 
+    /** convenience-method if you only have a stackname instead of a File (directory)
+     */
     void createAndPublishExecutionZoneAction(ExecutionZone execZone, String stackName, Map processParameters=null, List runtimeAttributes=null) {
       File stackDir = new File(getZenbootScriptsDir().getAbsolutePath() + "/"+ execZone.type.name + "/scripts/"+stackName)
       createAndPublishExecutionZoneAction(execZone, stackDir, processParameters, runtimeAttributes)
     }
 
+    /** the main-one with a File-parameter
+     */
     void createAndPublishExecutionZoneAction(ExecutionZone execZone, File scriptDir, Map processParameters=null, List runtimeAttributes=null) {
+
+      if (processParameters == null) {
+        processParameters = ParameterMetadataList.convertToMap(getExecutionZoneParameters(execZone, scriptDir))
+      } else {
+        def origProcessParameters = ParameterMetadataList.convertToMap(getExecutionZoneParameters(execZone, scriptDir))
+        processParameters =  origProcessParameters << processParameters
+      }
       ExecutionZoneAction action = createExecutionZoneAction(execZone, scriptDir, processParameters, runtimeAttributes)
       this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
     }
 
+    /* The exposed-Version
+     */
     ExecutionZoneAction createExecutionZoneAction(ExposedExecutionZoneAction exposedAction, Map processParameters=null, List runtimeAttributes=null) {
         Map mergedParameters = exposedAction.processingParameters.inject([:]) { Map map, ProcessingParameter param ->
             map[param.name] = param.value
@@ -118,14 +131,21 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     }
 
     ExecutionZoneAction createExecutionZoneAction(ExecutionZone execZone, File scriptDir, Map processParameters=null, List runtimeAttributes=null) {
+
+
+        ArrayList<ProcessingParameter> typedProcessParametersArrayList = new ArrayList<ProcessingParameter>()
+        processParameters.each { key, value ->
+          typedProcessParametersArrayList << new ProcessingParameter(name:key, value:value, comment:"Parameters added automatically by an execution zone action.")
+        }
+        return this.createExecutionZoneAction(execZone, scriptDir, typedProcessParametersArrayList, runtimeAttributes)
+    }
+
+    ExecutionZoneAction createExecutionZoneAction(ExecutionZone execZone, File scriptDir, ArrayList<ProcessingParameter> processParameters, List runtimeAttributes=null) {
         ExecutionZoneAction execAction = new ExecutionZoneAction(executionZone:execZone, scriptDir:scriptDir)
 
-        if (processParameters) {
-            execZone.processingParameters.each { it ->
-                execZone.processingParameters << new ProcessingParameter(name:it.name, value:it.value, comment:"Parameters added automatically by an execution zone action.")
-            }
 
-            ControllerUtils.synchronizeProcessingParameterValues(processParameters, execAction)
+        processParameters.each {
+          execAction.addProcessingParameter(it)
         }
 
         if (runtimeAttributes) {
@@ -217,6 +237,9 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return parameters
     }
 
+    /* central entrypoint to get parameters and overlay them by the ones from
+     * the execZone. Called by AjaxCalls
+     */
     Set getExecutionZoneParameters(ExecutionZone execZone, File scriptDir) {
         ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), execZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList

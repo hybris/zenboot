@@ -62,13 +62,20 @@ class ControllerUtils {
         return parameters
     }
 
-    static void synchronizeProcessingParameters(Set procParams, def model) {
-        def deletedExecZoneParams = model.processingParameters.findAll { ProcessingParameter param ->
+    /*
+     * called when a ExecutionZone is saved/updated
+     * This enables deletion of parameters as well
+     */
+    static void synchronizeProcessingParameters(Set procParams, def execZone) {
+        // Find and delete all Parameters in the execZone which are not present in the set
+        def deletedExecZoneParams = execZone.processingParameters.findAll { ProcessingParameter param ->
             !procParams*.name.contains(param.name)
         }
-        model.processingParameters?.removeAll(deletedExecZoneParams)
+        execZone.processingParameters?.removeAll(deletedExecZoneParams)
+        // and then the the set is added to the execZoneAction
+        // This will also update existing Parameters
         procParams.each { ProcessingParameter procParam ->
-            model.addProcessingParameter(procParam)
+          execZone.addProcessingParameter(procParam)
         }
     }
 

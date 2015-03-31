@@ -254,7 +254,7 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         }
 
         // Admin is the only one who can update different things than params
-        if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             executionZoneInstance.properties = params
             executionZoneInstance.enableExposedProcessingParameters = (params.enableExposedProcessingParameters != null)
         }
