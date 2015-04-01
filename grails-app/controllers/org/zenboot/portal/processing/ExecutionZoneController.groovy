@@ -134,23 +134,41 @@ class ExecutionZoneController implements ApplicationEventPublisherAware {
         }
 
         def executionZoneInstanceList
+        def executionZoneInstanceListCount
         def filteredExecutionZoneInstanceList = []
         def parameters = [:]
+
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
           executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
+          executionZoneInstanceListCount = ExecutionZone.countByEnabled(enabled)
         } else {
-
-          executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
+          /* executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
 
           filteredExecutionZoneInstanceList.addAll(executionZoneInstanceList.findAll() { executionZone ->
             executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
           })
-          executionZoneInstanceList = filteredExecutionZoneInstanceList
+          executionZoneInstanceList = filteredExecutionZoneInstanceList */
+
+          executionZoneInstanceList = executionZoneService.findAllByEnabledFiltered(enabled, params)
+          executionZoneInstanceListCount = executionZoneService.countByEnabledFiltered(enabled)
+
+          // Let's try something different
+          /*
+          def criteria = ExecutionZone.createCriteria()
+          executionZoneInstanceList = criteria.list(max: params.max, offset: params.offset) {
+            and {
+              enabled == true
+              executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), myself)
+            }
+          }
+          // doesn't work unfortunately :-(
+          */
         }
+        log.debug("model: executionZoneInstanceList(.size(): "+executionZoneInstanceList.size()+"), executionZoneInstanceTotal ("+executionZoneInstanceListCount+"), executionZoneTypes")
 
         [
             executionZoneInstanceList: executionZoneInstanceList,
-            executionZoneInstanceTotal: ExecutionZone.findAllByEnabled(enabled).size(),
+            executionZoneInstanceTotal: executionZoneInstanceListCount,
             executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list()
         ]
     }

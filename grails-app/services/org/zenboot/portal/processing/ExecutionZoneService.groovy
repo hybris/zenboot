@@ -85,6 +85,32 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return attributes*.trim()*.toLowerCase()
     }
 
+    def findAllByEnabledFiltered(enabled, params) {
+      def executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled)
+      def filteredExecutionZoneInstanceList = []
+      filteredExecutionZoneInstanceList.addAll(executionZoneInstanceList.findAll() { executionZone ->
+        this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
+      })
+      int offset = params ? (params.int("offset") ? params.int("offset") : 0) : 0
+      int max = params ? (params.int("max") ? params.int("max") : -1) : -1
+      log.debug("params sent max "+max+" and offset "+offset)
+      log.debug("filteredExecutionZoneInstanceList.size() "+filteredExecutionZoneInstanceList.size())
+      int upperBoundary = Math.min(max+offset, filteredExecutionZoneInstanceList.size()) -1
+      log.debug("returning filteredExecutionZoneInstanceList["+offset+","+upperBoundary+"]")
+      log.debug("which is size:"+filteredExecutionZoneInstanceList[offset..upperBoundary].size())
+      return filteredExecutionZoneInstanceList[offset..upperBoundary]
+
+    }
+
+    int countByEnabledFiltered(enabled) {
+      def executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled)
+      def filteredExecutionZoneInstanceList = []
+      filteredExecutionZoneInstanceList.addAll(executionZoneInstanceList.findAll() { executionZone ->
+        this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
+      })
+      return filteredExecutionZoneInstanceList.size()
+    }
+
     /** convenience-method for creating ExecutionZones
       * meant to be called in scripts
       */
