@@ -229,16 +229,16 @@
 
 							<div class="tab-content">
 							  <div class="tab-pane <g:if test="${structuredScriptDirs.create.size() > 0}">active</g:if>" id="sd-create">
-									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.create, type:'create']"/>
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.create, type:'create', execId: executionZoneInstance?.id]"/>
 								</div>
 							  <div class="tab-pane" id="sd-update">
-									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.update, type:'update']"/>
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.update, type:'update', execId: executionZoneInstance?.id]"/>
 								</div>
 							  <div class="tab-pane" id="sd-delete">
-									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.delete, type:'delete']"/>
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.delete, type:'delete', execId: executionZoneInstance?.id]"/>
 								</div>
 							  <div class="tab-pane <g:if test="${structuredScriptDirs.create.size() == 0}">active</g:if>" id="sd-misc">
-									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.misc, type:'misc']"/>
+									<g:render template="scriptDirs" model="['scriptDirs':structuredScriptDirs.misc, type:'misc', execId: executionZoneInstance?.id]"/>
 								</div>
 							</div>
 
