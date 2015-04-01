@@ -15,6 +15,7 @@ class ScriptletBatchController {
     def PageRenderer groovyPageRenderer
     def executionZoneService
     def springSecurityService
+    def ScriptletBatchService
 
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -24,7 +25,7 @@ class ScriptletBatchController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 15, 100)
+        params.max = Math.min(params.max ? params.int('max') : 15, 30)
         if (!params.sort) {
             params.sort = "creationDate"
         }
@@ -36,35 +37,28 @@ class ScriptletBatchController {
         def batchInstanceList
         def batchInstanceCount
         def parameters = [:]
+        def executionZone = null
         if (params.execId) {
-          def executionZoneInstance = ExecutionZone.get(params.execId)
-          if (!executionZoneInstance) {
+          executionZone = ExecutionZone.get(params.execId)
+          if (!executionZone) {
               flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
               redirect(action: "list")
               return
           }
-            parameters.execId = params.execId
-            batchInstanceList = ScriptletBatch.findAllByExecutionZoneActionInList(executionZoneInstance.actions, params)
-            batchInstanceCount = ScriptletBatch.findAllByExecutionZoneActionInList(executionZoneInstance.actions).size()
-        } else {
-            batchInstanceList = ScriptletBatch.list(params)
-            batchInstanceCount = ScriptletBatch.count()
         }
 
-        def filteredBatchInstanceList = []
-        def filteredBatchInstanceCount
+        parameters.execId = params.execId
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-          filteredBatchInstanceList = batchInstanceList
+          batchInstanceList = executionZone ? ScriptletBatch.findAllByExecutionZoneActionInList(executionZone.actions, params) : ScriptletBatch.list(params)
+          batchInstanceCount = executionZone ? ScriptletBatch.findAllByExecutionZoneActionInList(executionZone.actions).size() : ScriptletBatch.count()
+
         } else {
-          filteredBatchInstanceList.addAll(batchInstanceList.findAll() { scriptletBatch ->
-            executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), scriptletBatch.executionZoneAction.executionZone)
-          })
+          batchInstanceList = ScriptletBatchService.findAllByExecZoneFiltered(executionZone,params)
+          batchInstanceCount = ScriptletBatchService.countByExecZoneFiltered(executionZone)
         }
-        filteredBatchInstanceCount = filteredBatchInstanceList.size()
 
-
-        [scriptletBatchInstanceList: filteredBatchInstanceList, scriptletBatchInstanceTotal: filteredBatchInstanceCount, parameters:parameters]
+        [scriptletBatchInstanceList: batchInstanceList, scriptletBatchInstanceTotal: batchInstanceCount, parameters:parameters]
     }
 
     def ajaxList() {

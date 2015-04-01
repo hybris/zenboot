@@ -9,6 +9,7 @@ import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.zenboot.portal.security.Person
+import org.zenboot.portal.security.Role
 
 class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
@@ -17,8 +18,52 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     def grailsApplication
     def executionZoneService
     def executionService
+    def springSecurityService
 
     def ScriptletFlowCache
+
+
+    def findAllByExecZoneFiltered(ExecutionZone execZone) {
+      def scriptletBatchList = []
+      if (execZone != null) {
+         execZone.actions.each { action ->
+           if (action.scriptletBatches[0] != null) {
+             scriptletBatchList.add(action.scriptletBatches[0])
+           }
+         }
+      } else {
+        def executionZoneInstanceList = ExecutionZone.findAll()
+
+        executionZoneInstanceList.each { executionZone ->
+          if (executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)) {
+            executionZone.actions.each { action ->
+              if (action.scriptletBatches[0] != null) {
+                scriptletBatchList.add(action.scriptletBatches[0])
+              }
+            }
+          }
+        }
+
+      }
+      return scriptletBatchList
+    }
+
+    def findAllByExecZoneFiltered(ExecutionZone execZone, params) {
+      def filteredScriptletBatchList = findAllByExecZoneFiltered(execZone)
+      int offset = params ? (params.int("offset") ? params.int("offset") : 0) : 0
+      int max = params ? (params.int("max") ? params.int("max") : -1) : -1
+      log.debug("params sent max "+max+" and offset "+offset)
+      log.debug("filteredScriptletBatchList.size() "+filteredScriptletBatchList.size())
+      int upperBoundary = Math.min(max+offset, filteredScriptletBatchList.size()) -1
+      log.debug("returning filteredScriptletBatchList["+offset+","+upperBoundary+"]")
+      log.debug("which is size:"+filteredScriptletBatchList[offset..upperBoundary].size())
+      return filteredScriptletBatchList[offset..upperBoundary]
+
+    }
+
+    int countByExecZoneFiltered(ExecutionZone execZone) {
+      return findAllByExecZoneFiltered(execZone).size()
+    }
 
     @Override
     public void onApplicationEvent(ProcessingEvent event) {
