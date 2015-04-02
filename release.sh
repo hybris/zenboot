@@ -19,7 +19,7 @@ done
 echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
 
 echo "type in you password with sudo-rights (will be cached and later used with docker"
-[ "$ASK" == "yes" ] && sudo ls -l > /dev/null
+sudo ls -l > /dev/null
 
 # Check whether travis finished the build, something like:
 while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .[0].state`XX" == "finishedXX" ]; do
@@ -31,28 +31,24 @@ date
 echo "# Will now release $1"
 # ------------------verifying versions -----------------
 sed -i -e "s/app.version=.*/app.version=$VERSION/" application.properties
-sed -i -e "s/download\/v....../download\/v$VERSION/" Dockerfile
+sed -i -e "s/download\/v[.0-9]*/download\/v$VERSION/" Dockerfile
 
 git add application.properties
 git add Dockerfile
 git commit -m "Release v${VERSION}"
-[ "$ASK" == "yes" ] && echo -n "about to push ... [enter]" && read
 git push
 git tag v${VERSION}
-[ "$ASK" == "yes" ] && echo -n "about to push tag ... [enter]" && read
 git push origin v${VERSION}
 # enforce to type in sudo-password
-[ "$ASK" == "yes" ] || sudo ls -l > /dev/null
 echo "waiting for at last 5 mins ..."
 sleep 300
 while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .[0].state`XX" == "finishedXX" ]; do
   echo "build is till ot finished ... waiting ..."
   sleep 60
 done
-sudo docker build -t k9ert/zenboot:v${VERSION} .
+sudo docker build -t hybris/zenboot:v${VERSION} .
 echo -n "about to tag the Dockerimage"
-sudo docker tag k9ert/zenboot:v${VERSION} k9ert/zenboot:latest
-sudo docker push k9ert/zenboot:latest
-sudo docker push k9ert/zenboot:v${VERSION}
+sudo docker tag hybris/zenboot:v${VERSION} k9ert/zenboot:latest
+sudo docker push hybris/zenboot:latest
+sudo docker push hybris/zenboot:v${VERSION}
 date
-
