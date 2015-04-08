@@ -1,4 +1,10 @@
 FROM codenvy/jdk7_tomcat7
+# https://github.com/codenvy/dockerfiles/blob/master/base/jdk7/Dockerfile
+# FROM codenvy/shellinabox
+# https://github.com/codenvy/dockerfiles/blob/master/base/shellinabox/Dockerfile
+# FROM debian:jessie
+# https://github.com/tianon/docker-brew-debian/blob/8105df0412f86c08d11e86f7f6bab6160ff1e837/jessie/Dockerfile
+# FROM scratch
 ADD zenboot.properties /etc/zenboot/zenboot.properties
 RUN sudo apt-get update && sudo apt-get install -y curl ansible openssh-client sshpass socat dnsutils jq less vim
 ADD docker-provisioning/ansible.cfg /etc/ansible/ansible.cfg
