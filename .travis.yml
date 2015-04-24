@@ -16,7 +16,7 @@ script:
 notifications:
   email:
   - k9ert@gmx.de
-  - pawel.oczadly@hybris.com
+  slack: yrpm:rDezlAPq20RKGIp10YUeHRnq
 deploy:
   provider: releases
   api_key:
