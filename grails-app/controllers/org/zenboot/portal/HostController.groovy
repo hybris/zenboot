@@ -2,10 +2,23 @@ package org.zenboot.portal
 
 import org.springframework.dao.DataIntegrityViolationException
 import org.zenboot.portal.processing.ExecutionZone
+import org.springframework.http.HttpStatus
 
-class HostController {
+class HostController extends AbstractRestController {
 
     static allowedMethods = [update: "POST", delete: "POST"]
+
+    def rest = {
+        Host host = Host.findById(params.id)
+
+        if (!host) {
+            this.renderRestResult(HttpStatus.NOT_FOUND)
+            return
+        }
+        this.renderRestResult(HttpStatus.OK, host)
+        return
+    }
+
 
     def index() {
         redirect(action: "list", params: params)

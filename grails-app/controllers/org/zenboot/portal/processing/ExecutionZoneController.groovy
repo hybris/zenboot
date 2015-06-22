@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
+import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.RestResult
@@ -16,13 +17,26 @@ import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.MetadataParameterComparator
 import org.zenboot.portal.processing.meta.ParameterMetadata
 
-class ExecutionZoneController implements ApplicationEventPublisherAware {
+class ExecutionZoneController extends AbstractRestController implements ApplicationEventPublisherAware {
 
     def applicationEventPublisher
     def executionZoneService
     def springSecurityService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+    def rest = {
+        ExecutionZone execZone = ExecutionZone.findById(params.id)
+
+        if (!execZone) {
+            this.renderRestResult(HttpStatus.NOT_FOUND)
+            return
+        }
+        //log.info("execZone"+execZone.hosts)
+        this.renderRestResult(HttpStatus.OK, execZone)
+        return
+    }
+
 
     def execute(ExecuteExecutionZoneCommand cmd) {
         flash.action = 'execute'

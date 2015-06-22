@@ -71,6 +71,7 @@ grails.views.gsp.encoding = "UTF-8"
 grails.converters.encoding = "UTF-8"
 grails.converters.xml.default.deep = true
 grails.converters.json.default.deep = true
+grails.converters.json.circular.reference.behaviour = "INSERT_NULL"
 
 // enable Sitemesh preprocessing of GSP pages
 grails.views.gsp.sitemesh.preprocess = true

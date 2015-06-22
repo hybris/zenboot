@@ -1,5 +1,6 @@
 import grails.util.Environment
 
+import org.zenboot.portal.Host
 import org.zenboot.portal.processing.ExecutionZone
 import org.zenboot.portal.processing.ExecutionZoneType
 import org.zenboot.portal.processing.ExposedExecutionZoneAction
@@ -26,6 +27,29 @@ class BootStrap {
 
         //setup the sanity check (used for CI)
         this.setupSanityCheckExposedExecutionZoneAction()
+
+        // setting up JSON-Marshallers
+        grails.converters.JSON.registerObjectMarshaller(ExecutionZone) {
+            // you can filter here the key-value pairs to output:
+            def returnArray = [:]
+            returnArray['description'] = it.description
+            returnArray['hosts'] = it.hosts
+            return returnArray
+        }
+
+        grails.converters.JSON.registerObjectMarshaller(Host) {
+            // you can filter here the key-value pairs to output:
+            def returnArray = [:]
+            returnArray['ipAddress'] = it.ipAddress
+            returnArray['cname'] = it.cname
+            returnArray['macAddress'] = it.macAddress
+            returnArray['creationDate'] = it.creationDate
+            returnArray['expiryDate'] = it.expiryDate
+            returnArray['state'] = it.state
+            returnArray['hostname'] = it.hostname
+            returnArray['serviceUrls'] = it.serviceUrls
+            return returnArray
+        }
     }
 
     private setupSecurity() {
@@ -54,7 +78,7 @@ class BootStrap {
     }
 
     private setupSanityCheckExposedExecutionZoneAction() {
-        
+
         // Setup a user capable of calling the Exposed Action afterwards
         def userRole = Role.findByAuthority(Role.ROLE_SANITYCHECK) ?: new Role(authority: Role.ROLE_SANITYCHECK).save(failOnError: true)
         def sanitycheckUser = Person.findByUsername('sanitycheck') ?: new Person(
@@ -66,7 +90,7 @@ class BootStrap {
         if (!sanitycheckUser.authorities.contains(userRole)) {
             PersonRole.create sanitycheckUser, userRole
         }
-        
+
         ExecutionZoneType sanityType = ExecutionZoneType.findByName("internal")
 
         ExecutionZone execZoneSanity = ExecutionZone.findByType(sanityType)
