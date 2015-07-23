@@ -205,6 +205,20 @@
 			</div>
 			<div class="accordion-group">
 				<div class="accordion-heading">
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#execZoneUrls">
+						<g:message code="executionZone.execZoneUrls.label" default="Service Urls" />
+					</a>
+				</div>
+				<div id="execZoneUrls" class="accordion-body collapse in">
+					<div id="zoneUrls" class="accordion-inner">
+						<g:each in="${executionZoneInstance.getActiveServiceUrls()}" var="serviceUrl">
+							<a href="${serviceUrl.url}" target="_blank">${serviceUrl.url}</a> &nbsp; &nbsp;
+						</g:each>
+					</div>
+				</div>
+			</div>
+			<div class="accordion-group">
+				<div class="accordion-heading">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#execScript">
         		<g:message code="executionZone.execAction.label" default="Execute Script" />
       		</a>
