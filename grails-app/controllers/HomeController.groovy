@@ -12,7 +12,7 @@ class HomeController {
 
       int allHostsCount = Host.count()
       int completedHostsCount = Host.countByState(HostState.COMPLETED)
-      int stillRunningRate = completedHostsCount / allHostsCount * 100
+      int stillRunningRate = completedHostsCount / (allHostsCount != 0 ? allHostsCount : 1) * 100
 
       def allActiveExecutionZone = ExecutionZone.findAllByEnabled(true)
       int allActiveExecutionZoneCount = allActiveExecutionZone.size()
@@ -20,7 +20,7 @@ class HomeController {
 
       int allExecZoneActionCount = ScriptletBatch.count()
       int successfulExecZoneActionCount = ScriptletBatch.countByState(ProcessState.SUCCESS)
-      int successRate = successfulExecZoneActionCount / allExecZoneActionCount * 100
+      int successRate = successfulExecZoneActionCount / (allExecZoneActionCount != 0 ? allExecZoneActionCount : 1) * 100
 
       [allHostsCount: allHostsCount,
        completedHostsCount: completedHostsCount,
