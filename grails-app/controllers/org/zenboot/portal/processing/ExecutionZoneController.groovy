@@ -130,6 +130,11 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         chain(controller:'exposedExecutionZoneAction', action:'create', model:['exposedExecutionZoneActionInstance':cmd.executionZoneAction])
     }
 
+    def userLikedIt = { ExecutionZone execZone ->
+      execZone.like(springSecurityService.currentUser)
+
+    }
+
     def index() {
         redirect(action: "list", params: params)
     }
@@ -146,6 +151,10 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         if (!params.disabled) {
             enabled = true
         }
+        def favs = false
+        if (params.favs) {
+            favs = true
+        }
 
         def executionZoneInstanceList
         def executionZoneInstanceListCount
@@ -153,6 +162,11 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
           executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
+          if (favs) {
+            executionZoneInstanceList = executionZoneInstanceList.findAll() { executionZone ->
+              executionZone.userLiked(springSecurityService.currentUser)
+            }
+          }
           executionZoneInstanceListCount = ExecutionZone.countByEnabled(enabled)
         } else {
           executionZoneInstanceList = executionZoneService.findAllByEnabledFiltered(enabled, params)
@@ -163,7 +177,8 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         [
             executionZoneInstanceList: executionZoneInstanceList,
             executionZoneInstanceTotal: executionZoneInstanceListCount,
-            executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list()
+            executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list(),
+            user: springSecurityService.currentUser
         ]
     }
 

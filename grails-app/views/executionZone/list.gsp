@@ -30,11 +30,25 @@
           <g:message code="executionZone.show.enabled" default="Show enabled" />
         </g:link>
       </g:else>
+
+			<g:if test="${!params.favs}">
+				<g:link action="list" params="[favs: 'show']" class="btn btn-submit pull-right">
+					<g:message code="executionZone.show.favs" default="Show Favs" />
+				</g:link>
+			</g:if>
+			<g:else>
+				<g:link action="list" class="btn btn-submit pull-right">
+					<g:message code="executionZone.show.all" default="Show All" />
+				</g:link>
+			</g:else>
     </div>
 
 		<table class="table table-striped">
 			<thead>
 				<tr>
+					<th>
+						<g:message code="executionZone.favorite.label" default="Fav" />
+					</th>
 					<g:sortableColumn property="type.name" title="${message(code: 'executionZone.type.label', default: 'Type')}" />
 <!--  		<g:sortableColumn property="puppetEnvironment" title="${message(code: 'executionZone.puppetEnvironment.label', default: 'Puppet-Env')}" />
 					<g:sortableColumn property="qualityStage" title="${message(code: 'executionZone.qualityStage.label', default: 'Quality-Stage')}" />
@@ -55,6 +69,14 @@
 			<tbody>
 				<g:each in="${executionZoneInstanceList}" status="i" var="executionZoneInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}${executionZoneInstance.enabled ?: ' warning'}">
+						<td>
+							<g:if test="${executionZoneInstance.userLiked(user)}">
+								<i class="icon-star"></i>
+							</g:if>
+							<g:else>
+								<i class="icon-star-empty"/>
+							</g:else>
+						</td>
 						<td>
 							<g:link action="show" id="${executionZoneInstance.id}">
 								${fieldValue(bean: executionZoneInstance, field: "type")}

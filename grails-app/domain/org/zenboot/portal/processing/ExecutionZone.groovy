@@ -4,7 +4,9 @@ import org.zenboot.portal.Template;
 import org.zenboot.portal.Host
 import org.zenboot.portal.HostState
 
-class ExecutionZone {
+import ru.jconsulting.likeable.Likeable
+
+class ExecutionZone implements Likeable {
 
     Date creationDate
     ExecutionZoneType type

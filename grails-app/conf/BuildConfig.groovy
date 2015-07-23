@@ -58,6 +58,8 @@ grails.project.dependency.resolution = {
         runtime ":jquery-ui:1.8.15"
 
         build ':tomcat:7.0.42'
+
+        compile ':likeable:0.1.2'
     }
 }
 
