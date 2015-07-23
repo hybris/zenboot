@@ -20,8 +20,11 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     def executionService
     def springSecurityService
 
-    def ScriptletFlowCache
+    def scriptletFlowCache
 
+    def clearCache() {
+      scriptletFlowCache = null
+    }
 
     def findAllByExecZoneFiltered(ExecutionZone execZone) {
       def scriptletBatchList = []
@@ -220,6 +223,9 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
 
     ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, List runtimeAttributes, ExecutionZoneType type) {
+        log.debug("cache is:" + scriptletFlowCache)
+        log.debug("runtimeAttributes are: " + runtimeAttributes)
+
         if (scriptletFlowCache == null) {
           scriptletFlowCache = [:]
         }

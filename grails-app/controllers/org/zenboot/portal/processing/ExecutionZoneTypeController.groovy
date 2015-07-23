@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException
 class ExecutionZoneTypeController {
 
     def executionZoneService
+    def scriptletBatchService
     def springSecurityService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -36,7 +37,7 @@ class ExecutionZoneTypeController {
             return
         }
 
-		flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneType.label', default: 'ExecutionZoneType'), executionZoneTypeInstance.id])
+		    flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneType.label', default: 'ExecutionZoneType'), executionZoneTypeInstance.id])
         redirect(action: "show", id: executionZoneTypeInstance.id)
     }
 
@@ -83,13 +84,16 @@ class ExecutionZoneTypeController {
 
         executionZoneTypeInstance.properties = params
         executionZoneTypeInstance.description = "lastly set devMode to "+ executionZoneTypeInstance.devMode + " by " + springSecurityService.currentUser.username + " at " + new Date()
+        // We clear the cache each time someone has edited a ExecutionZoneType
+        // high likely that he changed devMode and we want to have a clean start afterwards
+        scriptletBatchService.clearCache()
 
         if (!executionZoneTypeInstance.save(flush: true)) {
             render(view: "edit", model: [executionZoneTypeInstance: executionZoneTypeInstance])
             return
         }
 
-		flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZoneType.label', default: 'ExecutionZoneType'), executionZoneTypeInstance.id])
+		    flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZoneType.label', default: 'ExecutionZoneType'), executionZoneTypeInstance.id])
         redirect(action: "show", id: executionZoneTypeInstance.id)
     }
 
