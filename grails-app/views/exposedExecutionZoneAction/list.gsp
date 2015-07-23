@@ -59,7 +59,7 @@
 		</table>
 
 		<div class="pagination">
-			<g:paginate total="${exposedExecutionZoneActionInstanceTotal}" />
+			<g:paginate total="${exposedExecutionZoneActionInstanceTotal}" params="${params}"/>
 		</div>
 	</div>
 </body>

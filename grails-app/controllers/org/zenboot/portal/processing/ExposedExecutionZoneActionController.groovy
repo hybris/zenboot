@@ -61,7 +61,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
         resolvedParams.missingParameters.each { paramName ->
            cmd.errors.reject('executionZone.parameters.emptyValue', [paramName].asType(Object[]), 'Mandatory parameter is empty')
         }
-        
+
         if (cmd.hasErrors()) {
             chain(action:'show', id:cmd.execId, model:[cmd:cmd])
             return
@@ -79,22 +79,29 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
     def list() {
         def executionZones
+        def parameters = [:]
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        if (!params.sort) {
+            params.sort = "creationDate"
+        }
+        if (!params.order) {
+            params.order = "desc"
+        }
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             executionZones = ExposedExecutionZoneAction.list(params)
         } else {
             executionZones = ExposedExecutionZoneAction.createCriteria().list(params) {
                 roles {
                     or {
-                        springSecurityService.currentUser.getAuthorities()*.authority.each { auth ->                        
+                        springSecurityService.currentUser.getAuthorities()*.authority.each { auth ->
                             eq('authority', auth)
                         }
                     }
-                    
+
                 }
             }
         }
-        [exposedExecutionZoneActionInstanceList: executionZones, exposedExecutionZoneActionInstanceTotal: executionZones.size()]
+        [exposedExecutionZoneActionInstanceList: executionZones, exposedExecutionZoneActionInstanceTotal: ExposedExecutionZoneAction.count(), parameters: parameters]
     }
 
     def create() {
@@ -280,7 +287,7 @@ class UpdateExposedExecutionZoneActionCommand extends SaveExposedExecutionZoneAc
 class ExecuteExposedExecutionZoneActionCommand {
 
     def executionZoneService
-    
+
     Long execId
     Map exposedExecutionZoneActionParameters
     Map parameters
@@ -288,7 +295,7 @@ class ExecuteExposedExecutionZoneActionCommand {
     static constraints = {
         execId nullable:false
     }
-    
+
 
 
     /*boolean validate() {
