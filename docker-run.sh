@@ -1,7 +1,7 @@
 #/bin/bash
 
 CWD=`pwd`
-dockerimage="k9ert/zenboot"
+dockerimage="hybris/zenboot"
 
 [ -f zenboot.Docker.properties ] || cp zenboot.Docker.properties.template zenboot.Docker.properties
 
