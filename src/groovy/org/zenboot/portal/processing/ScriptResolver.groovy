@@ -109,6 +109,7 @@ class ScriptResolver {
 
     private List getLookupPath(String rootDir, yaml) {
       List lookupPath = []
+      lookupPath << scriptDir.getAbsolutePath()
       lookupPath << rootDir
       yaml.lookupPath?.each { String path ->
         if (path.startsWith('/')) {
