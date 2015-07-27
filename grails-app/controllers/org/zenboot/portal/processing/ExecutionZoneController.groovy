@@ -54,6 +54,14 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         redirect(action:"show", id:cmd.execId)
     }
 
+    def ajaxUserLike() {
+      log.info("user like" + params.id)
+      def executionZoneInstance = ExecutionZone.get(params.id)
+      executionZoneInstance.like(springSecurityService.currentUser)
+      def cssclass= executionZoneInstance.userLiked(springSecurityService.currentUser)?"icon-star":"icon-star-empty"
+      render "<i class=\"${cssclass}\"/>"
+    }
+
     def ajaxGetParameters = { GetExecutionZoneParametersCommand cmd ->
         if (cmd.hasErrors()) {
             return render(view:"/ajaxError", model:[result:cmd])
@@ -128,11 +136,6 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             return
         }
         chain(controller:'exposedExecutionZoneAction', action:'create', model:['exposedExecutionZoneActionInstance':cmd.executionZoneAction])
-    }
-
-    def userLikedIt = { ExecutionZone execZone ->
-      execZone.like(springSecurityService.currentUser)
-
     }
 
     def index() {
