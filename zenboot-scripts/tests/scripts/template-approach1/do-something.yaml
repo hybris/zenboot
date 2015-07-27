@@ -12,5 +12,6 @@
 lookupPath:
   - ../template-approach1
 scripts:
-  - do-something.yaml
-  - do-something-else.yaml
+  - pre-do-something.sh
+  - do-something.sh
+  - post-do-something.sh

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "Let's overwrite the post-script"
+echo "This should now fail"

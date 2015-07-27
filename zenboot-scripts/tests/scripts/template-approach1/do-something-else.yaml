@@ -1,4 +1,5 @@
 #
+#
 # It is possible to reference other script in other folders by adding YAML files to the scriptlet stack.
 #
 # A property "lookupPath" can be set which defines where Zenboot should look for such scripts.
@@ -12,5 +13,6 @@
 lookupPath:
   - ../template-approach1
 scripts:
-  - do-something.yaml
-  - do-something-else.yaml
+  - pre-do-something-else.sh
+  - do-something-else.sh
+  - post-do-something-else.sh
