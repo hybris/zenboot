@@ -31,6 +31,7 @@ class Scriptlet extends Processable implements ProcessListener {
         output type: 'text'
         error type: 'text'
         logged type: 'text'
+        file type: 'blob' // see #43
     }
 
     @Override
