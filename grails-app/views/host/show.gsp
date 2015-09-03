@@ -43,15 +43,6 @@
 				</dd>
 			</g:if>
 
-			<g:if test="${hostInstance?.instanceId}">
-				<dt>
-					<g:message code="host.instanceId.label" default="Instance Id" />
-				</dt>
-				<dd>
-					<g:fieldValue bean="${hostInstance}" field="instanceId" />
-				</dd>
-			</g:if>
-
 			<g:if test="${hostInstance?.cname}">
 				<dt>
 					<g:message code="host.cname.label" default="Cname" />
@@ -67,6 +58,15 @@
 				</dt>
 				<dd>
 					<g:fieldValue bean="${hostInstance}" field="macAddress" />
+				</dd>
+			</g:if>
+
+			<g:if test="${hostInstance?.datacenter}">
+				<dt>
+					<g:message code="host.datacenter.label" default="Datacenter" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="datacenter" />
 				</dd>
 			</g:if>
 

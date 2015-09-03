@@ -8,6 +8,7 @@ class Host {
     String ipAddress
     String cname
     String macAddress
+    String datacenter
     Date creationDate
     Date expiryDate
     String instanceId // can be used for the ID if the underlying IAAS-Provider
