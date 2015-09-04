@@ -166,7 +166,11 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return this.createExecutionZoneAction(execZone, scriptDir, typedProcessParametersArrayList, runtimeAttributes)
     }
 
-    ExecutionZoneAction createExecutionZoneAction(ExecutionZone execZone, File scriptDir, ArrayList<ProcessingParameter> processParameters, List runtimeAttributes=null) {
+    ExecutionZoneAction createExecutionZoneAction(ExecutionZone execZone,
+          File scriptDir,
+          ArrayList<ProcessingParameter> processParameters,
+          List runtimeAttributes=null) {
+
         ExecutionZoneAction execAction = new ExecutionZoneAction(executionZone:execZone, scriptDir:scriptDir)
 
 
