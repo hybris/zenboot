@@ -35,6 +35,8 @@ class ParameterMetadataList {
 		return parameters
 	}
 
+  // This is the only one which is relevant outside because no one cares
+	// about the satisfied ones
 	Set getUnsatisfiedParameters() {
 		Set parameters = []
 		this.unsatisfiedParameters.each {
@@ -68,6 +70,9 @@ class ParameterMetadataList {
 		}
 	}
 
+	// this method needs to be called in respect of the execution flow
+	// it will then automatically calculate params which needs values
+	// in the stack in order to be executed
 	void addParameters(Collection parameters) {
 		//verify consumed parameters first
 		def inputParameters = parameters.findAll { ParameterMetadata parameter ->

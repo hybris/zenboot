@@ -2,7 +2,7 @@
 	<strong>
 		<g:message code="executionZone.scriptletMetadata.file" default="Required by:" />
 	</strong>
-	${scriptlet.script?.path.replace('\\', '/').split('/')[-2]}/${scriptlet.script?.name}
+	${scriptlet.script ? scriptlet.script.path.replace('\\', '/').split('/')[-2] : "no script EXPLICITELY" }/${scriptlet.script?.name}
 	<br />
 
 	<strong>

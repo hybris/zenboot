@@ -30,9 +30,9 @@ class ParameterMetadataTest {
       pm1.metaClass.value = "hi"
       assertEquals("hi",pm1.value)
       // Doesn't look that awfull? We're using metaClass features to create properties on the fly
-      // this is used in ExecutionZoneService:235-240
+      // this is used in ExecutionZoneService:284-289
 
-      // ... not sure why this is implemented like that, though. 
+      // ... not sure why this is implemented like that, though.
     }
 
 

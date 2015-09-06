@@ -8,6 +8,7 @@ import org.zenboot.portal.processing.ProcessingParameter
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
+import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.ho.yaml.Yaml
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
@@ -289,8 +290,27 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
   				  paramMetaData.metaClass.overlay = false
   			  }
 		    }
+        // Now the other way around. We also want all the execZoneParams which
+        // are not defined to be used in here. They are usefull, although
+        // the usage might be more of a black magic than the ones who
+        // are statically defined
+        overlayParameters.each { ProcessingParameter param ->
+          if (!parameters*.name.contains(param.name)) {
+            ParameterMetadata newParamMataData = new ParameterMetadata(
+              script:null,
+              description: param.description,
+              name:param.name,
+              type: ParameterType.CONSUME,
+              visible: true)
+            newParamMataData.metaClass.value = param.value
+            // We're not really overlaying because no script stated that it uses
+            // the value but this is better than false later in the UI
+            newParamMataData.metaClass.overlay = true
+            parameters << newParamMataData
+          }
+        }
 		    return parameters
-	}
+    }
 
     def resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction, Map parameters) {
         def result = new Expando()

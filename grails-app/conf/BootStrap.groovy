@@ -29,6 +29,7 @@ class BootStrap {
         this.setupSanityCheckExposedExecutionZoneAction()
 
         // setting up JSON-Marshallers
+        // otherwise you're rendering out half of the heap-space
         grails.converters.JSON.registerObjectMarshaller(ExecutionZone) {
             // you can filter here the key-value pairs to output:
             def returnArray = [:]
