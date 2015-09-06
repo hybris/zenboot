@@ -70,12 +70,23 @@
 				<g:each in="${executionZoneInstanceList}" status="i" var="executionZoneInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}${executionZoneInstance.enabled ?: ' warning'}">
 						<td>
+
 							<g:if test="${executionZoneInstance.userLiked(user)}">
-								<i class="icon-star"></i>
+								<g:remoteLink action="ajaxUserLike" id="${executionZoneInstance.id}" update="${executionZoneInstance.id}_fav">
+									<div id="${executionZoneInstance.id}_fav">
+										<i class="icon-star"></i>
+									</div>
+								</g:remoteLink>
+
 							</g:if>
 							<g:else>
-								<i class="icon-star-empty"/>
+								<g:remoteLink action="ajaxUserLike" id="${executionZoneInstance.id}" update="${executionZoneInstance.id}_fav">
+									<div id="${executionZoneInstance.id}_fav">
+										<i class="icon-star-empty"></i>
+									</div>
+								</g:remoteLink>
 							</g:else>
+
 						</td>
 						<td>
 							<g:link action="show" id="${executionZoneInstance.id}">

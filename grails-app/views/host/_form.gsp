@@ -35,6 +35,15 @@
 	</div>
 </div>
 
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'datacenter', 'error')} ">
+	<label class="control-label" for="datacenter">
+		<g:message code="host.datacenter.label" default="Datacenter" />
+	</label>
+	<div class="controls">
+		<g:textField name="datacenter" value="${hostInstance?.datacenter}" readonly="true" />
+	</div>
+</div>
+
 <div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'hostname', 'error')} required">
 	<label class="control-label" for="hostname">
 		<g:message code="host.hostname.label" default="Hostname" />

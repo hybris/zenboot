@@ -20,27 +20,16 @@
 			</div>
 		</g:if>
 
-		<g:if test="${params.max > 20}">
-			<div class="pagination">
-				<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
-			</div>
-		</g:if>
-
-
-
 		<table class="table table-striped">
 			<thead>
 				<tr>
 					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" />
 					<g:sortableColumn property="cname" title="${message(code: 'host.cname.label', default: 'Cname')}" />
-					<g:sortableColumn property="macAddress" title="${message(code: 'host.macAddress.label', default: 'Mac Address')}" />
 					<g:sortableColumn property="hostname.name" title="${message(code: 'host.hostname.label', default: 'Hostname')}" />
 					<g:sortableColumn property="instanceId" title="${message(code: 'host.instanceId.label', default: 'Instance Id')}" defaultOrder="desc"/>
 					<g:sortableColumn property="state" title="${message(code: 'host.state.label', default: 'State')}" />
-					<g:sortableColumn property="expiryDate" title="${message(code: 'host.state.label', default: 'Expiry Date')}" />
-					<th>
-						<g:message code="host.type.label" default="Type" />
-					</th>
+					<g:sortableColumn property="expiryDate" title="${message(code: 'host.expiryDate.label', default: 'Expiry Date')}" />
+					<g:sortableColumn property="datacenter" title="${message(code: 'host.datacenter.label', default: 'Datacenter')}" />
 				</tr>
 			</thead>
 			<tbody>
@@ -53,9 +42,6 @@
 						</td>
 						<td>
 							${fieldValue(bean: hostInstance, field: "cname")}
-						</td>
-                        <td>
-							${fieldValue(bean: hostInstance, field: "macAddress")}
 						</td>
 						<td>
 							${fieldValue(bean: hostInstance, field: "hostname")}
@@ -70,7 +56,7 @@
 							${fieldValue(bean: hostInstance, field: "expiryDate")}
 						</td>
 						<td>
-							${hostInstance.class.getSimpleName()}
+							${fieldValue(bean: hostInstance, field: "datacenter")}
 						</td>
 					</tr>
 				</g:each>

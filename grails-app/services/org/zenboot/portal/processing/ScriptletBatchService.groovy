@@ -90,7 +90,9 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
                 return map
             })
             processContext.execZone=action.executionZone
+            processContext.parameters.put("EXECUTIONZONE_TYPE",action.executionZone.type.name)
             ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
+            processContext.parameters.put("SCRIPTDIR",batch.executionZoneAction.scriptDir)
             processContext.scriptletBatch=batch
             try {
               batch.execute(processContext)

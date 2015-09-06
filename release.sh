@@ -48,7 +48,7 @@ while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .
 done
 sudo docker build -t hybris/zenboot:v${VERSION} .
 echo -n "about to tag the Dockerimage"
-sudo docker tag hybris/zenboot:v${VERSION} k9ert/zenboot:latest
+sudo docker tag hybris/zenboot:v${VERSION} hybris/zenboot:latest
 sudo docker push hybris/zenboot:latest
 sudo docker push hybris/zenboot:v${VERSION}
 date
