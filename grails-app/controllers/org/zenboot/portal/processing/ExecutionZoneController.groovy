@@ -178,6 +178,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             executionZoneInstanceList: executionZoneInstanceList,
             executionZoneInstanceTotal: executionZoneInstanceListCount,
             executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list(),
+            parameters:parameters,
             user: springSecurityService.currentUser
         ]
     }
