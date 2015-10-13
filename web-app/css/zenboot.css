@@ -46,6 +46,12 @@
 	margin: 5px 0 5px 0;
 }
 
+#processqueue > table {
+    table-layout: fixed;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
 #footer {
 	color: #999999;
 	font-size: 8pt;
