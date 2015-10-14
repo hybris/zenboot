@@ -35,6 +35,8 @@ class BootStrap {
             def returnArray = [:]
             returnArray['description'] = it.description
             returnArray['hosts'] = it.hosts
+            returnArray['serviceUrls'] = it.getActiveServiceUrls()
+            returnArray['customerEmail'] = it.param('CUSTOMER_EMAIL')
             return returnArray
         }
 

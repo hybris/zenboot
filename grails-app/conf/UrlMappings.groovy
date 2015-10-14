@@ -13,10 +13,11 @@ class UrlMappings {
         "/"(controller:'home', action:'index')
 
         //REST
-        "/rest/customer/$id/$property?"(controller:'customer', action:'rest')
-        "/rest/host/$id"(controller:'host', action:'rest')
-        "/rest/executionzone/$id"(controller:'executionZone', action:'rest')
-        "/rest/action/$id/status"(controller:'executionZoneAction', action:'rest')
+        "/rest/customers/$id/$property?"(controller:'customer', action:'rest')
+        "/rest/hosts/$id"(controller:'host', action:'rest')
+        "/rest/executionzones"(controller: "executionZone", action: "list")
+        "/rest/executionzones/$id"(controller:'executionZone', action:'rest')
+        "/rest/actions/$id/status"(controller:'executionZoneAction', action:'rest')
         "/rest/hiera/$puppetEnvironment/$qualityStage?"(controller:'hieraRest', action:'rest')
         "/rest/templates/$action?/$id?" (controller:'template')
         "/rest/properties/$puppetEnvironment/$qualityStage?"(controller:'propertiesRest', action:'rest')

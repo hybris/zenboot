@@ -177,13 +177,19 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         }
         log.debug("model: executionZoneInstanceList(.size(): "+executionZoneInstanceList.size()+"), executionZoneInstanceTotal ("+executionZoneInstanceListCount+"), executionZoneTypes")
 
-        [
-            executionZoneInstanceList: executionZoneInstanceList,
-            executionZoneInstanceTotal: executionZoneInstanceListCount,
-            executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list(),
-            parameters:parameters,
-            user: springSecurityService.currentUser
-        ]
+        println "the request:"+request
+        request.withFormat {
+            html {
+                    [
+                        executionZoneInstanceList: executionZoneInstanceList,
+                        executionZoneInstanceTotal: executionZoneInstanceListCount,
+                        executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list(),
+                        parameters:parameters,
+                        user: springSecurityService.currentUser
+                    ]
+            }
+            json { render executionZoneInstanceList as JSON }
+        }
     }
 
     def create() {
