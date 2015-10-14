@@ -143,7 +143,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 15, 30)
+        params.max = params.max ? params.int('max') : 15
         if (!params.sort) {
             params.sort = "enabled"
         }
@@ -166,18 +166,21 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
           executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
           if (favs) {
+            executionZoneInstanceList = ExecutionZone.findAll()
             executionZoneInstanceList = executionZoneInstanceList.findAll() { executionZone ->
               executionZone.userLiked(springSecurityService.currentUser)
             }
+            executionZoneInstanceListCount = executionZoneInstanceList.size()
+          } else {
+            executionZoneInstanceListCount = ExecutionZone.countByEnabled(enabled)
           }
-          executionZoneInstanceListCount = ExecutionZone.countByEnabled(enabled)
+
         } else {
           executionZoneInstanceList = executionZoneService.findAllByEnabledFiltered(enabled, params)
           executionZoneInstanceListCount = executionZoneService.countByEnabledFiltered(enabled)
         }
         log.debug("model: executionZoneInstanceList(.size(): "+executionZoneInstanceList.size()+"), executionZoneInstanceTotal ("+executionZoneInstanceListCount+"), executionZoneTypes")
 
-        println "the request:"+request
         request.withFormat {
             html {
                     [
