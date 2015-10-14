@@ -20,6 +20,13 @@
 			</div>
 		</g:if>
 
+
+		<g:if test="${params.max > 20}">
+			<div class="pagination">
+				<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
+			</div>
+		</g:if>
+
 		<table class="table table-striped">
 			<thead>
 				<tr>
