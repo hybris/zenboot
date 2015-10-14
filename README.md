@@ -14,7 +14,7 @@ all the servers in the DB
 ## Go with Docker
 
 ``` bash
-./run-docker.sh
+./docker-run.sh
 # login at localhost:8080 with admin/zenboot
 mkdir -p zenboot-scripts/mytest/scripts
 mkdir -p zenboot-scripts/mytest/plugins
