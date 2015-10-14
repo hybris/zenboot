@@ -70,7 +70,7 @@ class ExecutionService {
           if (procHandler.hasError()) {
               if (procHandler.exitValue == 143) {
                 // seems to be some kind of magicValue for a process which get killed
-                throw new ScriptExecutionException("Execution of script '${procHandler.command}' took too long. Timeout is currently "+ this.grailsApplication.config.zenboot.process.timeout.toInteger()+"seconds.", procHandler.exitValue)
+                throw new ScriptExecutionException("Execution of script '${procHandler.command}' took too long. Timeout is currently "+ this.grailsApplication.config.zenboot.process.timeout.toInteger()+" seconds.", procHandler.exitValue)
               } else {
                 throw new ScriptExecutionException("Execution of script '${procHandler.command}' failed with return code '${procHandler.exitValue}'", procHandler.exitValue)
               }

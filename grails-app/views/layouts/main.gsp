@@ -26,7 +26,7 @@
 	</div>
 
 	<div class="row-fluid">
-		<div class="span10 offset2">
+		<div class="span9 offset3">
 			<sec:ifLoggedIn>
 				<ul class="nav nav-tabs">
 					<apNav:renderMenu group="tabs" var="item" mainMenu="true">
@@ -39,7 +39,7 @@
 
 	<div class="container-fluid">
 		<div class="row-fluid">
-			<div class="span2">
+			<div class="span3">
 				<ul class="nav nav-pills nav-tabs nav-stacked">
 					<apNav:renderMenu group="menu" var="item">
 						<g:render template="/layouts/menuItem" model="[item:item]" />
@@ -51,7 +51,7 @@
 					</sec:ifLoggedIn>
 				</div>
 			</div>
-			<div class="span10">
+			<div class="span9">
 				<g:layoutBody />
 			</div>
 		</div>

@@ -89,9 +89,7 @@
 
 						</td>
 						<td>
-							<g:link action="show" id="${executionZoneInstance.id}">
 								${fieldValue(bean: executionZoneInstance, field: "type")}
-							</g:link>
 						</td>
 <!--        <td>  For now, let's disable this. Might be good to make that configurable
                 ${fieldValue(bean: executionZoneInstance, field: "puppetEnvironment")}
@@ -100,7 +98,9 @@
                 ${fieldValue(bean: executionZoneInstance, field: "qualityStage")}
             </td>
 -->					<td>
+						<g:link action="show" id="${executionZoneInstance.id}">
 							${fieldValue(bean: executionZoneInstance, field: "description")}
+						</g:link>
 						</td>
 						<td>
 							<g:render template="parametersInList" model="[parameters:executionZoneInstance.processingParameters]"></g:render>
