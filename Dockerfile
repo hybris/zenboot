@@ -6,10 +6,10 @@ FROM codenvy/jdk7_tomcat7
 # https://github.com/tianon/docker-brew-debian/blob/8105df0412f86c08d11e86f7f6bab6160ff1e837/jessie/Dockerfile
 # FROM scratch
 ADD zenboot.properties /etc/zenboot/zenboot.properties
-RUN sudo apt-get update && sudo apt-get install -y curl ansible openssh-client sshpass socat dnsutils jq less vim
+RUN sudo apt-get update && sudo apt-get install -y curl ansible openssh-client sshpass socat dnsutils jq less vim netcat-openbsd
 ADD docker-provisioning/ansible.cfg /etc/ansible/ansible.cfg
 RUN mkdir -p /home/user/zenboot
-ADD https://github.com/hybris/zenboot/releases/download/v0.9.5/zenboot.war /home/user/tomcat7/webapps/zenboot.war
+ADD https://github.com/hybris/zenboot/releases/download/v0.9.6/zenboot.war /home/user/tomcat7/webapps/zenboot.war
 ADD docker-provisioning/setenv.sh /home/user/tomcat7/bin/setenv.sh
 RUN sudo chown user:user /home/user/tomcat7/bin/setenv.sh
 #ADD target/zenboot.war /home/user/tomcat7/webapps/zenboot.war
