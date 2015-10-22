@@ -1,6 +1,7 @@
 package org.zenboot.portal.processing.meta
 
 import groovy.text.SimpleTemplateEngine
+import org.zenboot.portal.processing.groovy.GroovyScriptUtil
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -48,8 +49,7 @@ class ScriptletAnnotationReader {
 
     private Class getScriptletClass(File script) {
       if (script.getName().split(/\./)[-1] == "groovy") {
-        GroovyClassLoader gcl = new GroovyClassLoader(this.class.classLoader)
-        return gcl.parseClass(script)
+          return GroovyScriptUtil.parseGroovyScript(script)
       } else {
         Class scriptletClass
         Script groovyScript = this.getGroovyScript(script)
