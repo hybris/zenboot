@@ -6,7 +6,7 @@ import org.apache.log4j.WriterAppender
 import org.zenboot.portal.ProcessListener
 import org.zenboot.portal.processing.Processable.ProcessState
 
-/**  A Scriptlet is a Domai-class and represents one Run of a
+/**  A Scriptlet is a Domain-class and represents one Run of a
   *  specific Script. It stores all all related stuff in the DB
   *  and also has (unfortunately) execution-logic
   */

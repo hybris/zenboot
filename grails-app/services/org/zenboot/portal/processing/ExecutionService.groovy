@@ -1,6 +1,7 @@
 package org.zenboot.portal.processing
 
 import org.springframework.context.ApplicationListener
+import org.zenboot.portal.processing.groovy.GroovyScriptUtil
 import org.zenboot.portal.ProcessHandler
 import org.zenboot.portal.processing.converter.ParameterConverter
 import org.zenboot.portal.processing.converter.ParameterConverterMap
@@ -101,8 +102,7 @@ class ExecutionService {
   }
 
   private Object createObjectFromGroovy(File pluginFile, Processable processable) {
-    GroovyClassLoader gcl = new GroovyClassLoader(this.class.classLoader)
-    Class clazz = gcl.parseClass(pluginFile)
+    Class clazz = GroovyScriptUtil.parseGroovyScript(pluginFile)
 
     def plugin = clazz.newInstance()
     def properties = plugin.metaClass.properties*.name
