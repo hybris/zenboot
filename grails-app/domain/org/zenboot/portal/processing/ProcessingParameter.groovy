@@ -67,13 +67,14 @@ class ProcessingParameter implements Comparable {
     }
 
     def addParameterLogs() {
-        if (this.comment != null) {
-            addToProcessingParameterLogs(new ProcessingParameterLog(name: this.name, description: this.description, value: this.value, comment: this.comment))
-            this.comment = null
-        }
+      if (this.comment == "INSERT" || this.comment == "UPDATE") {
+        addToProcessingParameterLogs(new ProcessingParameterLog(name: this.name, description: this.description, value: this.value, comment: this.comment))
+      }
+      this.comment=null
     }
 
     def beforeUpdate() {
+        this.comment="UPDATE"
         // if nothing changes, do not log update
         if(!this.isDirty()) {
             this.comment = null
@@ -81,6 +82,7 @@ class ProcessingParameter implements Comparable {
     }
 
     def afterInsert(){
+        this.comment="INSERT"
         addParameterLogs()
     }
 

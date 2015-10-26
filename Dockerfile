@@ -13,7 +13,7 @@ RUN cd /etc/ansible/roles && sudo git clone https://github.com/jivesoftware/ansi
 ADD docker-provisioning/ansible.cfg /etc/ansible/ansible.cfg
 USER user
 RUN mkdir -p /home/user/zenboot
-ADD https://github.com/hybris/zenboot/releases/download/v0.9.6/zenboot.war /home/user/tomcat7/webapps/zenboot.war
+ADD https://github.com/hybris/zenboot/releases/download/v0.9.7/zenboot.war /home/user/tomcat7/webapps/zenboot.war
 ADD docker-provisioning/setenv.sh /home/user/tomcat7/bin/setenv.sh
 RUN sudo chown user:user /home/user/tomcat7/bin/setenv.sh
 #ADD target/zenboot.war /home/user/tomcat7/webapps/zenboot.war
