@@ -16,3 +16,4 @@ zenboot-scripts/internal/scripts/sanity-restcheck/temp
 .idea
 out/
 lib/
+/classes/

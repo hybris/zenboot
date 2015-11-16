@@ -12,6 +12,7 @@
 lookupPath:
   - ../create_host
 scripts:
-  - create-host-instance.sh
   - set-shortname.sh
+  - CheckIfHostExists.groovy
+  - create-host-instance.sh
   - create-dns.sh
