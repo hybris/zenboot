@@ -33,7 +33,7 @@ tabData << [name: 'users',    icon: 'icon_users', messageCode: 'spring.security.
 				<td/>
 				<td valign="top" class="name">
 						<sup>executionZone --> instance of org.zenboot.portal.processing.ExecutionZone</sup><br/>
-						<sup>example: parameter.param('DOMAIN') ==~ /.*test.mycompany.com.*/</sup><br/><br/>
+						<sup>example: executionZone.param('DOMAIN') ==~ /.*test.mycompany.com.*/</sup><br/><br/>
 				</td>
 			</tr>
 			<s2ui:textFieldRow size='75' style="height:100px;" name='parameterEditExpression' labelCode='parameterEditExpression.authority.label' bean="${role}"
