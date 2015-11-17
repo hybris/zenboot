@@ -1,8 +1,11 @@
 <div id="container_${editorId}" class="readme"></div>
 
-<a class="btn btn-mini" style="margin-top:5px;" id="button-update-${editorId}">Update Readme</a>
+<sec:ifAllGranted roles="ROLE_ADMIN">
+    <a class="btn btn-mini" style="margin-top:5px;" id="button-update-${editorId}">Update Readme</a>
+</sec:ifAllGranted>
 <span class="label label-important hide" id="label-failure-${editorId}"><i class="icon-thumbs-down icon-white"></i></span>
 <span class="label label-success hide" id="label-success-${editorId}"><i class="icon-thumbs-up icon-white"></i></span>
+<span class="label label-failure hide" id="label-failure-${editorId}"><i class="icon-thumbs-down icon-white"></i></span>
 
 <g:hiddenField name="checksum-${editorId}" id="checksum-${editorId}" value="${checksum}"/>
 
@@ -40,6 +43,11 @@ ${editorId}.on('save', function() {
         contentType: 'application/json',
         dataType: 'json',
         success: function(data, text) {
+            if (data && data.error) {
+                $('#label-failure-${editorId}').fadeIn();
+                setTimeout(function() {$('#label-failure-${editorId}').fadeOut()}, 1500);
+                return;
+            }
         	$('#checksum-${editorId}').val(data.value)
             $('#label-success-${editorId}').fadeIn();
             setTimeout(function() {$('#label-success-${editorId}').fadeOut()}, 1500);
