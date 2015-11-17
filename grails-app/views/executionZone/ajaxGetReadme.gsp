@@ -31,7 +31,7 @@ var opts = {
 
 ${editorId} = new EpicEditor(opts);
 ${editorId}.load();
-${editorId}.importFile('${scriptDir}', '${markdown.replace("\n", "\\n")}');
+${editorId}.importFile('${scriptDir}', '${markdown.encodeAsJavaScript()}');
 ${editorId}.preview();
 ${editorId}.on('save', function() {
     $.ajax({
