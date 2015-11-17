@@ -219,11 +219,11 @@
 			</div>
 			<div class="accordion-group">
 				<div class="accordion-heading">
-					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#execScript">
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#executeScript">
         		<g:message code="executionZone.execAction.label" default="Execute Script" />
       		</a>
 				</div>
-				 <div id="execScript" class="accordion-body collapse in">
+				 <div id="executeScript" class="accordion-body collapse in">
 				 	<div id="scriptDirs" class="accordion-inner">
 				 		<g:form method="post">
 
