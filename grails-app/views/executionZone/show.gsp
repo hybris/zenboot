@@ -100,14 +100,9 @@
 										<ul class="unstyled hide">
 											<g:each in="${executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }}" var="h" status="status">
 												<li>
-													<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-														<g:link controller="host" action="show" id="${h.id}">
-															${h.cname} (${h.hostname} : <g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
-														</g:link>
-													</sec:ifAllGranted>
-													<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-														${h.cname} ( ${h.hostname} : <g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
-													</sec:ifNotGranted>
+													<g:link controller="host" action="show" id="${h.id}">
+														${h.cname} (${h.hostname} : <g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
+													</g:link>
 												</li>
 											</g:each>
 										</ul>
