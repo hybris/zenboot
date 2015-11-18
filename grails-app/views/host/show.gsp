@@ -197,13 +197,13 @@
 
 		<g:form name="markHostForm" action="markHost">
 			<g:hiddenField name="id" value="${hostInstance?.id}" />
-			<g:actionSubmit id="markAsBrokenButton" action="markHostBroken"
-							title="trigger deletion of the host after some time"
-							value="mark broken" class="btn" >
-			</g:actionSubmit>
 			<g:actionSubmit id="markUnknownButton" action="markHostUnknown"
 							title="prevent the host from being deleted if you accidentally marked it as broken"
-							value="mark unknown" class="btn" >
+							value="mark unknown" class="btn btn-primary" >
+			</g:actionSubmit>
+			<g:actionSubmit id="markAsBrokenButton" action="markHostBroken"
+							title="trigger deletion of the host after some time"
+							value="mark broken" class="btn btn-danger" >
 			</g:actionSubmit>
 		</g:form>
 		<g:form name="hostForm">
