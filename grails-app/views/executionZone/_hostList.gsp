@@ -1,6 +1,6 @@
 <g:set var="hosts" value="${executionZone.hosts.findAll { it.state == state }}" />
 <div class="collapsable-list">
-    <a class="collapsed" style="cursor: pointer">
+    <a id="expand-${state}" class="collapsed" style="cursor: pointer">
         <g:message code="no.of.hosts"
                    default="{0} {1} hosts"
                    args="[hosts.size(), state.toString().toLowerCase()]"/>
