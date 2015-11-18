@@ -93,51 +93,8 @@
 										<g:message code="executionZone.hosts.label" default="Hosts" />
 									</dt>
 									<dd>
-										<div class="collapsable-list">
-											<a class="collapsed" style="cursor: pointer">
-												<g:message
-														code="executionZone.hosts.findAll { it.state == HostState.COMPLETED }.size"
-														default="{0} completed hosts defined"
-														args="[executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }.size()]"/>
-												<i class="icon-resize-full"></i>
-											</a>
-											<ul class="unstyled hide">
-												<g:each in="${executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }}"
-														var="h" status="status">
-													<li>
-														<g:link controller="host" action="show" id="${h.id}">
-															${h.cname} (${h.hostname} :
-															<g:formatDate type="datetime" style="MEDIUM"
-																		  timeStyle="SHORT" date="${h.creationDate}"/>
-															)
-														</g:link>
-													</li>
-												</g:each>
-											</ul>
-										</div>
-
-										<div class="collapsable-list">
-											<a class="collapsed" style="cursor: pointer">
-												<g:message
-														code="executionZone.hosts.findAll { it.state == HostState.CREATED }.size"
-														default="{0} created hosts defined"
-														args="[executionZoneInstance.hosts.findAll { it.state == HostState.CREATED }.size()]"/>
-												<i class="icon-resize-full"></i>
-											</a>
-											<ul class="unstyled hide">
-												<g:each in="${executionZoneInstance.hosts.findAll { it.state == HostState.CREATED }}"
-														var="h" status="status">
-													<li>
-														<g:link controller="host" action="show" id="${h.id}">
-															${h.cname} (${h.hostname} :
-															<g:formatDate type="datetime" style="MEDIUM"
-																		  timeStyle="SHORT" date="${h.creationDate}"/>
-															)
-														</g:link>
-													</li>
-												</g:each>
-											</ul>
-										</div>
+										<g:render template="hostList" model="['state': HostState.COMPLETED, 'executionZone': executionZoneInstance]" />
+										<g:render template="hostList" model="['state': HostState.CREATED, 'executionZone': executionZoneInstance]" />
 									</dd>
 								</g:if>
 
