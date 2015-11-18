@@ -1,12 +1,14 @@
 package org.zenboot.portal
 
+import grails.plugins.springsecurity.Secured
 import org.springframework.dao.DataIntegrityViolationException
 import org.zenboot.portal.processing.ExecutionZone
 import org.springframework.http.HttpStatus
 
 class HostController extends AbstractRestController {
 
-    static allowedMethods = [update: "POST", delete: "POST"]
+    static allowedMethods = [update: "POST", delete: "POST", markHostBroken: "POST", markHostUnknown: "POST"]
+    def executionZoneService
 
     def rest = {
         Host host = Host.findById(params.id)
@@ -123,6 +125,31 @@ class HostController extends AbstractRestController {
             hostInstance.save(flush:true)
             redirect(action: "list")
         }
+    }
+
+    @Secured(['ROLE_USER'])
+    def markHostBroken() {
+        markHost(HostState.BROKEN)
+    }
+
+    @Secured(['ROLE_USER'])
+    def markHostUnknown() {
+        markHost(HostState.UNKNOWN)
+    }
+
+    private def markHost(HostState state) {
+        Host hostInstance = Host.get(params.id)
+
+        def executionZoneInstance = hostInstance.execZone
+
+        if (!executionZoneService.userHasAccess(executionZoneInstance)) {
+            return render(view: "/login/denied")
+        }
+
+        hostInstance.state = state;
+        hostInstance.save(flush:true, failOnError: true)
+
+        redirect(action: "show", id: params.id)
     }
 
 }
