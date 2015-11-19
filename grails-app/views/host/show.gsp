@@ -155,6 +155,7 @@
 				</dt>
 				<dd>
 					<g:formatDate date="${hostInstance?.creationDate}" />
+					(<prettytime:display date="${hostInstance?.creationDate}" />)
 				</dd>
 			</g:if>
 
@@ -179,6 +180,7 @@
 				</dt>
 				<dd>
 					<g:formatDate date="${hostInstance?.expiryDate}" />
+					(<prettytime:display date="${hostInstance?.expiryDate}" />)
 				</dd>
 			</g:if>
 
