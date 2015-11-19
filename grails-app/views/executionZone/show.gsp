@@ -92,25 +92,9 @@
 									<dt>
 										<g:message code="executionZone.hosts.label" default="Hosts" />
 									</dt>
-									<dd class="collapsable-list">
-										<a class="collapsed" style="cursor: pointer">
-											<g:message code="executionZone.hosts.findAll { it.state == HostState.COMPLETED }.size" default="{0} completed hosts defined" args="[executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }.size()]" />
-											<i class="icon-resize-full"></i>
-										</a>
-										<ul class="unstyled hide">
-											<g:each in="${executionZoneInstance.hosts.findAll { it.state == HostState.COMPLETED }}" var="h" status="status">
-												<li>
-													<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-														<g:link controller="host" action="show" id="${h.id}">
-															${h.cname} (${h.hostname} : <g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
-														</g:link>
-													</sec:ifAllGranted>
-													<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-														${h.cname} ( ${h.hostname} : <g:formatDate type="datetime" style="MEDIUM" timeStyle="SHORT" date="${h.creationDate}"/>)
-													</sec:ifNotGranted>
-												</li>
-											</g:each>
-										</ul>
+									<dd>
+										<g:render template="hostList" model="['state': HostState.COMPLETED, 'executionZone': executionZoneInstance]" />
+										<g:render template="hostList" model="['state': HostState.CREATED, 'executionZone': executionZoneInstance]" />
 									</dd>
 								</g:if>
 

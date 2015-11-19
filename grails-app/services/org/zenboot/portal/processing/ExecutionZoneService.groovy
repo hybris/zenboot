@@ -1,5 +1,6 @@
 package org.zenboot.portal.processing
 
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.PathResolver
@@ -356,6 +357,11 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         }
       }
       return false
+    }
+
+    boolean userHasAccess(ExecutionZone zone) {
+        SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
+                hasAccess(springSecurityService.currentUser.getAuthorities(), zone)
     }
 
     boolean canEdit(Role role, ProcessingParameter parameter) {
