@@ -99,7 +99,7 @@
             </td>
 -->					<td>
 						<g:link action="show" id="${executionZoneInstance.id}">
-							${fieldValue(bean: executionZoneInstance, field: "description")}
+							${fieldValue(bean: executionZoneInstance, field: "description") ?: "NO_DESCRIPTION" }
 						</g:link>
 						</td>
 						<td>
