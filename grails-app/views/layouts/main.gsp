@@ -75,7 +75,7 @@
 	<sec:ifLoggedIn>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			zenboot.startProcessQueue('<g:createLink controller="scriptletBatch" action="ajaxList" />', 1500)
+			zenboot.startProcessQueue('<g:createLink controller="scriptletBatch" action="ajaxList" />', 5000)
 		});
    </script>
 	</sec:ifLoggedIn>
