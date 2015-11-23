@@ -5,6 +5,7 @@ import static org.junit.Assert.*
 import org.junit.*
 import org.zenboot.portal.processing.Processable.ProcessState
 import org.zenboot.portal.processing.converter.ParameterConverterMap
+import org.apache.commons.logging.LogFactory
 
 class ScriptletTests {
 
@@ -139,6 +140,7 @@ class ScriptletTests {
     void testProcessUnitLogTracking() {
         def logMessage = "*#-What a spooky message#-*"
         Scriptlet processUnit = new Scriptlet()
+        def log = LogFactory.getLog("org.zenboot.portal.processing.ScriptletTests")
         processUnit.process = { log.debug(logMessage) }
         processUnit.execute()
         assertTrue("Log entry not found", processUnit.logged.contains(logMessage))
