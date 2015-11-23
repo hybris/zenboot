@@ -17,21 +17,22 @@ class CronjobService implements ApplicationEventPublisherAware {
         List jobs = this.getJobList(cronExpression)
         jobs.each { job ->
             def properties = job.metaClass.properties*.name
-            
+
             JobContext jobContext = new JobContext()
-            
+
             if (properties.contains('before')) {
-                job.before(jobContext);
+                job.before(jobContext)
             }
             jobContext.actions.each { ExecutionZoneAction action ->
                 this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
+                Thread.sleep(jobContext.jobExecutionDelay)
             }
             if (properties.contains('after')) {
-                job.after(jobContext);
+                job.after(jobContext)
             }
         }
     }
-    
+
 
 	private List getJobList(CronjobExpression cronExpression) {
         List jobs = []
@@ -56,7 +57,7 @@ class CronjobService implements ApplicationEventPublisherAware {
 
     private def getJob(File jobClass, def exposedAction) {
         if (jobClass == null) {
-            return null; 
+            return null;
         }
         GroovyClassLoader gcl = new GroovyClassLoader(this.class.classLoader)
         Class clazz = gcl.parseClass(jobClass)
@@ -75,7 +76,7 @@ class CronjobService implements ApplicationEventPublisherAware {
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
-        this.applicationEventPublisher = eventPublisher        
+        this.applicationEventPublisher = eventPublisher
     }
 
 }

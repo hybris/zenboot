@@ -93,6 +93,7 @@ class DeleteHost {
             log.info("not deleting" + host)
           }
         }
+        jobCtx.jobExecutionDelay=10000
     }
 
     def after = { JobContext jobCtx ->
