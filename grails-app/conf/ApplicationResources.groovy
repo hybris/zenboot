@@ -3,6 +3,7 @@ modules = {
         dependsOn 'jquery'
         dependsOn 'bootstrap'
         resource url:'css/zenboot.css'
+        resource url:'js/jquery.winFocus.js'
         resource url:'js/zenboot.js'
     }
     epiceditor {

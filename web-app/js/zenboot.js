@@ -5,6 +5,10 @@ zenboot.refreshInterval = null
 
 zenboot.startProcessQueue = function(url, refreshRate) {
 	zenboot.refreshInterval = setInterval(function() {
+	    if (!zenboot.hasFocus) {
+	        return;
+	    }
+
 		$.ajax({
 			url : url
 		}).done(function(data) {
@@ -434,6 +438,16 @@ zenboot.templateCheck = function(url){
 
 $(document).ready(function() {
 	zenboot.enableCollapsableList()
+    zenboot.hasFocus = true;
+
+	$.winFocus({
+        blur: function(event) {
+            zenboot.hasFocus = false;
+        },
+        focus: function(event) {
+            zenboot.hasFocus = true;
+        }
+    });
 });
 
 $(document).unload(function() {
