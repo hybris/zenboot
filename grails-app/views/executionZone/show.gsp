@@ -207,7 +207,7 @@
         		<g:message code="executionZone.execAction.label" default="Execute Script" />
       		</a>
 				</div>
-				 <div id="executeScript" class="accordion-body collapse in">
+				 <div id="executeScript" class="accordion-body collapse ${flash.action == 'update' ? '' : 'in'}">
 				 	<div id="scriptDirs" class="accordion-inner">
 				 		<g:form method="post">
 
