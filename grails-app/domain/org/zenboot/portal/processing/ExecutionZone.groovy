@@ -98,6 +98,14 @@ class ExecutionZone implements Likeable {
       return param == null ? "" : param.value
     }
 
+    HashMap params() {
+      def params = [:]
+      this.processingParameters.each(){
+        params[it.name] = it.value
+      }
+      return params
+    }
+
     List getAuditLogEvents() {
         return ProcessingParameterLog.findAllByProcessingParameterInList(this.processingParameters, [sort: "dateCreated", order: "desc"])
     }
