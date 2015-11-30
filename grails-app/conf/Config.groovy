@@ -168,6 +168,11 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
     '/**':                                  [Role.ROLE_ADMIN],
  ]
 
+ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+     "/console/**":          ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"],
+     "/plugins/console*/**": ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"]
+ ]
+
 //fix pagination bug in bootstrap
 grails.plugins.twitterbootstrap.fixtaglib = true
 
