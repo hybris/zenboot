@@ -1,9 +1,11 @@
 package org.zenboot.portal
-
 import org.zenboot.portal.processing.ExecutionZone
 import org.zenboot.portal.processing.ScriptletBatch
 
 class Host {
+
+    static auditable = true
+
 
     String ipAddress
     String cname
@@ -38,6 +40,7 @@ class Host {
         hostname(nullable:false)
         environment(nullable:false)
     }
+
 
     def beforeInsert = { creationDate = new Date() }
 

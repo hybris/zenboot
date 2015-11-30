@@ -194,6 +194,21 @@
 						</g:link>
 				</dd>
 			</g:if>
+
+			<g:if test="${auditLogEvents.size()>0}">
+				<dt>
+					<g:message code="host.scriptletBatches.label" default="auditLogEvents" />
+				</dt>
+				<dd class="collapsable-list">
+					<a class="collapsed" style="cursor: pointer">
+						<g:message code="auditLogEvents.size()" default="{0} auditLogEvents" args="[auditLogEvents.size()]" />
+						<i class="icon-resize-full"></i>
+					</a>
+					<ul class="unstyled hide">
+						<g:render contextPath="/auditLogEvent" template="list" model="['auditLogEventInstanceList': auditLogEvents,'auditLogEventInstanceTotal':auditLogEvents.size()]" />
+					</ul>
+				</dd>
+			</g:if>
 		</dl>
 
 
@@ -227,6 +242,7 @@
 		    });
             </g:javascript>
 		</g:if>
+
 	</div>
 </body>
 </html>

@@ -61,6 +61,8 @@ grails.project.dependency.resolution = {
 
         compile ':likeable:0.1.2'
         compile ":pretty-time:2.1.3.Final-1.0.1"
+
+        compile ':audit-logging:1.1.0'
     }
 }
 

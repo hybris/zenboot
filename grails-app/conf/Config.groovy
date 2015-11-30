@@ -179,6 +179,9 @@ grails.plugins.twitterbootstrap.fixtaglib = true
 grails.plugin.likeable.liker.evaluator = { request.person }
 grails.plugin.likeable.liker.className = 'org.zenboot.portal.security.Person'
 
+// Added by the Audit-Logging plugin:
+auditLog.auditDomainClassName = 'org.zenboot.portal.AuditLogEvent'
+
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements
 
 /* remove this line

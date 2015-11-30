@@ -59,7 +59,10 @@ class HostController extends AbstractRestController {
             return
         }
 
-        [hostInstance: hostInstance]
+        def auditLogEvents = AuditLogEvent.findAllByClassNameAndPersistedObjectId("Host",params.id,[sort:"persistedObjectVersion",order: "desc"])
+
+        [hostInstance: hostInstance,
+         auditLogEvents: auditLogEvents]
     }
 
     def edit() {
