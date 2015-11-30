@@ -221,6 +221,10 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             return
         }
 
+        showModel(executionZoneInstance)
+    }
+
+    def showModel(executionZoneInstance) {
         if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) &&
               !executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZoneInstance)) {
           render(view: "/login/denied")
@@ -305,8 +309,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
         if (!executionZoneInstance.save(flush: true)) {
             flash.action = 'update'
-            render(view: "show", model: [executionZoneInstance: executionZoneInstance])
-            return
+            return render(view: "show", model: showModel(executionZoneInstance))
         }
 
         flash.action = 'update'

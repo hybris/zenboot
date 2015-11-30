@@ -27,9 +27,10 @@ class ExecutionZone implements Likeable {
 
     static constraints = {
         type nullable:false
+        description blank: false, nullable: false
 
         processingParameters validator: { val, obj ->
-            val.each {ProcessingParameter pParam ->
+            val.each { ProcessingParameter pParam ->
                 // if (pParam.id) { // only check updated parameters???
                     if(! pParam.validate()) {
                         pParam.errors.allErrors.each { error ->
