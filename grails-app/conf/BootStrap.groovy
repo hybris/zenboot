@@ -33,6 +33,7 @@ class BootStrap {
         grails.converters.JSON.registerObjectMarshaller(ExecutionZone) {
             // you can filter here the key-value pairs to output:
             def returnArray = [:]
+            returnArray['id'] = it.id
             returnArray['description'] = it.description
             returnArray['hosts'] = it.hosts
             returnArray['serviceUrls'] = it.getActiveServiceUrls()
