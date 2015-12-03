@@ -72,6 +72,7 @@ grails.war.copyToWebApp = { args ->
         include(name: "css/**")
         include(name: "images/**")
         include(name: "WEB-INF/**")
+        include(name: "tspa/**")
     }
     //yscripts to WAR file
     fileset(dir:".") {
