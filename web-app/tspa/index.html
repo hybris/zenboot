@@ -1,18 +1,19 @@
-<html ng-app="countryApp" >
+<html ng-app="zenboottspaApp" >
   <head>
     <meta charset="utf-8">
     <title>zenboot as Single Page Application</title>
     <!-- angular in version 1.2.1 -->
     <script src="/zenboot/js/angular.min.js"></script>
     <script>
-      var countryApp = angular.module('countryApp', []);
-      countryApp.controller('CountryCtrl', function ( $scope, $http ){
+      var zenboottspaApp = angular.module('zenboottspaApp', []);
+      zenboottspaApp.controller('zenboottspaCtrl', function ( $scope, $http ){
         $scope.limit=1
         $http(
           {
             method: 'GET',
             url: '/zenboot/rest/executionzones\?max\=100000',
-            headers: {"X-Testing" : "testing", 'Content-Type': 'application/json'},
+            //headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': "application/json"},
             data: "" // this is needed see http://stackoverflow.com/questions/24895290/content-type-header-not-being-set-with-angular-http
 
           }
@@ -37,7 +38,7 @@
     <link href="/zenboot/static/bundle-bundle_bootstrap_head.css" type="text/css" rel="stylesheet" media="screen, projection">
     <link href="/zenboot/static/bundle-bundle_application_head.css" type="text/css" rel="stylesheet" media="screen, projection">
   </head>
-  <body ng-controller="CountryCtrl"  background="/zenboot/images/zenboot_bg.png " style="background-repeat:repeat;margin:0">
+  <body ng-controller="zenboottspaCtrl"  background="/zenboot/images/zenboot_bg.png " style="background-repeat:repeat;margin:0">
     <input ng-model="query" type="text"/>
     <span class="icon-chevron-up" ng-click="limit=limit+1"> &nbsp;</span>
     <span class="icon-chevron-down" ng-click="limit=limit-1">&nbsp;</span>
