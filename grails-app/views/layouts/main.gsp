@@ -12,7 +12,7 @@
 <body>
 	<div class="row-fluid" id="header">
 		<div class="span2" id="logo">
-			<g:link controller="home" action="index">
+			<g:link uri="/tspa">
 				<img src="${resource(dir: 'images', file: 'zenboot-logo.png')}" alt="Zenboot Logo" />
 			</g:link>
 		</div>
