@@ -8,6 +8,10 @@ class UserNotification {
   boolean enabled
   String message
 
+  def beforeInsert = {
+      this.creationDate = new Date()
+  }
+
   static constraints = {
   }
 }
