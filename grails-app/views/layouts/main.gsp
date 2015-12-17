@@ -27,9 +27,9 @@
 		</div>
 	</div>
 
-	<g:if test="${notification}">
-		<div class="alert alert-warning" role="alert">${notification}</div>
-	</g:if>
+	<g:each var="notification" in="${notifications}">
+		<div class="alert alert-${notification.type.name().toLowerCase()}" role="alert">${notification.message}</div>
+	</g:each>
 
 	<div class="row-fluid">
 		<div class="span9 offset3">

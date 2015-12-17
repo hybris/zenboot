@@ -5,10 +5,11 @@ class ZenbootFilters {
      notificationFilter(controller:'*', action:'*') {
        after = { Map model ->
          if (model) {
-           String message = UserNotification.findByEnabled(true)?.message
-           if (message) {
-             model["notification"]=message
-           }
+             def query = UserNotification.where {
+                 enabled == true
+                 message != null
+             }
+             model["notifications"] = query.list().sort()
          }
         }
       }

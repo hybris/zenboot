@@ -25,7 +25,8 @@
 				<tr>
 					<g:sortableColumn property="creationDate" title="${message(code: 'userNotification.creationDate.label', default: 'Creation Date')}" />
 					<g:sortableColumn property="enabled" title="${message(code: 'userNotification.enabled.label', default: 'Enabled')}" />
-					<g:sortableColumn property="name" title="${message(code: 'userNotification.message.label', default: 'Message')}" />
+					<g:sortableColumn property="type" title="${message(code: 'userNotification.type.label', default: 'Type')}" />
+					<g:sortableColumn property="message" title="${message(code: 'userNotification.message.label', default: 'Message')}" />
 				</tr>
 			</thead>
 			<tbody>
@@ -39,7 +40,11 @@
 								<i class="icon-ok"></i>
 							</g:if>
 							<g:else>
-								<i class="icon-remove"></i></</g:else>
+								<i class="icon-remove"></i>
+							</</g:else>
+						</td>
+						<td>
+							${fieldValue(bean: userNotificationInstance, field: "type")}
 						</td>
 						<td>
 							<g:link action="show" id="${userNotificationInstance.id}">

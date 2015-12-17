@@ -18,3 +18,13 @@
 		<g:textField name="message" value="${userNotificationInstance?.message}" />
 	</div>
 </div>
+
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'type', 'error')} required">
+	<label class="control-label" for="type">
+		<g:message code="host.type.label" default="type" />
+		<span class="required-indicator">*</span>
+	</label>
+	<div class="controls">
+		<g:select name="type" from="${org.zenboot.portal.NotificationType.values()}" keys="${org.zenboot.portal.NotificationType.values()*.name()}" required="" value="${type?.state?.name()}" readonly="false" />
+	</div>
+</div>
