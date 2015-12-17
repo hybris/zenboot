@@ -19,13 +19,13 @@ class UserNotificationController {
     def show() {
         def userNotificationInstance = UserNotification.get(params.id)
         if (!userNotificationInstance) {
-          flash.message = message(code: 'default.not.found.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
-          redirect(action: "list")
-          return
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
+            redirect(action: "list")
+            return
         }
-        def auditLogEvents = AuditLogEvent.findAllByClassNameAndPersistedObjectId("UserNotification",params.id,[sort:"persistedObjectVersion",order: "desc"])
+        def auditLogEvents = AuditLogEvent.findAllByClassNameAndPersistedObjectId("UserNotification", params.id, [sort: "persistedObjectVersion", order: "desc"])
 
-        [userNotificationInstance: userNotificationInstance,auditLogEvents: auditLogEvents]
+        [userNotificationInstance: userNotificationInstance, auditLogEvents: auditLogEvents]
     }
 
     def create() {
@@ -40,7 +40,7 @@ class UserNotificationController {
             return
         }
 
-		    flash.message = message(code: 'default.created.message', args: [message(code: 'userNotification.label', default: 'UserNotification'), userNotificationInstance.id])
+        flash.message = message(code: 'default.created.message', args: [message(code: 'userNotification.label', default: 'UserNotification'), userNotificationInstance.id])
         redirect(action: "show", id: userNotificationInstance.id)
     }
 
@@ -67,8 +67,8 @@ class UserNotificationController {
             def version = params.version.toLong()
             if (userNotificationInstance.version > version) {
                 userNotificationInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'userNotificationInstance.label', default: 'UserNotification')] as Object[],
-                          "Another user has updated this UserNotification while you were editing")
+                        [message(code: 'userNotificationInstance.label', default: 'UserNotification')] as Object[],
+                        "Another user has updated this UserNotification while you were editing")
                 render(view: "edit", model: [userNotificationInstance: userNotificationInstance])
                 return
             }
@@ -88,18 +88,18 @@ class UserNotificationController {
     def delete() {
         def userNotificationInstance = UserNotification.get(params.id)
         if (!userNotificationInstance) {
-      flash.message = message(code: 'default.not.found.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
             redirect(action: "list")
             return
         }
 
         try {
             userNotificationInstance.delete(flush: true)
-      flash.message = message(code: 'default.deleted.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
             redirect(action: "list")
         }
         catch (DataIntegrityViolationException e) {
-      flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'UserNotification.label', default: 'UserNotification'), params.id])
             redirect(action: "show", id: params.id)
         }
     }
