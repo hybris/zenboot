@@ -4,7 +4,6 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="main" />
-        <title>Show AuditLogEvent</title>
     </head>
     <body>
         <div class="nav">
@@ -12,7 +11,7 @@
             <span class="menuButton"><g:link class="list" action="list">AuditLogEvent List</g:link></span>
         </div>
         <div class="body">
-            <h1>Show AuditLogEvent</h1>
+            <h1>AuditLogEvent</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
