@@ -9,7 +9,7 @@ class ZenbootFilters {
                  enabled == true
                  message != null
              }
-             model["notifications"] = query.list().sort()
+             model["notifications"] = query.list().sort { it.type }
          }
         }
       }
