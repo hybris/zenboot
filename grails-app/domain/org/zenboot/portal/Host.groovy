@@ -2,7 +2,7 @@ package org.zenboot.portal
 import org.zenboot.portal.processing.ExecutionZone
 import org.zenboot.portal.processing.ScriptletBatch
 
-class Host {
+public class Host {
 
     static auditable = true
 
@@ -28,6 +28,7 @@ class Host {
         dnsEntries cascade: 'all-delete-orphan'
         hostname cascade: 'all'
         sort creationDate: "desc"
+        scriptletBatches sort: 'creationDate', order: 'asc'
     }
 
     static constraints = {
