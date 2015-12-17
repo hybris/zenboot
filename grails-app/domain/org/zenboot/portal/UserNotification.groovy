@@ -14,5 +14,6 @@ class UserNotification {
   }
 
   static constraints = {
+    message blank: false, nullable: false
   }
 }
