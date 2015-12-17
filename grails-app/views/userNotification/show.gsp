@@ -41,6 +41,13 @@
 				<g:fieldValue bean="${userNotificationInstance}" field="message" />
 			</dd>
 
+			<dt>
+				<g:message code="userNotification.type.label" default="Type" />
+			</dt>
+			<dd>
+				<g:fieldValue bean="${userNotificationInstance}" field="type" />
+			</dd>
+
 			<g:if test="${auditLogEvents.size()>0}">
 				<dt>
 					<g:message code="host.scriptletBatches.label" default="auditLogEvents" />
