@@ -16,7 +16,9 @@
 				<img src="${resource(dir: 'images', file: 'zenboot-logo.png')}" alt="Zenboot Logo" />
 			</g:link>
 		</div>
+
 		<div class="span6" id="title"></div>
+
 		<div class="span4" style="text-align: right; padding: 5px 10px 0 0; color: white;" id="authentication">
 			<sec:ifLoggedIn>
 				<g:message code="login.welcome" default="Welcome" />
@@ -24,6 +26,10 @@
 			</sec:ifLoggedIn>
 		</div>
 	</div>
+
+	<g:each var="notification" in="${notifications}">
+		<div class="alert alert-${notification.type.name().toLowerCase()}" role="alert">${notification.message}</div>
+	</g:each>
 
 	<div class="row-fluid">
 		<div class="span9 offset3">

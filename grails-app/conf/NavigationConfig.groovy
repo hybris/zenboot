@@ -40,10 +40,12 @@ navigation.menu = [
     [controller:'exposedExecutionZoneAction', title:'Exposed Actions', action:'edit', path:['processing', 'executionzoneactions'], isVisible:false],
     [controller:'exposedExecutionZoneAction', title:'Exposed Actions', action:'delete', path:['processing', 'executionzoneactions'], isVisible:false],
     [controller:'exposedExecutionZoneAction', title:'Exposed Actions', action:'save', path:['processing', 'executionzoneactions'], isVisible:false],
-    
+
     [controller:'scriptletBatch', title:'Executed Actions', action:'list', path:['processing', 'scriptletbatches']],
     [controller:'scriptletBatch', title:'Executed Actions', action:'show', path:['processing', 'scriptletbatches'], isVisible:false],
 
     [controller:'administration', title:'User Management', action:'user', path:['administration', 'user']],
+    [controller:'userNotification', title:'User Notifications', action:'list', path:['administration', 'userNotifications']],
     [controller:'administration', title:'DB Console', action:'dbconsole', path:['administration', 'dbconsole']],
+
 ]
