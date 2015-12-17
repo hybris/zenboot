@@ -32,7 +32,7 @@
 				<g:each in="${userNotificationInstanceList}" status="i" var="userNotificationInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 						<td>
-							${fieldValue(bean: hostInstance, field: "creationDate")}
+							${fieldValue(bean: userNotificationInstance, field: "creationDate")}
 						</td>
 						<td>
 							<g:if test="${userNotificationInstance.enabled}">
