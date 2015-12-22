@@ -1,7 +1,9 @@
 <strong>
 	${element.file.name}
 </strong>
-<a class="zb-tooltip" onclick="javascript:$('#${element.file.name.replace(".","_")}_text').slideToggle()" title="${message(code:'scriptletBatch.button.showCode', default:'Show Code')}">
+<a class="zb-tooltip"
+	onclick="javascript:$('#${element.file.name.replace('.','_')}_text').slideToggle();"
+	title="${message(code:'scriptletBatch.button.showCode', default:'Show Code')}">
 	<i class="icon-eye-close"></i>
 </a>
 <g:if test="${type}">
@@ -25,4 +27,4 @@
 	</tr>
 </table>
 
-<pre id="${element.file.name.replace(".","_")}_text" style="display: none;">${element.file.text}</pre>
+<pre id="${element.file.name.replace('.','_')}_text" style="display: none;">${element.file.text}</pre>
