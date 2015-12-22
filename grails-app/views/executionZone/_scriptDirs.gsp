@@ -6,10 +6,16 @@
     <i class="icon-book"></i>
   </g:remoteLink>
   <g:remoteLink action="ajaxGetFlowChart" params="[scriptDir:scriptDir,execId:execId]" update="scriptdir-${i}_flow_${type}"
-                before="if (!zenboot.prepareAjaxLoading('scriptdir-${i}_flow_${type}', 'scriptdir-${i}_spinner_${type}')) return false"
-                after="zenboot.finalizeAjaxLoading('scriptdir-${i}_flow_${type}', 'scriptdir-${i}_spinner_${type}');" asynchronous="false">
+                before="\$(this).parent().find('.toggle-all-code').toggle(); if (!zenboot.prepareAjaxLoading('scriptdir-${i}_flow_${type}', 'scriptdir-${i}_spinner_${type}')) return false"
+                after="zenboot.finalizeAjaxLoading('scriptdir-${i}_flow_${type}', 'scriptdir-${i}_spinner_${type}');"
+                asynchronous="false">
     <i class="icon-search"></i>
   </g:remoteLink>
+  <a class="zb-tooltip toggle-all-code" title="${message(code:'scriptletBatch.button.showAllCode', default:'Show All Code')}"
+     style="display: none"
+     onclick="$(this).parent().find('pre').toggle();" >
+    <i class="icon-eye-close"></i>
+  </a>
   <span id="scriptdir-${i}_spinner_${type}" class="hide">
     <img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
   </span>
