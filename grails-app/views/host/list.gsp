@@ -30,13 +30,13 @@
 		<table class="table table-striped">
 			<thead>
 				<tr>
-					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" />
-					<g:sortableColumn property="cname" title="${message(code: 'host.cname.label', default: 'Cname')}" />
-					<g:sortableColumn property="hostname.name" title="${message(code: 'host.hostname.label', default: 'Hostname')}" />
-					<g:sortableColumn property="instanceId" title="${message(code: 'host.instanceId.label', default: 'Instance Id')}" defaultOrder="desc"/>
-					<g:sortableColumn property="state" title="${message(code: 'host.state.label', default: 'State')}" />
-					<g:sortableColumn property="expiryDate" title="${message(code: 'host.expiryDate.label', default: 'Expiry Date')}" />
-					<g:sortableColumn property="datacenter" title="${message(code: 'host.datacenter.label', default: 'Datacenter')}" />
+					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" params="${parameters}"/>
+					<g:sortableColumn property="cname" title="${message(code: 'host.cname.label', default: 'Cname')}" params="${parameters}"/>
+					<g:sortableColumn property="hostname.name" title="${message(code: 'host.hostname.label', default: 'Hostname')}"  params="${parameters}"/>
+					<g:sortableColumn property="instanceId" title="${message(code: 'host.instanceId.label', default: 'Instance Id')}" defaultOrder="desc" params="${parameters}"/>
+					<g:sortableColumn property="state" title="${message(code: 'host.state.label', default: 'State')}" params="${parameters}"/>
+					<g:sortableColumn property="expiryDate" title="${message(code: 'host.expiryDate.label', default: 'Expiry Date')}" params="${parameters}"/>
+					<g:sortableColumn property="datacenter" title="${message(code: 'host.datacenter.label', default: 'Datacenter')}" params="${parameters}"/>
 				</tr>
 			</thead>
 			<tbody>
