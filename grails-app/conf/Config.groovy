@@ -140,6 +140,7 @@ grails.plugins.springsecurity.filterChain.chainMap = [
  ]
 
 grails.plugins.springsecurity.controllerAnnotations.staticRules = [
+    '/assets/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/js/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/images/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/css/**':                              ['IS_AUTHENTICATED_ANONYMOUSLY'],
