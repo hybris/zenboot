@@ -1,13 +1,14 @@
 <!doctype html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>
-	<g:layoutTitle default="Zenboot" />
-</title>
-<link rel="shortcut icon" href="${resource(dir: 'images', file: 'favicon.ico')}" type="image/x-icon">
-<r:require modules="application,bootstrap" />
-<r:layoutResources />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>
+        <g:layoutTitle default="Zenboot" />
+    </title>
+    <asset:link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+    <asset:javascript src="fp.js"/>
+    <asset:stylesheet src="fp.css"/>
+    <asset:stylesheet href="application.css"/>
 </head>
 <body>
 	<div class="row-fluid" id="header">
@@ -76,14 +77,16 @@
 		</div>
 	</div>
 
-	<r:layoutResources />
+	<asset:javascript src="application.js"/>
 
 	<sec:ifLoggedIn>
-	<script type="text/javascript">
-		$(document).ready(function() {
-			zenboot.startProcessQueue('<g:createLink controller="scriptletBatch" action="ajaxList" />', 5000)
-		});
-   </script>
+        <asset:script type="text/javascript">
+            $(document).ready(function() {
+                zenboot.startProcessQueue('<g:createLink controller="scriptletBatch" action="ajaxList" />', 5000)
+            });
+       </asset:script>
 	</sec:ifLoggedIn>
+
+	<asset:deferredScripts/>
 </body>
 </html>

@@ -355,7 +355,7 @@
 		</div>
 	</div>
 
-	<g:javascript>
+	<asset:script>
     $('#scriptDirs input:radio').change(function(event) {
         $.ajax({
             url : '<g:createLink action="ajaxGetParameters" params="[execId:executionZoneInstance?.id]" />&scriptDir=' + encodeURI($(this).val()),
@@ -380,6 +380,6 @@
     $(document).ready(function() {
         zenboot.enableParameterList();
     });
-	</g:javascript>
+	</asset:script>
 </body>
 </html>

@@ -144,7 +144,7 @@
 	</div>
 
 
-<g:javascript>
+<asset:script>
 $('#template_versions').change(function(event) {
 	zenboot.loadTemplate($('#template_versions option:selected').val());
 });
@@ -177,4 +177,4 @@ $('#templateRemoveForm').submit(function(event){
   event.preventDefault();
 });
 
-</g:javascript>
+</asset:script>

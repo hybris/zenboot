@@ -132,7 +132,7 @@
 </g:if>
 
 
-<g:javascript>
+<asset:script>
 $(document).ready(function() {
     zenboot.enableProcessingParameterButtons(function() {
         //fire resize event to refresh copy-button position
@@ -164,4 +164,4 @@ $(document).ready(function() {
         $('#parameters-import').modal('hide')
     });
 });
-</g:javascript>
+</asset:script>

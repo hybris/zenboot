@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus
 
 class HostController extends AbstractRestController {
 
+    def filterPaneService
+
     static allowedMethods = [update: "POST", delete: "POST", markHostBroken: "POST", markHostUnknown: "POST"]
     def executionZoneService
 
@@ -31,7 +33,7 @@ class HostController extends AbstractRestController {
 
         def hostInstanceList
         def hostInstanceTotal
-        def parameters = [:]
+        def parameters = [:] // TODO why is this here? why not use params?
         if (params.execId) {
           def executionZoneInstance = ExecutionZone.get(params.execId)
           if (!executionZoneInstance) {
@@ -155,4 +157,18 @@ class HostController extends AbstractRestController {
         redirect(action: "show", id: params.id)
     }
 
+    def filter = {
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+
+        def parameters = [:]
+
+        render(view: 'list',
+                model: [
+                        hostInstanceList : filterPaneService.filter(params, Host),
+                        hostInstanceTotal: filterPaneService.count(params, Host),
+                        parameters       : parameters,
+                        filterParams     : org.grails.plugin.filterpane.FilterPaneUtils.extractFilterParams(params),
+                        params           : params,
+                ])
+    }
 }

@@ -26,6 +26,9 @@
 				<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
 			</div>
 		</g:if>
+		<filterpane:filterPane domain="Host" formMethod="get" />
+		<filterpane:filterButton text="Filter" />
+		<filterpane:currentCriteria domainBean="Host" fullAssociationPathFieldNames="no" />
 
 		<table class="table table-striped">
 			<thead>

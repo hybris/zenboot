@@ -37,19 +37,17 @@ grails.project.dependency.resolution = {
         compile ":hibernate:3.6.10.2"
         compile ":version-update:1.2.0"
         compile ":joda-time:1.5"
-        runtime ":jquery:1.7.1"
-        //runtime ":zipped-resources:1.0"
-        //runtime ":cached-resources:1.0"
+        compile ":asset-pipeline:1.9.3"
+        runtime ":jquery:1.11.1"
         //runtime ":yui-minify-resources:0.1.5"
         //compile ":cache-headers:1.1.5"
         runtime ":executor:0.3"
         runtime ":mail:1.0"
         runtime ":navigation:1.3.2"
         runtime ":quartz2:0.2.3"
-        runtime ":resources:1.2.1"
         runtime ":spring-security-core:1.2.7.3"
         compile ":webxml:1.4.1"
-        runtime ':twitter-bootstrap:2.3.2'
+        runtime ':twitter-bootstrap:2.3.2.2'
         runtime ':console:1.5.0'
 
         //spring security ui specific
@@ -63,6 +61,7 @@ grails.project.dependency.resolution = {
         compile ":pretty-time:2.1.3.Final-1.0.1"
 
         compile ':audit-logging:1.1.0'
+        compile "org.grails.plugins:filterpane:2.4.3"
     }
 }
 
