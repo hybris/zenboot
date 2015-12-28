@@ -21,12 +21,12 @@
 		</g:if>
 
 
-		<g:if test="${params.max > 20}">
+		<g:if test="${params.max > 20 && hostInstanceTotal > 20}">
 			<div class="pagination">
 				<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
 			</div>
 		</g:if>
-		<filterpane:filterPane domain="Host" formMethod="get" />
+		<filterpane:filterPane domain="Host" action="list" formMethod="get" associatedProperties="execZone.description, execZone.id" />
 		<filterpane:filterButton text="Filter" />
 		<filterpane:currentCriteria domainBean="Host" fullAssociationPathFieldNames="no" />
 

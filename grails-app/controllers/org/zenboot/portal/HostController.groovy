@@ -31,26 +31,15 @@ class HostController extends AbstractRestController {
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
-        def hostInstanceList
-        def hostInstanceTotal
-        def parameters = [:] // TODO why is this here? why not use params?
-        if (params.execId) {
-          def executionZoneInstance = ExecutionZone.get(params.execId)
-          if (!executionZoneInstance) {
-              flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
-              redirect(action: "list")
-              return
-          }
-            parameters.execId = params.execId
-            hostInstanceList = Host.findAllByExecZone(executionZoneInstance, params)
-            hostInstanceTotal = Host.findAllByExecZone(executionZoneInstance).size()
-        } else {
-            hostInstanceList = Host.list(params)
-            hostInstanceTotal = Host.count()
-        }
+        def parameters = params
 
-
-        [hostInstanceList: hostInstanceList, hostInstanceTotal: hostInstanceTotal, parameters:parameters]
+        [
+                hostInstanceList : filterPaneService.filter(params, Host),
+                hostInstanceTotal: filterPaneService.count(params, Host),
+                parameters       : parameters,
+                filterParams     : org.grails.plugin.filterpane.FilterPaneUtils.extractFilterParams(params),
+                params           : params,
+        ]
     }
 
     def show() {
@@ -157,18 +146,4 @@ class HostController extends AbstractRestController {
         redirect(action: "show", id: params.id)
     }
 
-    def filter = {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-        def parameters = [:]
-
-        render(view: 'list',
-                model: [
-                        hostInstanceList : filterPaneService.filter(params, Host),
-                        hostInstanceTotal: filterPaneService.count(params, Host),
-                        parameters       : parameters,
-                        filterParams     : org.grails.plugin.filterpane.FilterPaneUtils.extractFilterParams(params),
-                        params           : params,
-                ])
-    }
 }

@@ -178,7 +178,7 @@
 								<g:link controller="scriptletBatch" action="list" params="[execId : executionZoneInstance?.id]" class="btn">
 										<g:message code="executionZone.showExecutedActions.label" default="Log" />
 								</g:link>
-								<g:link controller="Host" action="list" params="[execId : executionZoneInstance?.id]" class="btn">
+								<g:link controller="Host" action="list" params="['filter.op.execZone.id': 'Equal', 'filter.execZone.id': executionZoneInstance?.id]" class="btn">
 										<g:message code="executionZone.showExecutedActions.label" default="Hosts" />
 								</g:link>
 							</fieldset>
