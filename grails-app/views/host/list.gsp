@@ -28,7 +28,7 @@
 		</g:if>
 		<filterpane:filterPane domain="Host" action="list" formMethod="get" associatedProperties="execZone.description, execZone.id" />
 		<filterpane:filterButton text="Filter" />
-		<filterpane:currentCriteria domainBean="Host" fullAssociationPathFieldNames="no" />
+		<filterpane:currentCriteria domainBean="Host" action="list" fullAssociationPathFieldNames="no" />
 
 		<table class="table table-striped">
 			<thead>
