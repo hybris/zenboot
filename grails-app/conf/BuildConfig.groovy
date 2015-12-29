@@ -38,7 +38,7 @@ grails.project.dependency.resolution = {
         compile ":version-update:1.2.0"
         compile ":joda-time:1.5"
         compile ":asset-pipeline:1.9.3"
-        runtime ":jquery:1.11.1"
+        runtime ":jquery:1.7.2"
         //runtime ":yui-minify-resources:0.1.5"
         //compile ":cache-headers:1.1.5"
         runtime ":executor:0.3"
