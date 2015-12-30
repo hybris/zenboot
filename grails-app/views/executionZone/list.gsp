@@ -20,24 +20,13 @@
 
 
     <div class="row-fluid">
-      <g:if test="${!params.disabled}">
-        <g:link action="list" params="[disabled: 'show']" class="btn btn-submit pull-right">
-          <g:message code="executionZone.show.disabled" default="Show disabled" />
-        </g:link>
-      </g:if>
-      <g:else>
-        <g:link action="list" class="btn btn-submit pull-right">
-          <g:message code="executionZone.show.enabled" default="Show enabled" />
-        </g:link>
-      </g:else>
-
 			<g:if test="${!params.favs}">
-				<g:link action="list" params="[favs: 'show']" class="btn btn-submit pull-right">
+				<g:link action="list" params="${parameters + [favs: 'show']}" class="btn btn-submit pull-right">
 					<g:message code="executionZone.show.favs" default="Show Favs" />
 				</g:link>
 			</g:if>
 			<g:else>
-				<g:link action="list" class="btn btn-submit pull-right">
+				<g:link action="list" class="btn btn-submit pull-right" params="${parameters - ['favs': 'show']}">
 					<g:message code="executionZone.show.all" default="Show All" />
 				</g:link>
 			</g:else>
@@ -49,10 +38,10 @@
 					<th>
 						<g:message code="executionZone.favorite.label" default="Fav" />
 					</th>
-					<g:sortableColumn property="type.name" title="${message(code: 'executionZone.type.label', default: 'Type')}" />
+					<g:sortableColumn property="type.name" title="${message(code: 'executionZone.type.label', default: 'Type')}" params="${parameters}" />
 <!--  		<g:sortableColumn property="puppetEnvironment" title="${message(code: 'executionZone.puppetEnvironment.label', default: 'Puppet-Env')}" />
-					<g:sortableColumn property="qualityStage" title="${message(code: 'executionZone.qualityStage.label', default: 'Quality-Stage')}" />
---> 			<g:sortableColumn style="width:20%" property="description" title="${message(code: 'executionZone.description.label', default: 'Description')}" />
+					<g:sortableColumn property="qualityStage" title="${message(code: 'executionZone.qualityStage.label', default: 'Quality-Stage')}" /> -->
+					<g:sortableColumn style="width:20%" property="description" title="${message(code: 'executionZone.description.label', default: 'Description')}" params="${parameters}" />
 					<th>
 						<g:message code="executionZone.parameters.label" default="Parameters" />
 					</th>
@@ -121,13 +110,21 @@
 		</table>
 
 		<fieldset class="buttons spacer">
+			<filterpane:filterButton text="Filter" class="btn" />
 			<g:link class="btn btn-primary" action="create">
 				${message(code: 'default.button.create.label', default: 'Cancel')}
 			</g:link>
 		</fieldset>
+		<br />
+
+		<filterpane:filterPane domain="ExecutionZone" action="list" formMethod="get"
+							   filterProperties="description, enabled, hosts, type, processingParameters"
+							   associatedProperties="hosts.cname, type.name, processingParameters.name, processingParameters.value"/>
+		<h4>Current Filters:</h4>
+		<filterpane:currentCriteria class="list-group" action="list" domainBean="ExecutionZone" fullAssociationPathFieldNames="no" />
 
 		<div class="pagination">
-			<g:paginate total="${executionZoneInstanceTotal}" max="1" params="${parameters}"/>
+			<filterpane:paginate total="${executionZoneInstanceTotal}" domainBean="ExecutionZone"/>
 		</div>
 	</div>
 </body>

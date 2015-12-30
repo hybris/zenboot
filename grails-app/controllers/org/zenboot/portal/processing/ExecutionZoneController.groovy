@@ -5,6 +5,7 @@ import grails.converters.XML
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.grails.plugin.filterpane.FilterPaneUtils
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.dao.DataIntegrityViolationException
@@ -22,6 +23,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     def applicationEventPublisher
     def executionZoneService
     def springSecurityService
+    def filterPaneService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -143,41 +145,53 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     }
 
     def list() {
-        params.max = params.max ? params.int('max') : 15
+        def parameters = params.findAll { it.value instanceof String }
+
+        if (!params.filter) {
+            parameters.putAll 'filter.enabled': true, 'filter.op.enabled': 'Equal'
+
+            request.withFormat {
+                html { redirect(action: "list", params: parameters) }
+                json { render(action: "list", params: parameters) }
+            }
+        }
+
         if (!params.sort) {
             params.sort = "enabled"
         }
         if (!params.order) {
             params.order = "desc"
         }
-        def enabled = false
-        if (!params.disabled) {
-            enabled = true
-        }
+
         def favs = false
         if (params.favs) {
             favs = true
         }
 
-        def executionZoneInstanceList
-        def executionZoneInstanceListCount
-        def parameters = [:]
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+
+        def executionZoneInstanceList = []
+        def executionZoneInstanceListCount = 0
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-          executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled, params)
-          if (favs) {
-            executionZoneInstanceList = ExecutionZone.findAll()
-            executionZoneInstanceList = executionZoneInstanceList.findAll() { executionZone ->
-              executionZone.userLiked(springSecurityService.currentUser)
+            if (favs) {
+                executionZoneInstanceList = filterPaneService.
+                        filter(params, ExecutionZone).
+                        findAll() { executionZone ->
+                            executionZone.userLiked(springSecurityService.currentUser)
+                        }
+                executionZoneInstanceListCount = executionZoneInstanceList.size()
+            } else {
+                executionZoneInstanceList = filterPaneService.filter(params, ExecutionZone)
+                executionZoneInstanceListCount = filterPaneService.count(params, ExecutionZone)
             }
-            executionZoneInstanceListCount = executionZoneInstanceList.size()
-          } else {
-            executionZoneInstanceListCount = ExecutionZone.countByEnabled(enabled)
-          }
 
         } else {
-          executionZoneInstanceList = executionZoneService.findAllByEnabledFiltered(enabled, params)
-          executionZoneInstanceListCount = executionZoneService.countByEnabledFiltered(enabled)
+            executionZoneInstanceList = filterPaneService.filter(params - [max: params.max, offset: params.offset], ExecutionZone)
+            List filteredExecutionZoneInstanceList = executionZoneService.filterByAccessPermission(executionZoneInstanceList)
+            executionZoneInstanceListCount = filteredExecutionZoneInstanceList.size()
+
+            executionZoneInstanceList = executionZoneService.getRange(filteredExecutionZoneInstanceList, params)
         }
         log.debug("model: executionZoneInstanceList(.size(): "+executionZoneInstanceList.size()+"), executionZoneInstanceTotal ("+executionZoneInstanceListCount+"), executionZoneTypes")
 
@@ -186,8 +200,9 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
                     [
                         executionZoneInstanceList: executionZoneInstanceList,
                         executionZoneInstanceTotal: executionZoneInstanceListCount,
-                        executionZoneTypes: org.zenboot.portal.processing.ExecutionZoneType.list(),
-                        parameters:parameters,
+                        executionZoneTypes: ExecutionZoneType.list(),
+                        parameters: parameters,
+                        filterParams: FilterPaneUtils.extractFilterParams(params),
                         user: springSecurityService.currentUser
                     ]
             }
@@ -274,7 +289,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             redirect(action: "list")
             return
         }
-        [executionZoneInstance: executionZoneInstance,, executionZoneTypes:ExecutionZoneType.list()]
+        [executionZoneInstance: executionZoneInstance, executionZoneTypes:ExecutionZoneType.list()]
     }
 
     def update() {
