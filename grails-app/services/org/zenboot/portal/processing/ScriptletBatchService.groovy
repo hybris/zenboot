@@ -1,7 +1,6 @@
 package org.zenboot.portal.processing
 
 import org.springframework.context.ApplicationListener
-import org.zenboot.portal.ProcessHandler
 import org.zenboot.portal.processing.converter.ParameterConverter
 import org.zenboot.portal.processing.converter.ParameterConverterMap
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
@@ -9,7 +8,6 @@ import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.zenboot.portal.security.Person
-import org.zenboot.portal.security.Role
 
 class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
@@ -26,46 +24,28 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
       scriptletFlowCache = null
     }
 
-    def findAllByExecZoneFiltered(ExecutionZone execZone) {
-      def scriptletBatchList = []
-      if (execZone != null) {
-         execZone.actions.each { action ->
-           if (action.scriptletBatches[0] != null) {
-             scriptletBatchList.add(action.scriptletBatches[0])
-           }
-         }
-      } else {
-        def executionZoneInstanceList = ExecutionZone.findAll()
+    def filterByAccessPermission(scriptletBatches) {
+        def hasAccess = { zone ->
+            executionZoneService.hasAccess(
+                    springSecurityService.currentUser.getAuthorities(),
+                    zone
+            )
+        }.memoize() // caching ftw
 
-        executionZoneInstanceList.each { executionZone ->
-          if (executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)) {
-            executionZone.actions.each { action ->
-              if (action.scriptletBatches[0] != null) {
-                scriptletBatchList.add(action.scriptletBatches[0])
-              }
-            }
-          }
+        scriptletBatches.findAll  { ScriptletBatch batch ->
+            hasAccess(batch.executionZoneAction.executionZone)
         }
-
-      }
-      return scriptletBatchList
     }
 
-    def findAllByExecZoneFiltered(ExecutionZone execZone, params) {
-      def filteredScriptletBatchList = findAllByExecZoneFiltered(execZone)
+    def getRange(scriptLetBatches, params) {
       int offset = params ? (params.int("offset") ? params.int("offset") : 0) : 0
       int max = params ? (params.int("max") ? params.int("max") : -1) : -1
       log.debug("params sent max "+max+" and offset "+offset)
-      log.debug("filteredScriptletBatchList.size() "+filteredScriptletBatchList.size())
-      int upperBoundary = Math.min(max+offset, filteredScriptletBatchList.size()) -1
+      log.debug("filteredScriptletBatchList.size() "+scriptLetBatches.size())
+      int upperBoundary = Math.min(max+offset, scriptLetBatches.size()) -1
       log.debug("returning filteredScriptletBatchList["+offset+","+upperBoundary+"]")
-      log.debug("which is size:"+filteredScriptletBatchList[offset..upperBoundary].size())
-      return filteredScriptletBatchList[offset..upperBoundary]
-
-    }
-
-    int countByExecZoneFiltered(ExecutionZone execZone) {
-      return findAllByExecZoneFiltered(execZone).size()
+      log.debug("which is size:"+scriptLetBatches[offset..upperBoundary].size())
+      return scriptLetBatches[offset..upperBoundary]
     }
 
     @Override

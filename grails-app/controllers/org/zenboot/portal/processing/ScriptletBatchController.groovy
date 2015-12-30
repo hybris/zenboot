@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.gsp.PageRenderer
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.grails.plugin.filterpane.FilterPaneUtils
 import org.zenboot.portal.security.Role
 
 
@@ -15,7 +16,8 @@ class ScriptletBatchController {
     def PageRenderer groovyPageRenderer
     def executionZoneService
     def springSecurityService
-    def ScriptletBatchService
+    def scriptletBatchService
+    def filterPaneService
 
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -33,32 +35,29 @@ class ScriptletBatchController {
             params.order = "desc"
         }
 
-
-        def batchInstanceList
-        def batchInstanceCount
-        def parameters = [:]
-        def executionZone = null
-        if (params.execId) {
-          executionZone = ExecutionZone.get(params.execId)
-          if (!executionZone) {
-              flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
-              redirect(action: "list")
-              return
-          }
-        }
-
-        parameters.execId = params.execId
+        def batches
+        def batchCount
+        def parameters = params.findAll { it.value instanceof String }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-          batchInstanceList = executionZone ? ScriptletBatch.findAllByExecutionZoneActionInList(executionZone.actions, params) : ScriptletBatch.list(params)
-          batchInstanceCount = executionZone ? ScriptletBatch.findAllByExecutionZoneActionInList(executionZone.actions).size() : ScriptletBatch.count()
-
+            batches = filterPaneService.filter(params, ScriptletBatch)
+            batchCount = filterPaneService.count(params, ScriptletBatch)
         } else {
-          batchInstanceList = ScriptletBatchService.findAllByExecZoneFiltered(executionZone,params)
-          batchInstanceCount = ScriptletBatchService.countByExecZoneFiltered(executionZone)
+            // could be more elegant by first finding the execution zones that the user has access to,
+            // and then adding/modifying a filter param for this
+            batches = filterPaneService.filter(params - [max: params.max, offset: params.offset], ScriptletBatch)
+            batches = scriptletBatchService.filterByAccessPermission(batches)
+
+            batchCount = batches.size()
+            batches = scriptletBatchService.getRange(batches, params)
         }
 
-        [scriptletBatchInstanceList: batchInstanceList, scriptletBatchInstanceTotal: batchInstanceCount, parameters:parameters]
+        [
+            scriptletBatchInstanceList: batches,
+            scriptletBatchInstanceTotal: batchCount,
+            filterParams: FilterPaneUtils.extractFilterParams(params),
+            parameters: parameters
+        ]
     }
 
     def ajaxList() {

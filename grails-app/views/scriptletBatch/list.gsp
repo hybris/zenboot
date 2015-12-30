@@ -51,14 +51,31 @@
 						<td>
 							${fieldValue(bean: scriptletBatchInstance, field: "state")}
 						</td>
+						<td>
+							<g:link controller="executionZone" action="show" id="${scriptletBatchInstance.executionZoneAction.executionZone.id}">
+								${fieldValue(bean: scriptletBatchInstance, field: "executionZoneAction.executionZone.description")}
+							</g:link>
+						</td>
 
 					</tr>
 				</g:each>
 			</tbody>
 		</table>
 
+		<fieldset class="buttons spacer">
+			<filterpane:filterButton class="btn" text="Filter" />
+		</fieldset>
+
+		<filterpane:filterPane domain="ScriptletBatch" action="list" formMethod="get"
+							   excludeProperties=""
+							   associatedProperties="executionZoneAction.executionZone.description, executionZoneAction.executionZone.id"/>
+		<filterpane:isFiltered>
+			<h4>Current Filters:</h4>
+			<filterpane:currentCriteria domainBean="ScriptletBatch" action="list" fullAssociationPathFieldNames="no"/>
+		</filterpane:isFiltered>
+
 		<div class="pagination">
-			<g:paginate controller="ScriptletBatch" action="list" total="${scriptletBatchInstanceTotal}" params="${parameters}"/>
+			<filterpane:paginate total="${scriptletBatchInstanceTotal}" domainBean="ScriptletBatch"/>
 		</div>
 	</div>
 </body>
