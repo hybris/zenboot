@@ -1,8 +1,8 @@
 package org.zenboot.portal
 
 import grails.plugins.springsecurity.Secured
+import org.grails.plugin.filterpane.FilterPaneUtils
 import org.springframework.dao.DataIntegrityViolationException
-import org.zenboot.portal.processing.ExecutionZone
 import org.springframework.http.HttpStatus
 
 class HostController extends AbstractRestController {
@@ -31,13 +31,13 @@ class HostController extends AbstractRestController {
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
-        def parameters = params
+        def parameters = params.findAll { it.value instanceof String }
 
         [
                 hostInstanceList : filterPaneService.filter(params, Host),
                 hostInstanceTotal: filterPaneService.count(params, Host),
                 parameters       : parameters,
-                filterParams     : org.grails.plugin.filterpane.FilterPaneUtils.extractFilterParams(params),
+                filterParams     : FilterPaneUtils.extractFilterParams(params),
                 params           : params,
         ]
     }

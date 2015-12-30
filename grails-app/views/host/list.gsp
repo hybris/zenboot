@@ -33,7 +33,7 @@
 		<table class="table table-striped">
 			<thead>
 				<tr>
-					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" params="${parameters}"/>
+					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" params="${parameters}" encodeAs="raw"/>
 					<g:sortableColumn property="cname" title="${message(code: 'host.cname.label', default: 'Cname')}" params="${parameters}"/>
 					<g:sortableColumn property="hostname.name" title="${message(code: 'host.hostname.label', default: 'Hostname')}"  params="${parameters}"/>
 					<g:sortableColumn property="instanceId" title="${message(code: 'host.instanceId.label', default: 'Instance Id')}" defaultOrder="desc" params="${parameters}"/>
@@ -74,7 +74,7 @@
 		</table>
 
 		<div class="pagination">
-			<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
+			<filterpane:paginate total="${hostInstanceTotal}" domainBean="Host"/>
 		</div>
 	</div>
 </body>
