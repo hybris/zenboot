@@ -195,6 +195,12 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             executionZones = filterPaneService.filter(params - [max: params.max, offset: params.offset], ExecutionZone)
             executionZones = executionZoneService.filterByAccessPermission(executionZones)
 
+            if (favs) {
+                executionZones = executionZones.findAll() { executionZone ->
+                    executionZone.userLiked(springSecurityService.currentUser)
+                }
+            }
+
             executionZoneCount = executionZones.size()
             executionZones = executionZoneService.getRange(executionZones, params)
         }

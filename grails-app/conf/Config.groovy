@@ -154,6 +154,7 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
     '/executionZone/show':                  [Role.ROLE_USER],
     '/executionZone/update':                [Role.ROLE_USER],
     '/executionZone/ajaxGetParameters/**':  [Role.ROLE_USER],
+    '/executionZone/ajaxUserLike/**':       [Role.ROLE_USER],
     '/executionZone/execute':               [Role.ROLE_USER],
     '/scriptletBatch/list':                 [Role.ROLE_USER],
     '/scriptletBatch/show':                 [Role.ROLE_USER],
