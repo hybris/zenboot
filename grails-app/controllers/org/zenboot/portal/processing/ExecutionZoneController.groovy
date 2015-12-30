@@ -173,45 +173,45 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
-        def executionZoneInstanceList = []
-        def executionZoneInstanceListCount = 0
+        def executionZones = []
+        def executionZoneCount = 0
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             if (favs) {
-                executionZoneInstanceList = filterPaneService.
+                executionZones = filterPaneService.
                         filter(params - [max: params.max, offset: params.offset], ExecutionZone).
                         findAll() { executionZone ->
                             executionZone.userLiked(springSecurityService.currentUser)
                         }
 
-                executionZoneInstanceListCount = executionZoneInstanceList.size()
-                executionZoneInstanceList = executionZoneService.getRange(executionZoneInstanceList, params)
+                executionZoneCount = executionZones.size()
+                executionZones = executionZoneService.getRange(executionZones, params)
             } else {
-                executionZoneInstanceList = filterPaneService.filter(params, ExecutionZone)
-                executionZoneInstanceListCount = filterPaneService.count(params, ExecutionZone)
+                executionZones = filterPaneService.filter(params, ExecutionZone)
+                executionZoneCount = filterPaneService.count(params, ExecutionZone)
             }
 
         } else {
-            executionZoneInstanceList = filterPaneService.filter(params - [max: params.max, offset: params.offset], ExecutionZone)
-            executionZoneInstanceList = executionZoneService.filterByAccessPermission(executionZoneInstanceList)
+            executionZones = filterPaneService.filter(params - [max: params.max, offset: params.offset], ExecutionZone)
+            executionZones = executionZoneService.filterByAccessPermission(executionZones)
 
-            executionZoneInstanceListCount = executionZoneInstanceList.size()
-            executionZoneInstanceList = executionZoneService.getRange(executionZoneInstanceList, params)
+            executionZoneCount = executionZones.size()
+            executionZones = executionZoneService.getRange(executionZones, params)
         }
-        log.debug("model: executionZoneInstanceList(.size(): "+executionZoneInstanceList.size()+"), executionZoneInstanceTotal ("+executionZoneInstanceListCount+"), executionZoneTypes")
+        log.debug("model: executionZoneInstanceList(.size(): "+executionZones.size()+"), executionZoneInstanceTotal ("+executionZoneCount+"), executionZoneTypes")
 
         request.withFormat {
             html {
                     [
-                        executionZoneInstanceList: executionZoneInstanceList,
-                        executionZoneInstanceTotal: executionZoneInstanceListCount,
+                        executionZoneInstanceList: executionZones,
+                        executionZoneInstanceTotal: executionZoneCount,
                         executionZoneTypes: ExecutionZoneType.list(),
                         parameters: parameters,
                         filterParams: FilterPaneUtils.extractFilterParams(params),
                         user: springSecurityService.currentUser
                     ]
             }
-            json { render executionZoneInstanceList as JSON }
+            json { render executionZones as JSON }
         }
     }
 
