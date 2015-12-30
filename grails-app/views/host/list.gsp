@@ -75,6 +75,7 @@
 		</fieldset>
 
 		<filterpane:filterPane domain="Host" action="list" formMethod="get"
+							   excludeProperties="environment, macAddress, expiryDate"
 							   associatedProperties="execZone.description, execZone.id"/>
 		<filterpane:isFiltered>
 			<h4>Current Filters:</h4>
