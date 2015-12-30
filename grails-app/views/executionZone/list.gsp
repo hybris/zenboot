@@ -118,6 +118,7 @@
 		<br />
 
 		<filterpane:filterPane domain="ExecutionZone" action="list" formMethod="get"
+							   listDistinct="true" uniqueCountColumn="id"
 							   filterProperties="description, enabled, hosts, type, processingParameters"
 							   associatedProperties="hosts.cname, type.name, processingParameters.name, processingParameters.value"/>
 		<filterpane:isFiltered>

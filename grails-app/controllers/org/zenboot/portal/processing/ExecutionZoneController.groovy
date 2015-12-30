@@ -145,6 +145,9 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     }
 
     def list() {
+        // workaround for bug in filterpane
+        params.listDistinct = true
+
         def parameters = params.findAll { it.value instanceof String }
 
         if (!params.filter) {
