@@ -120,8 +120,11 @@
 		<filterpane:filterPane domain="ExecutionZone" action="list" formMethod="get"
 							   filterProperties="description, enabled, hosts, type, processingParameters"
 							   associatedProperties="hosts.cname, type.name, processingParameters.name, processingParameters.value"/>
-		<h4>Current Filters:</h4>
-		<filterpane:currentCriteria class="list-group" action="list" domainBean="ExecutionZone" fullAssociationPathFieldNames="no" />
+		<filterpane:isFiltered>
+			<h4>Current Filters:</h4>
+			<filterpane:currentCriteria class="list-group" action="list" domainBean="ExecutionZone"
+										fullAssociationPathFieldNames="no"/>
+		</filterpane:isFiltered>
 
 		<div class="pagination">
 			<filterpane:paginate total="${executionZoneInstanceTotal}" domainBean="ExecutionZone"/>

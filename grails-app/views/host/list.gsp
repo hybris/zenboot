@@ -26,9 +26,6 @@
 				<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
 			</div>
 		</g:if>
-		<filterpane:filterPane domain="Host" action="list" formMethod="get" associatedProperties="execZone.description, execZone.id" />
-		<filterpane:filterButton text="Filter" />
-		<filterpane:currentCriteria domainBean="Host" action="list" fullAssociationPathFieldNames="no" />
 
 		<table class="table table-striped">
 			<thead>
@@ -72,6 +69,17 @@
 				</g:each>
 			</tbody>
 		</table>
+
+		<fieldset class="buttons spacer">
+			<filterpane:filterButton class="btn" text="Filter" />
+		</fieldset>
+
+		<filterpane:filterPane domain="Host" action="list" formMethod="get"
+							   associatedProperties="execZone.description, execZone.id"/>
+		<filterpane:isFiltered>
+			<h4>Current Filters:</h4>
+			<filterpane:currentCriteria domainBean="Host" action="list" fullAssociationPathFieldNames="no"/>
+		</filterpane:isFiltered>
 
 		<div class="pagination">
 			<filterpane:paginate total="${hostInstanceTotal}" domainBean="Host"/>
