@@ -85,7 +85,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return attributes*.trim()*.toLowerCase()
     }
 
-    private ArrayList filterByAccessPermission(executionZoneInstanceList) {
+    public List filterByAccessPermission(executionZoneInstanceList) {
         executionZoneInstanceList.findAll() { executionZone ->
             this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
         }
