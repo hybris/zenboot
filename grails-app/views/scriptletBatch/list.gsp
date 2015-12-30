@@ -28,6 +28,7 @@
 					<g:sortableColumn property="endDate" title="${message(code: 'scriptletBatch.endDate.label', default: 'End Date')}" />
 					<g:sortableColumn property="startDate" title="${message(code: 'scriptletBatch.startDate.label', default: 'Start Date')}" />
 					<g:sortableColumn property="state" title="${message(code: 'scriptletBatch.state.label', default: 'State')}" />
+					<g:sortableColumn property="executionZoneAction.executionZone" title="${message(code: 'scriptletBatch.zone.label', default: 'Zone')}" />
 				</tr>
 			</thead>
 			<tbody>
