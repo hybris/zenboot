@@ -115,7 +115,6 @@
 				${message(code: 'default.button.create.label', default: 'Cancel')}
 			</g:link>
 		</fieldset>
-		<br />
 
 		<filterpane:filterPane domain="ExecutionZone" action="list" formMethod="get"
 							   listDistinct="true" uniqueCountColumn="id"

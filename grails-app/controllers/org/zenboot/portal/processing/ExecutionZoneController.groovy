@@ -179,11 +179,13 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             if (favs) {
                 executionZoneInstanceList = filterPaneService.
-                        filter(params, ExecutionZone).
+                        filter(params - [max: params.max, offset: params.offset], ExecutionZone).
                         findAll() { executionZone ->
                             executionZone.userLiked(springSecurityService.currentUser)
                         }
+
                 executionZoneInstanceListCount = executionZoneInstanceList.size()
+                executionZoneInstanceList = executionZoneService.getRange(executionZoneInstanceList, params)
             } else {
                 executionZoneInstanceList = filterPaneService.filter(params, ExecutionZone)
                 executionZoneInstanceListCount = filterPaneService.count(params, ExecutionZone)
@@ -191,10 +193,10 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
         } else {
             executionZoneInstanceList = filterPaneService.filter(params - [max: params.max, offset: params.offset], ExecutionZone)
-            List filteredExecutionZoneInstanceList = executionZoneService.filterByAccessPermission(executionZoneInstanceList)
-            executionZoneInstanceListCount = filteredExecutionZoneInstanceList.size()
+            executionZoneInstanceList = executionZoneService.filterByAccessPermission(executionZoneInstanceList)
 
-            executionZoneInstanceList = executionZoneService.getRange(filteredExecutionZoneInstanceList, params)
+            executionZoneInstanceListCount = executionZoneInstanceList.size()
+            executionZoneInstanceList = executionZoneService.getRange(executionZoneInstanceList, params)
         }
         log.debug("model: executionZoneInstanceList(.size(): "+executionZoneInstanceList.size()+"), executionZoneInstanceTotal ("+executionZoneInstanceListCount+"), executionZoneTypes")
 
