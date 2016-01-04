@@ -37,15 +37,23 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }
     }
 
-    def getRange(scriptLetBatches, params) {
-      int offset = params ? (params.int("offset") ? params.int("offset") : 0) : 0
-      int max = params ? (params.int("max") ? params.int("max") : -1) : -1
-      log.debug("params sent max "+max+" and offset "+offset)
-      log.debug("filteredScriptletBatchList.size() "+scriptLetBatches.size())
-      int upperBoundary = Math.min(max+offset, scriptLetBatches.size()) -1
-      log.debug("returning filteredScriptletBatchList["+offset+","+upperBoundary+"]")
-      log.debug("which is size:"+scriptLetBatches[offset..upperBoundary].size())
-      return scriptLetBatches[offset..upperBoundary]
+    def getRange(scriptletBatches, params) {
+        if (scriptletBatches.empty) {
+            return scriptletBatches
+        }
+
+        int offset = 0
+        int max = 10
+        if (params) {
+            offset = params.int("offset") ?: 0
+            max = params.int("max") ?: 10
+        }
+        log.debug("params sent max "+max+" and offset "+offset)
+        log.debug("filteredScriptletBatchList.size() "+scriptletBatches.size())
+        int upperBoundary = Math.min(max+offset, scriptletBatches.size()) -1
+        log.debug("returning filteredScriptletBatchList["+offset+","+upperBoundary+"]")
+        log.debug("which is size:"+scriptletBatches[offset..upperBoundary].size())
+        return scriptletBatches[offset..upperBoundary]
     }
 
     @Override
