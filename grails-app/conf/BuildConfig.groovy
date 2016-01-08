@@ -61,7 +61,7 @@ grails.project.dependency.resolution = {
         compile ":pretty-time:2.1.3.Final-1.0.1"
 
         compile ':audit-logging:1.1.0'
-        compile "org.grails.plugins:filterpane:2.4.3"
+        compile "org.grails.plugins:filterpane:2.4.2"
     }
 }
 
