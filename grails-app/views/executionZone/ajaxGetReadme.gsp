@@ -12,7 +12,7 @@
 <script type="text/javascript">
 var opts = {
   container: 'container_${editorId}',
-  basePath: '<g:resource dir="/js/epiceditor" />',
+  basePath: '${assetPath(src: 'epiceditor')}',
   clientSideStorage: false,
   parser: marked,
   file: {

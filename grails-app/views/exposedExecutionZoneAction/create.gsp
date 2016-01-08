@@ -64,7 +64,7 @@
 		</g:form>
 	</div>
 
-	<g:javascript>
+	<asset:script>
 	$(document).ready(function() {
 	    //Exposed action data get lost if the page will be reloaded (data were transfered in request scope)
 		if ($('input[name=scriptDir]').val() !== "" && $('.alert').size() === 0) {
@@ -79,6 +79,6 @@
             });
 		}
 	});
-	</g:javascript>
+	</asset:script>
 </body>
 </html>

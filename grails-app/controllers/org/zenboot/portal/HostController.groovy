@@ -1,11 +1,13 @@
 package org.zenboot.portal
 
 import grails.plugins.springsecurity.Secured
+import org.grails.plugin.filterpane.FilterPaneUtils
 import org.springframework.dao.DataIntegrityViolationException
-import org.zenboot.portal.processing.ExecutionZone
 import org.springframework.http.HttpStatus
 
 class HostController extends AbstractRestController {
+
+    def filterPaneService
 
     static allowedMethods = [update: "POST", delete: "POST", markHostBroken: "POST", markHostUnknown: "POST"]
     def executionZoneService
@@ -29,26 +31,15 @@ class HostController extends AbstractRestController {
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
-        def hostInstanceList
-        def hostInstanceTotal
-        def parameters = [:]
-        if (params.execId) {
-          def executionZoneInstance = ExecutionZone.get(params.execId)
-          if (!executionZoneInstance) {
-              flash.message = message(code: 'default.not.found.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), params.execId])
-              redirect(action: "list")
-              return
-          }
-            parameters.execId = params.execId
-            hostInstanceList = Host.findAllByExecZone(executionZoneInstance, params)
-            hostInstanceTotal = Host.findAllByExecZone(executionZoneInstance).size()
-        } else {
-            hostInstanceList = Host.list(params)
-            hostInstanceTotal = Host.count()
-        }
+        def parameters = params.findAll { it.value instanceof String }
 
-
-        [hostInstanceList: hostInstanceList, hostInstanceTotal: hostInstanceTotal, parameters:parameters]
+        [
+                hostInstanceList : filterPaneService.filter(params, Host),
+                hostInstanceTotal: filterPaneService.count(params, Host),
+                parameters       : parameters,
+                filterParams     : FilterPaneUtils.extractFilterParams(params),
+                params           : params,
+        ]
     }
 
     def show() {

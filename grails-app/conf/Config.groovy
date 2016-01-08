@@ -140,6 +140,7 @@ grails.plugins.springsecurity.filterChain.chainMap = [
  ]
 
 grails.plugins.springsecurity.controllerAnnotations.staticRules = [
+    '/assets/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/js/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/images/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/css/**':                              ['IS_AUTHENTICATED_ANONYMOUSLY'],
@@ -153,6 +154,7 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
     '/executionZone/show':                  [Role.ROLE_USER],
     '/executionZone/update':                [Role.ROLE_USER],
     '/executionZone/ajaxGetParameters/**':  [Role.ROLE_USER],
+    '/executionZone/ajaxUserLike/**':       [Role.ROLE_USER],
     '/executionZone/execute':               [Role.ROLE_USER],
     '/scriptletBatch/list':                 [Role.ROLE_USER],
     '/scriptletBatch/show':                 [Role.ROLE_USER],

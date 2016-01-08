@@ -6,6 +6,7 @@ class ExecutionZoneAction extends AbstractExecutionZoneAction {
     List scriptletBatches = []
 
     static hasMany = [runtimeAttributes: String, scriptletBatches: ScriptletBatch]
+    static belongsTo = [executionZone: ExecutionZone]
 
     static mapping = {
         runtimeAttributes type: 'text', cascade: 'all'

@@ -236,11 +236,11 @@
 		</g:form>
 
 		<g:if test="${params.delete}">
-			<g:javascript>
+			<asset:script>
 		    $(document).ready(function() {
 			    $('#deleteButton').click()
 		    });
-            </g:javascript>
+            </asset:script>
 		</g:if>
 
 	</div>

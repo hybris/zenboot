@@ -21,7 +21,7 @@
 		</g:if>
 
 
-		<g:if test="${params.max > 20}">
+		<g:if test="${params.max > 20 && hostInstanceTotal > 20}">
 			<div class="pagination">
 				<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
 			</div>
@@ -30,7 +30,7 @@
 		<table class="table table-striped">
 			<thead>
 				<tr>
-					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" params="${parameters}"/>
+					<g:sortableColumn property="ipAddress" title="${message(code: 'host.ipAddress.label', default: 'Ip Address')}" params="${parameters}" encodeAs="raw"/>
 					<g:sortableColumn property="cname" title="${message(code: 'host.cname.label', default: 'Cname')}" params="${parameters}"/>
 					<g:sortableColumn property="hostname.name" title="${message(code: 'host.hostname.label', default: 'Hostname')}"  params="${parameters}"/>
 					<g:sortableColumn property="instanceId" title="${message(code: 'host.instanceId.label', default: 'Instance Id')}" defaultOrder="desc" params="${parameters}"/>
@@ -70,8 +70,20 @@
 			</tbody>
 		</table>
 
+		<fieldset class="buttons spacer">
+			<filterpane:filterButton class="btn" text="Filter" />
+		</fieldset>
+
+		<filterpane:filterPane domain="Host" action="list" formMethod="get"
+							   excludeProperties="environment, macAddress, expiryDate"
+							   associatedProperties="execZone.description, execZone.id"/>
+		<filterpane:isFiltered>
+			<h4>Current Filters:</h4>
+			<filterpane:currentCriteria domainBean="Host" action="list" fullAssociationPathFieldNames="no"/>
+		</filterpane:isFiltered>
+
 		<div class="pagination">
-			<g:paginate total="${hostInstanceTotal}" max="1" params="${parameters}"/>
+			<filterpane:paginate total="${hostInstanceTotal}" domainBean="Host"/>
 		</div>
 	</div>
 </body>

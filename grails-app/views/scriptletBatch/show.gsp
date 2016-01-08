@@ -169,7 +169,7 @@
 					<span id="stepsSpinner" class="property-value">
 						<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 					</span>
-					<g:javascript>
+					<asset:script>
 				    $(document).ready(function() {
                     var interval = setInterval(function() {
 			                $.ajax({
@@ -198,7 +198,7 @@
 			                });
 				        }, 1500);
 				    });
-				    </g:javascript>
+				    </asset:script>
 				</g:if>
 			</g:if>
 
@@ -213,10 +213,10 @@
 		</div>
 	</div>
 
-	<g:javascript>
+	<asset:script>
 	$(document).ready(function() {
         zenboot.enableTooltip();
 	});
-	</g:javascript>
+	</asset:script>
 </body>
 </html>

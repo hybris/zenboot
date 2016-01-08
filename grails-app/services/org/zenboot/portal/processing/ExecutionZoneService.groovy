@@ -2,10 +2,8 @@ package org.zenboot.portal.processing
 
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Role
-import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.PathResolver
 import org.zenboot.portal.ZenbootException
-import org.zenboot.portal.processing.ProcessingParameter
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
@@ -87,30 +85,30 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return attributes*.trim()*.toLowerCase()
     }
 
-    def findAllByEnabledFiltered(enabled, params) {
-      def executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled)
-      def filteredExecutionZoneInstanceList = []
-      filteredExecutionZoneInstanceList.addAll(executionZoneInstanceList.findAll() { executionZone ->
-        this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
-      })
-      int offset = params ? (params.int("offset") ? params.int("offset") : 0) : 0
-      int max = params ? (params.int("max") ? params.int("max") : -1) : -1
-      log.debug("params sent max "+max+" and offset "+offset)
-      log.debug("filteredExecutionZoneInstanceList.size() "+filteredExecutionZoneInstanceList.size())
-      int upperBoundary = Math.min(max+offset, filteredExecutionZoneInstanceList.size()) -1
-      log.debug("returning filteredExecutionZoneInstanceList["+offset+","+upperBoundary+"]")
-      log.debug("which is size:"+filteredExecutionZoneInstanceList[offset..upperBoundary].size())
-      return filteredExecutionZoneInstanceList[offset..upperBoundary]
-
+    public List filterByAccessPermission(executionZoneInstanceList) {
+        executionZoneInstanceList.findAll() { executionZone ->
+            this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
+        }
     }
 
-    int countByEnabledFiltered(enabled) {
-      def executionZoneInstanceList = ExecutionZone.findAllByEnabled(enabled)
-      def filteredExecutionZoneInstanceList = []
-      filteredExecutionZoneInstanceList.addAll(executionZoneInstanceList.findAll() { executionZone ->
-        this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
-      })
-      return filteredExecutionZoneInstanceList.size()
+    def getRange(filteredExecutionZoneInstanceList, params) {
+        if (filteredExecutionZoneInstanceList.size() == 0) {
+            return filteredExecutionZoneInstanceList
+        }
+
+        int offset = 0
+        int max = 10
+        if (params) {
+            offset = params.int("offset") ?: 0
+            max = params.int("max") ?: 10
+        }
+        log.debug("params sent max " + max + " and offset " + offset)
+        log.debug("filteredExecutionZoneInstanceList.size() " + filteredExecutionZoneInstanceList.size())
+        int upperBoundary = Math.min(max + offset, filteredExecutionZoneInstanceList.size()) - 1
+        log.debug("returning filteredExecutionZoneInstanceList[" + offset + "," + upperBoundary + "]")
+        if (offset > upperBoundary) return []
+        log.debug("which is size:" + filteredExecutionZoneInstanceList[offset..upperBoundary].size())
+        return filteredExecutionZoneInstanceList[offset..upperBoundary]
     }
 
     /** convenience-method for creating ExecutionZones

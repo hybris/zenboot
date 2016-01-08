@@ -50,10 +50,10 @@
 		<g:submitButton name="submit" class="btn btn-primary" value="${message(code: "springSecurity.login.button")}" />
 	</g:form>
 
-	<g:javascript>
+	<asset:script>
 		(function() {
 			document.forms['loginForm'].elements['j_username'].focus();
 		})();
-	</g:javascript>
+	</asset:script>
 </body>
 </html>

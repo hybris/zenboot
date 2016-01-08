@@ -49,7 +49,7 @@
     		</div>
     		<div id="showZone" class="accordion-body collapse">
     			<div class="accordion-inner">
-						<g:form method="post">
+						<g:form method="post"><!-- why is this a form??? -->
 							<dl class="dl-horizontal">
 								<g:if test="${executionZoneInstance?.type}">
 									<dt>
@@ -175,12 +175,14 @@
 							<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
 
 							<fieldset class="spacer buttons">
-								<g:link controller="scriptletBatch" action="list" params="[execId : executionZoneInstance?.id]" class="btn">
-										<g:message code="executionZone.showExecutedActions.label" default="Log" />
-								</g:link>
-								<g:link controller="Host" action="list" params="[execId : executionZoneInstance?.id]" class="btn">
-										<g:message code="executionZone.showExecutedActions.label" default="Hosts" />
-								</g:link>
+								<filterpane:filterLink controller="ScriptletBatch" action="list" class="btn"
+													   values="['executionZoneAction.executionZone.id': executionZoneInstance?.id]">
+									<g:message code="executionZone.showExecutedActions.label" default="Log" />
+                                </filterpane:filterLink>
+								<filterpane:filterLink controller="Host" action="list" class="btn"
+													   values="['execZone.id': executionZoneInstance?.id]">
+									<g:message code="executionZone.showExecutedActions.label" default="Hosts" />
+								</filterpane:filterLink>
 							</fieldset>
 
 						</g:form>
@@ -355,7 +357,7 @@
 		</div>
 	</div>
 
-	<g:javascript>
+	<asset:script>
     $('#scriptDirs input:radio').change(function(event) {
         $.ajax({
             url : '<g:createLink action="ajaxGetParameters" params="[execId:executionZoneInstance?.id]" />&scriptDir=' + encodeURI($(this).val()),
@@ -380,6 +382,6 @@
     $(document).ready(function() {
         zenboot.enableParameterList();
     });
-	</g:javascript>
+	</asset:script>
 </body>
 </html>
