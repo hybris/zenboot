@@ -323,29 +323,31 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             }
         }
 
+        def processingParameters = ControllerUtils.getProcessingParameters(params)
+
         // Admin is the only one who can update different things than params
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             executionZoneInstance.properties = params
             executionZoneInstance.enableExposedProcessingParameters = (params.enableExposedProcessingParameters != null)
-        }
+        } else {
+            processingParameters = processingParameters.collect { parameter ->
+                def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
 
-        def processingParameters = ControllerUtils.getProcessingParameters(params).collect { parameter ->
-            def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
+                if (unallowedEdit(parameter, originalParameter)) {
+                    executionZoneInstance.errors.reject('executionZone.failure.unallowedEdit',
+                            [parameter.name] as Object[],
+                            'You are not allowed to edit parameter {0}'
+                    )
+                }
 
-            if (unallowedEdit(parameter, originalParameter)) {
-                executionZoneInstance.errors.reject('executionZone.failure.unallowedEdit',
-                        [parameter.name] as Object[],
-                        'You are not allowed to edit parameter {0}'
-                )
+                parameter
             }
 
-            parameter
-        }
+            if (executionZoneInstance.errors.hasErrors()) {
+                flash.action = 'update'
 
-        if (executionZoneInstance.errors.hasErrors()) {
-            flash.action = 'update'
-
-            return render(view: "show", model: showModel(executionZoneInstance))
+                return render(view: "show", model: showModel(executionZoneInstance))
+            }
         }
 
         ControllerUtils.synchronizeProcessingParameters(processingParameters.toSet(), executionZoneInstance)
