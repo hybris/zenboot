@@ -323,15 +323,34 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             }
         }
 
+        def processingParameters = ControllerUtils.getProcessingParameters(params)
+
         // Admin is the only one who can update different things than params
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             executionZoneInstance.properties = params
             executionZoneInstance.enableExposedProcessingParameters = (params.enableExposedProcessingParameters != null)
+        } else {
+            processingParameters = processingParameters.collect { parameter ->
+                def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
+
+                if (unallowedEdit(parameter, originalParameter)) {
+                    executionZoneInstance.errors.reject('executionZone.failure.unallowedEdit',
+                            [parameter.name] as Object[],
+                            'You are not allowed to edit parameter {0}'
+                    )
+                }
+
+                parameter
+            }
+
+            if (executionZoneInstance.errors.hasErrors()) {
+                flash.action = 'update'
+
+                return render(view: "show", model: showModel(executionZoneInstance))
+            }
         }
 
-
-
-        ControllerUtils.synchronizeProcessingParameters(ControllerUtils.getProcessingParameters(params), executionZoneInstance)
+        ControllerUtils.synchronizeProcessingParameters(processingParameters.toSet(), executionZoneInstance)
 
         if (!executionZoneInstance.save(flush: true)) {
             flash.action = 'update'
@@ -342,6 +361,12 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
     }
+
+    private boolean unallowedEdit(parameter, originalParameter) {
+        (originalParameter?.value != parameter.value || originalParameter?.description != parameter.description) &&
+                !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
+    }
+
 
     def delete() {
         def executionZoneInstance = ExecutionZone.get(params.execId)
