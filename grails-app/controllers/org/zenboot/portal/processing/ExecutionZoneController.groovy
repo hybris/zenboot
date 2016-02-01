@@ -329,16 +329,23 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             executionZoneInstance.enableExposedProcessingParameters = (params.enableExposedProcessingParameters != null)
         }
 
-        def processingParameters = []
+        def processingParameters = ControllerUtils.getProcessingParameters(params).collect { parameter ->
+            def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
 
-        ControllerUtils.getProcessingParameters(params).each() { parameter ->
-          def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
+            if (unallowedEdit(parameter, originalParameter)) {
+                executionZoneInstance.errors.reject('executionZone.failure.unallowedEdit',
+                        [parameter.name] as Object[],
+                        'You are not allowed to edit parameter {0}'
+                )
+            }
 
-          if (!executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),parameter) &&
-            originalParameter != null && originalParameter.value != parameter.value) {
-              parameter.value = originalParameter.value
-          }
-          processingParameters.add(parameter)
+            parameter
+        }
+
+        if (executionZoneInstance.errors.hasErrors()) {
+            flash.action = 'update'
+
+            return render(view: "show", model: showModel(executionZoneInstance))
         }
 
         ControllerUtils.synchronizeProcessingParameters(processingParameters.toSet(), executionZoneInstance)
@@ -352,6 +359,12 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
     }
+
+    private boolean unallowedEdit(parameter, originalParameter) {
+        (originalParameter?.value != parameter.value || originalParameter?.description != parameter.description) &&
+                !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
+    }
+
 
     def delete() {
         def executionZoneInstance = ExecutionZone.get(params.execId)

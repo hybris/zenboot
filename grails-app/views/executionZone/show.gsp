@@ -286,8 +286,9 @@
 							<g:hasErrors bean="${executionZoneInstance}">
 								<ul class="alert alert-error" role="alert">
 									<g:eachError bean="${executionZoneInstance}" var="error">
-										<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>>
-										<g:message error="${error}" />
+										<li>
+											<g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>
+											<g:message error="${error}" />
 										</li>
 									</g:eachError>
 								</ul>
@@ -316,6 +317,17 @@
 					</div>
 					<div id="userEditParams" class="accordion-body collapse ${flash.action == 'update' ? 'in' : ''}">
 						<div class="accordion-inner">
+							<g:hasErrors bean="${executionZoneInstance}">
+								<ul class="alert alert-error" role="alert">
+									<g:eachError bean="${executionZoneInstance}" var="error">
+										<li>
+											<g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>
+											<g:message error="${error}" />
+										</li>
+									</g:eachError>
+								</ul>
+							</g:hasErrors>
+
 							<g:form method="post">
 								<g:hiddenField name="id" value="${executionZoneInstance?.id}" />
 								<g:hiddenField name="version" value="${executionZoneInstance?.version}" />
