@@ -329,9 +329,19 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             executionZoneInstance.enableExposedProcessingParameters = (params.enableExposedProcessingParameters != null)
         }
 
+        def processingParameters = []
 
+        ControllerUtils.getProcessingParameters(params).each() { parameter ->
+          def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
 
-        ControllerUtils.synchronizeProcessingParameters(ControllerUtils.getProcessingParameters(params), executionZoneInstance)
+          if (!executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(),parameter) &&
+            originalParameter != null && originalParameter.value != parameter.value) {
+              parameter.value = originalParameter.value
+          }
+          processingParameters.add(parameter)
+        }
+
+        ControllerUtils.synchronizeProcessingParameters(processingParameters.toSet(), executionZoneInstance)
 
         if (!executionZoneInstance.save(flush: true)) {
             flash.action = 'update'
