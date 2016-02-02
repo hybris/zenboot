@@ -279,35 +279,19 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     }
 
     boolean unallowedEdit(parameter, originalParameter) {
-        (originalParameter?.value != parameter?.value || originalParameter?.description != parameter?.description) &&
+        (originalParameter?.value != parameter?.value) &&
+//             || originalParameter?.description != parameter?.description) &&
                 !canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
     }
-
 
     boolean setParameters(AbstractExecutionZoneCommand command, Map parameters) {
         ExecutionZone executionZone = ExecutionZone.get(command.execId)
 
-        Set execZnParams = getExecutionZoneParameters(executionZone, command.scriptDir)
+        command.execZoneParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value")
 
-        def processingParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value").collectEntries { parameter ->
-            def originalParameter = execZnParams.find {
-                it.name == parameter.key
-            }
-
-            def processParameter = new ProcessingParameter(name:parameter.key, value:parameter.value)
-
-            if (unallowedEdit(processParameter, originalParameter)) {
-                // FIXME too early for "hidden" fields?
-                parameter.value = originalParameter.value
-            }
-
-            parameter
-        }
-
-        command.execZoneParameters = processingParameters
-
+        def paramMetadatas = getExecutionZoneParameters(ExecutionZone.get(command.execId), command.scriptDir)
+                
         if (command.containsInvisibleParameters) {
-            def paramMetadatas = getExecutionZoneParameters(ExecutionZone.get(command.execId), command.scriptDir)
 
             paramMetadatas.findAll { ParameterMetadata paramMetadata ->
                 if (!paramMetadata.visible && !command.execZoneParameters[paramMetadata.name]) {
@@ -315,11 +299,25 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
                 }
             }
         }
+        
         command.execZoneParameters.each { key, value ->
             if (!value) {
                 command.errors.reject('executionZone.parameters.emptyValue', [key].asType(Object[]), 'Mandatory parameter is empty')
             }
         }
+        
+        paramMetadatas.each { ParameterMetadata paramMetadata ->
+            def param = command.execZoneParameters[paramMetadata.name];
+            def originalParameter = executionZone.getProcessingParameter(paramMetadata.name) ?: paramMetadata
+            def processParam = new ProcessingParameter(name:originalParameter.name, value:param.value.toString())
+            if (unallowedEdit(processParam, originalParameter)) {
+                command.errors.reject('executionZone.failure.unallowedEdit',
+                    [originalParameter.name].asType(Object[]),
+                    'You are not allowed to edit parameter {0}'
+                )
+            }
+        }
+        
         return command.errors.hasErrors()
     }
 
