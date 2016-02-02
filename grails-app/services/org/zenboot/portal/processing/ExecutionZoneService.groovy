@@ -280,7 +280,6 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     boolean unallowedEdit(parameter, originalParameter) {
         (originalParameter?.value != parameter?.value) &&
-//             || originalParameter?.description != parameter?.description) &&
                 !canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
     }
 
