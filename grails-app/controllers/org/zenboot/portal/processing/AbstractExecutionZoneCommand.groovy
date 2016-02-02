@@ -1,7 +1,5 @@
 package org.zenboot.portal.processing
 
-import org.zenboot.portal.ControllerUtils
-import org.zenboot.portal.processing.meta.ParameterMetadata
 
 
 
@@ -26,23 +24,6 @@ abstract class AbstractExecutionZoneCommand {
     }
 
 
-    boolean setParameters(Map parameters) {
-        this.execZoneParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value")
-        if (this.containsInvisibleParameters) {
-          def paramMetadatas = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.execId), this.scriptDir)
-          paramMetadatas.findAll { ParameterMetadata paramMetadata ->
-            if (!paramMetadata.visible && !this.execZoneParameters[paramMetadata.name]) {
-                this.execZoneParameters[paramMetadata.name] = paramMetadata.value
-            }
-          }
-        }
-        this.execZoneParameters.each { key, value ->
-            if (!value) {
-                this.errors.reject('executionZone.parameters.emptyValue', [key].asType(Object[]), 'Mandatory parameter is empty')
-            }
-        }
-        return this.errors.hasErrors()
-    }
 
     abstract AbstractExecutionZoneAction getExecutionZoneAction();
 }

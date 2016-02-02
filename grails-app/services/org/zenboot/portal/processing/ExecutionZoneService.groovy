@@ -5,12 +5,13 @@ import org.zenboot.portal.security.Role
 import org.zenboot.portal.PathResolver
 import org.zenboot.portal.ZenbootException
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
-import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.ho.yaml.Yaml
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
+import org.zenboot.portal.ControllerUtils
+import org.zenboot.portal.processing.meta.ParameterMetadata
 
 class ExecutionZoneService implements ApplicationEventPublisherAware {
 
@@ -276,6 +277,52 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         Set parameters = overlayExecutionZoneParameters(paramMetaList, execZone.processingParameters)
         return parameters
     }
+
+    boolean unallowedEdit(parameter, originalParameter) {
+        (originalParameter?.value != parameter?.value || originalParameter?.description != parameter?.description) &&
+                !canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
+    }
+
+
+    boolean setParameters(AbstractExecutionZoneCommand command, Map parameters) {
+        ExecutionZone executionZone = ExecutionZone.get(command.execId)
+
+        Set execZnParams = getExecutionZoneParameters(executionZone, command.scriptDir)
+
+        def processingParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value").collectEntries { parameter ->
+            def originalParameter = execZnParams.find {
+                it.name == parameter.key
+            }
+
+            def processParameter = new ProcessingParameter(name:parameter.key, value:parameter.value)
+
+            if (unallowedEdit(processParameter, originalParameter)) {
+                // FIXME too early for "hidden" fields?
+                parameter.value = originalParameter.value
+            }
+
+            parameter
+        }
+
+        command.execZoneParameters = processingParameters
+
+        if (command.containsInvisibleParameters) {
+            def paramMetadatas = getExecutionZoneParameters(ExecutionZone.get(command.execId), command.scriptDir)
+
+            paramMetadatas.findAll { ParameterMetadata paramMetadata ->
+                if (!paramMetadata.visible && !command.execZoneParameters[paramMetadata.name]) {
+                    command.execZoneParameters[paramMetadata.name] = paramMetadata.value
+                }
+            }
+        }
+        command.execZoneParameters.each { key, value ->
+            if (!value) {
+                command.errors.reject('executionZone.parameters.emptyValue', [key].asType(Object[]), 'Mandatory parameter is empty')
+            }
+        }
+        return command.errors.hasErrors()
+    }
+
 
     private Set overlayExecutionZoneParameters(ParameterMetadataList paramMetaList, Set overlayParameters) {
         log.debug("Entering overlayExecutionZoneParameters")

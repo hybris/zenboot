@@ -110,7 +110,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     }
 
     def save = { SaveExposedExecutionZoneActionCommand cmd ->
-        cmd.setParameters(params.parameters)
+        executionZoneService.setParameters(cmd, params.parameters)
         if (cmd.hasErrors()) {
             render(view:"create", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.executionZoneAction])
             return
@@ -157,7 +157,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     }
 
     def update = { UpdateExposedExecutionZoneActionCommand cmd ->
-        cmd.setParameters(params.parameters)
+        executionZoneService.setParameters(cmd, params.parameters)
         cmd.params = params
         if (cmd.hasErrors()) {
             render(view:"edit", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.executionZoneAction])

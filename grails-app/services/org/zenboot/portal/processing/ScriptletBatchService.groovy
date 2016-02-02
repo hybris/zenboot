@@ -101,7 +101,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
               try {
                 execute(event)
               } catch (Exception e) {
-                log.error("Catched Exception: ",e)
+                log.error("Caught Exception: ",e)
               }
             }
         } else {
@@ -179,9 +179,9 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         if (batch.hasErrors()) {
             throw new ProcessingException("Failure while building ${batch}: ${batch.errors}")
         }
-        batch.save(flush:true, failOnError: true);
+        batch.save(flush:true, failOnError: true)
         action.scriptletBatches << batch
-        action.save(flush:true, failOnError: true);
+        action.save(flush:true, failOnError: true)
 
         this.addScriptlets(batch, action.runtimeAttributes)
 
