@@ -52,7 +52,7 @@
 							${fieldValue(bean: scriptletBatchInstance, field: "state")}
 						</td>
 						<td>
-							<g:link controller="executionZone" action="show" id="${scriptletBatchInstance.executionZoneAction.executionZone.id}">
+							<g:link controller="executionZone" action="show" id="${scriptletBatchInstance?.executionZoneAction?.executionZone?.id}">
 								${fieldValue(bean: scriptletBatchInstance, field: "executionZoneAction.executionZone.description")}
 							</g:link>
 						</td>
