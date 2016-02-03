@@ -3,7 +3,7 @@
 <g:each in="${executionZoneParameters}" var="entry" status="i">
   <tr>
     <td style="width: 45%">
-      <g:textField name="parameters.key" value="${entry.name}" />
+      <g:textField name="parameters.key" readonly="readonly" value="${entry.name}" />
     </td>
     <td style="width: 45%">
       <div class="control-group ${entry.overlay ? 'info' : entry.value ? 'success' : ''}">
