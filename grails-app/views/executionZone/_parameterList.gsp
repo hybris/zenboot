@@ -3,7 +3,7 @@
 <g:each in="${executionZoneParameters}" var="entry" status="i">
   <tr>
     <td style="width: 45%">
-      <g:textField name="parameters.key" readonly="readonly" value="${entry.name}" />
+      <g:textField name="parameters.key" readonly="true" value="${entry.name}" />
     </td>
     <td style="width: 45%">
       <div class="control-group ${entry.overlay ? 'info' : entry.value ? 'success' : ''}">
@@ -16,10 +16,15 @@
           </sec:ifNotGranted>
         </g:if>
         <g:else>
-          <g:field type="password" name="parameters.value" placeholder="${message(code:'executionZone.scriptletMetadata.secretValue', default:"Secret value")}" />
+          <sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+          <g:field type="password" name="parameters.value" placeholder="${message(code:'executionZone.scriptletMetadata.secretValue', default:'Secret value')}" />
           <span class="muted">
             <g:message code="executionZone.scriptletMetadata.secretField" default="Set this field only if secret value should be overridden" />
           </span>
+          </sec:ifAllGranted>
+          <sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+              <g:field type="password" readonly="${readonly} "name="parameters.value" placeholder="${message(code:'executionZone.scriptletMetadata.secretValue', default:'Secret value')}" />
+          </sec:ifNotGranted>
         </g:else>
       </div>
     </td>
