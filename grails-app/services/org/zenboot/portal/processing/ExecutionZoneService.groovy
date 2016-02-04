@@ -278,7 +278,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return parameters
     }
 
-    boolean unallowedEdit(parameter, originalParameter) {
+    boolean unallowedActionParameterEdit(parameter, originalParameter) {
         (originalParameter?.value != parameter?.value) &&
                 !canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
     }
@@ -304,22 +304,29 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
                 command.errors.reject('executionZone.parameters.emptyValue', [key].asType(Object[]), 'Mandatory parameter is empty')
             }
         }
-        
-        paramMetadatas.each { ParameterMetadata paramMetadata ->
-            def param = command.execZoneParameters[paramMetadata.name];
-            def originalParameter = executionZone.getProcessingParameter(paramMetadata.name) ?: paramMetadata
-            def processParam = new ProcessingParameter(name:originalParameter.name, value:param.value.toString())
-            if (unallowedEdit(processParam, originalParameter)) {
-                command.errors.reject('executionZone.failure.unallowedEdit',
-                    [originalParameter.name].asType(Object[]),
-                    'You are not allowed to edit parameter {0}'
-                )
-            }
-        }
-        
+
+        rejectIllegalParameterEdits(paramMetadatas, command, executionZone)
+
         return command.errors.hasErrors()
     }
 
+    def rejectIllegalParameterEdits(Set paramMetadatas, command, executionZone) {
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            return
+        }
+
+        paramMetadatas.each { ParameterMetadata paramMetadata ->
+            def param = command.execZoneParameters[paramMetadata.name];
+            def originalParameter = executionZone.getProcessingParameter(paramMetadata.name) ?: paramMetadata
+            def processParam = new ProcessingParameter(name: originalParameter.name, value: param.value.toString())
+            if (unallowedActionParameterEdit(processParam, originalParameter)) {
+                command.errors.reject('executionZone.failure.unallowedEdit',
+                        [originalParameter.name].asType(Object[]),
+                        'You are not allowed to edit parameter {0}'
+                )
+            }
+        }
+    }
 
     private Set overlayExecutionZoneParameters(ParameterMetadataList paramMetaList, Set overlayParameters) {
         log.debug("Entering overlayExecutionZoneParameters")
