@@ -333,7 +333,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             processingParameters = processingParameters.collect { parameter ->
                 def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
 
-                if (executionZoneService.unallowedEdit(parameter, originalParameter)) {
+                if (unallowedZoneParameterEdit(parameter, originalParameter)) {
                     executionZoneInstance.errors.reject('executionZone.failure.unallowedEdit',
                             [parameter.name] as Object[],
                             'You are not allowed to edit parameter {0}'
@@ -360,6 +360,12 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         flash.action = 'update'
         flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
+    }
+
+    boolean unallowedZoneParameterEdit(parameter, originalParameter) {
+        originalParameter?.description != parameter?.description ||
+                (originalParameter?.value != parameter?.value &&
+                        !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(), parameter))
     }
 
     def delete() {
