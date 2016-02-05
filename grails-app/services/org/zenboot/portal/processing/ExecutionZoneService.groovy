@@ -270,6 +270,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     /* central entrypoint to get parameters and overlay them by the ones from
      * the execZone. Called by AjaxCalls
+     *
+     * TODO the name is misleading, this gets all parameters of a scriptletbatch, not only the ones from the execution zone
      */
     Set getExecutionZoneParameters(ExecutionZone execZone, File scriptDir) {
         ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), execZone.type)
@@ -288,13 +290,13 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
         command.execZoneParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value")
 
-        def paramMetadatas = getExecutionZoneParameters(executionZone, command.scriptDir)
+        def originalParameters = getExecutionZoneParameters(executionZone, command.scriptDir)
                 
         if (command.containsInvisibleParameters) {
 
-            paramMetadatas.findAll { ParameterMetadata paramMetadata ->
-                if (!paramMetadata.visible && !command.execZoneParameters[paramMetadata.name]) {
-                    command.execZoneParameters[paramMetadata.name] = paramMetadata.value
+            originalParameters.each { ParameterMetadata originalParameter ->
+                if (!originalParameter.visible && !command.execZoneParameters[originalParameter.name]) {
+                    command.execZoneParameters[originalParameter.name] = originalParameter.value
                 }
             }
         }
@@ -309,19 +311,19 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
             }
         }
 
-        rejectIllegalParameterEdits(paramMetadatas, command, executionZone)
+        rejectIllegalParameterEdits(originalParameters, command, executionZone)
 
         return command.errors.hasErrors()
     }
 
-    def rejectIllegalParameterEdits(Set paramMetadatas, command, executionZone) {
+    def rejectIllegalParameterEdits(Set originalParameters, command, executionZone) {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             return
         }
 
-        paramMetadatas.each { ParameterMetadata paramMetadata ->
-            def param = command.execZoneParameters[paramMetadata.name];
-            def originalParameter = executionZone.getProcessingParameter(paramMetadata.name) ?: paramMetadata
+        originalParameters.each { ParameterMetadata originalParameterMetaData ->
+            def param = command.execZoneParameters[originalParameterMetaData.name];
+            def originalParameter = executionZone.getProcessingParameter(originalParameterMetaData.name) ?: originalParameterMetaData
             def processParam = new ProcessingParameter(name: originalParameter.name, value: param.value.toString())
             if (unallowedActionParameterEdit(processParam, originalParameter)) {
                 command.errors.reject('executionZone.failure.unallowedEdit',
