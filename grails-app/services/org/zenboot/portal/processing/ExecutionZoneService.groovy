@@ -288,7 +288,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
         command.execZoneParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value")
 
-        def paramMetadatas = getExecutionZoneParameters(ExecutionZone.get(command.execId), command.scriptDir)
+        def paramMetadatas = getExecutionZoneParameters(executionZone, command.scriptDir)
                 
         if (command.containsInvisibleParameters) {
 
@@ -301,7 +301,11 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         
         command.execZoneParameters.each { key, value ->
             if (!value) {
-                command.errors.reject('executionZone.parameters.emptyValue', [key].asType(Object[]), 'Mandatory parameter is empty')
+                command.errors.reject(
+                        'executionZone.parameters.emptyValue',
+                        [key] as Object[],
+                        'Mandatory parameter is empty'
+                )
             }
         }
 

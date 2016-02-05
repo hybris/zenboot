@@ -20,7 +20,7 @@ class ProcessContext {
 
     String getParamsAsString() {
       String paramsAsString=""
-      for ( key in parameters.keySet() ) {
+      for ( key in parameters?.keySet() ) {
            paramsAsString += key +"="+parameters.get(key) +"\n"
       }
       return paramsAsString
