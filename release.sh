@@ -18,9 +18,6 @@ done
 # version is not allowed to start with a letter
 echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
 
-echo "type in you password with sudo-rights (will be cached and later used with docker"
-sudo ls -l > /dev/null
-
 # Check whether travis finished the build, something like:
 while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .[0].state`XX" == "finishedXX" ]; do
   echo "# build is not finished ... waiting ..."
@@ -46,9 +43,9 @@ while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .
   echo "build is till ot finished ... waiting ..."
   sleep 60
 done
-sudo docker build -t hybris/zenboot:v${VERSION} .
+docker build -t hybris/zenboot:v${VERSION} .
 echo -n "about to tag the Dockerimage"
-sudo docker tag hybris/zenboot:v${VERSION} hybris/zenboot:latest
-sudo docker push hybris/zenboot:latest
-sudo docker push hybris/zenboot:v${VERSION}
+docker tag hybris/zenboot:v${VERSION} hybris/zenboot:latest
+docker push hybris/zenboot:latest
+docker push hybris/zenboot:v${VERSION}
 date
