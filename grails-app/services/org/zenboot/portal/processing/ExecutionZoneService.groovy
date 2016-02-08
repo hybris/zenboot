@@ -5,12 +5,13 @@ import org.zenboot.portal.security.Role
 import org.zenboot.portal.PathResolver
 import org.zenboot.portal.ZenbootException
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
-import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.ho.yaml.Yaml
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
+import org.zenboot.portal.ControllerUtils
+import org.zenboot.portal.processing.meta.ParameterMetadata
 
 class ExecutionZoneService implements ApplicationEventPublisherAware {
 
@@ -269,12 +270,68 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     /* central entrypoint to get parameters and overlay them by the ones from
      * the execZone. Called by AjaxCalls
+     *
+     * TODO the name is misleading, this gets all parameters of a scriptletbatch, not only the ones from the execution zone
      */
     Set getExecutionZoneParameters(ExecutionZone execZone, File scriptDir) {
         ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), execZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
         Set parameters = overlayExecutionZoneParameters(paramMetaList, execZone.processingParameters)
         return parameters
+    }
+
+    boolean unallowedActionParameterEdit(parameter, originalParameter) {
+        (originalParameter?.value != parameter?.value) &&
+                !canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
+    }
+
+    boolean setParameters(AbstractExecutionZoneCommand command, Map parameters) {
+        ExecutionZone executionZone = ExecutionZone.get(command.execId)
+
+        command.execZoneParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value")
+
+        def originalParameters = getExecutionZoneParameters(executionZone, command.scriptDir)
+                
+        if (command.containsInvisibleParameters) {
+
+            originalParameters.each { ParameterMetadata originalParameter ->
+                if (!originalParameter.visible && !command.execZoneParameters[originalParameter.name]) {
+                    command.execZoneParameters[originalParameter.name] = originalParameter.value
+                }
+            }
+        }
+        
+        command.execZoneParameters.each { key, value ->
+            if (!value) {
+                command.errors.reject(
+                        'executionZone.parameters.emptyValue',
+                        [key] as Object[],
+                        'Mandatory parameter is empty'
+                )
+            }
+        }
+
+        rejectIllegalParameterEdits(originalParameters, command, executionZone)
+
+        return command.errors.hasErrors()
+    }
+
+    def rejectIllegalParameterEdits(Set originalParameters, command, executionZone) {
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            return
+        }
+
+        originalParameters.each { ParameterMetadata originalParameterMetaData ->
+            def param = command.execZoneParameters[originalParameterMetaData.name];
+            def originalParameter = executionZone.getProcessingParameter(originalParameterMetaData.name) ?: originalParameterMetaData
+            def processParam = new ProcessingParameter(name: originalParameter.name, value: param.value.toString())
+            if (unallowedActionParameterEdit(processParam, originalParameter)) {
+                command.errors.reject('executionZone.failure.unallowedEdit',
+                        [originalParameter.name].asType(Object[]),
+                        'You are not allowed to edit parameter {0}'
+                )
+            }
+        }
     }
 
     private Set overlayExecutionZoneParameters(ParameterMetadataList paramMetaList, Set overlayParameters) {

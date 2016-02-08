@@ -16,12 +16,7 @@ class ParameterMetadataListTest {
       ParameterMetadata pmOne = new ParameterMetadata(name:"aName1", defaultValue:"aDefaultValue1", type:ParameterType.CONSUME)
       ParameterMetadata pmTwo = new ParameterMetadata(name:"aName2", defaultValue:"aDefaultValue2", type:ParameterType.CONSUME)
 
-      def coll = []
-
-      coll << pmOne
-      coll << pmTwo
-
-      pml.addParameters(coll)
+      pml.addParameters([pmOne, pmTwo])
 
       assertEquals("expect 2", 2, pml.parameters.size())
 

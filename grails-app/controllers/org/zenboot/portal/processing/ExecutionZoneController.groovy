@@ -42,7 +42,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
     def execute(ExecuteExecutionZoneCommand cmd) {
         flash.action = 'execute'
-        cmd.setParameters(params.parameters)
+        executionZoneService.setParameters(cmd, params.parameters)
         log.info("cmd setParameters:" + params.inspect())
         if (cmd.hasErrors()) {
             chain(action:"show", id:cmd.execId, model:[cmd:cmd])
@@ -132,7 +132,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     }
 
     def createExposedAction = { ExposeExecutionZoneCommand cmd ->
-        cmd.setParameters(params.parameters)
+        executionZoneService.setParameters(cmd, params.parameters)
         if (cmd.hasErrors()) {
             chain(action:"show", id:cmd.execId, model:[cmd:cmd])
             return
@@ -333,7 +333,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             processingParameters = processingParameters.collect { parameter ->
                 def originalParameter = executionZoneInstance.getProcessingParameter(parameter.name)
 
-                if (unallowedEdit(parameter, originalParameter)) {
+                if (unallowedZoneParameterEdit(parameter, originalParameter)) {
                     executionZoneInstance.errors.reject('executionZone.failure.unallowedEdit',
                             [parameter.name] as Object[],
                             'You are not allowed to edit parameter {0}'
@@ -362,11 +362,11 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         redirect(action: "show", id: executionZoneInstance.id)
     }
 
-    private boolean unallowedEdit(parameter, originalParameter) {
-        (originalParameter?.value != parameter.value || originalParameter?.description != parameter.description) &&
-                !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
+    boolean unallowedZoneParameterEdit(parameter, originalParameter) {
+        originalParameter?.description != parameter?.description ||
+                (originalParameter?.value != parameter?.value &&
+                        !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(), parameter))
     }
-
 
     def delete() {
         def executionZoneInstance = ExecutionZone.get(params.execId)
@@ -430,6 +430,7 @@ class GetExecutionZoneParametersCommand {
         }
     }
 
+    // FIXME extract, this is bullshit here
     def getExecutionZoneParameters() {
         def execZnParams = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.execId), this.scriptDir).asType(ParameterMetadata[])
         execZnParams.sort(true, new MetadataParameterComparator())

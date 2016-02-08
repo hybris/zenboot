@@ -81,8 +81,8 @@ grails.war.copyToWebApp = { args ->
 
 forkConfig = [maxMemory: 1024, minMemory: 64, debug: false, maxPerm: 256]
 grails.project.fork = [
-        test: forkConfig, // configure settings for the test-app JVM
-        run: forkConfig, // configure settings for the run-app JVM
-        war: forkConfig, // configure settings for the run-war JVM
-        console: forkConfig // configure settings for the Swing console JVM
+        test: forkConfig,
+        run: forkConfig,
+        war: forkConfig,
+        console: forkConfig
 ]

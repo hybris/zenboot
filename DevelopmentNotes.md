@@ -31,8 +31,7 @@ aspects of the preExecution.
 
 There are basically 4 types of ParameterCollections flying around:
 * Very near to the UI is a special kind of Map which holds the key/values as lists.
-see some converting methods which return a simple map from this params-special-map [ControllerUtils.groovy](https://github.com/hybris/zenboot/blob/8547d5eaff56acddf74baef79d76b896ddf9e944/src/groovy/org/zenboot/portal/ControllerUtils.groovy) and these are used e.g. in the setParameters-method of the
-[AbstractExecutionZoneCommand](https://github.com/hybris/zenboot/blob/543e9f6e5882990b392e5cd4890d19d4424b82b2/grails-app/controllers/org/zenboot/portal/processing/AbstractExecutionZoneCommand.groovy)
+see some converting methods which return a simple map from this params-special-map [ControllerUtils.groovy](https://github.com/hybris/zenboot/blob/8547d5eaff56acddf74baef79d76b896ddf9e944/src/groovy/org/zenboot/portal/ControllerUtils.groovy)
 * The Parameters which are CONSUMED and/or EMITTED and managed in [ParameterMetaData](https://github.com/hybris/zenboot/blob/c6c5b6749630176649eb8fc0e514a59ad82b4d72/src/groovy/org/zenboot/portal/processing/meta/ParameterMetadata.groovy)
 and the corresponding collectionClass [ParameterMetaDataList](https://github.com/hybris/zenboot/blob/c6c5b6749630176649eb8fc0e514a59ad82b4d72/src/groovy/org/zenboot/portal/processing/meta/ParameterMetadataList.groovy) which can get obtained from a
 ScriptletBatchFLow. Unfortunately these objects are also (mis-) used to store
