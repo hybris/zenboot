@@ -1,16 +1,12 @@
 #!/bin/bash
 
-ASK=yes
+set -e
 
 while [ $# -gt 0 ]; do
   case "$1" in
     -v)
       VERSION=$2
       shift 2 ;;
-    -n)
-      ask=no
-      echo "won't ask anything"
-      shift 1 ;;
   esac
 done
 
