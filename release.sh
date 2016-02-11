@@ -14,6 +14,11 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+if !docker ps  > /dev/null 2>&1; then
+   echo "failed to connect to the docker daemon, is docker(-machine) running and are you allowed to connect?"
+   exit 1
+fi
+
 if [[ $(git name-rev --name-only HEAD) != master ]]; then
     echo refusing to release from a branch that is not master
     exit 1
@@ -31,7 +36,8 @@ fi
 echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
 
 # Check whether travis finished the build, something like:
-while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .[0].state`XX" == "finishedXX" ]; do
+while curl -s 'https://api.travis-ci.org/repos/hybris/zenboot/builds' |\
+    jq --exit-status -r '.[0].state != "finished"'; do
   echo "# last travis build is not finished ... waiting ..."
   sleep 20
 done
@@ -48,16 +54,17 @@ git commit -m "Release v${VERSION}"
 git push
 git tag v${VERSION}
 git push origin v${VERSION}
-# enforce to type in sudo-password
+
 echo "waiting for at last 5 mins ..."
 sleep 300
-while [ ! "`curl https://api.travis-ci.org/repos/hybris/zenboot/builds | jq -r .[0].state`XX" == "finishedXX" ]; do
-  echo "build is till ot finished ... waiting ..."
+while curl -s 'https://api.travis-ci.org/repos/hybris/zenboot/builds' |\
+    jq --exit-status -r '.[0].state != "finished"'; do
+  echo "build is still not finished ... waiting ..."
   sleep 60
 done
 docker build -t hybris/zenboot:v${VERSION} .
 echo -n "about to tag the Dockerimage"
-docker tag hybris/zenboot:v${VERSION} hybris/zenboot:latest
+docker tag -f hybris/zenboot:v${VERSION} hybris/zenboot:latest
 docker push hybris/zenboot:latest
 docker push hybris/zenboot:v${VERSION}
 date
