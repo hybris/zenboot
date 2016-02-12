@@ -1,16 +1,12 @@
 #!/bin/bash
 
 set -e
-FORCE=false
 
 while [ $# -gt 0 ]; do
   case "$1" in
     -v)
       VERSION=$2
       shift 2 ;;
-    -f)
-      FORCE=true
-      shift 1 ;;
   esac
 done
 
@@ -24,10 +20,11 @@ if [[ $(git name-rev --name-only HEAD) != master ]]; then
     exit 1
 fi
 
+git fetch
 upstream=$(git for-each-ref --format='%(upstream:short)' refs/heads/master)
-if [[ $FORCE != true ]] && ! git diff --quiet --exit-code $upstream; then
+if ! git diff --quiet --exit-code $upstream; then
     echo "you are not on the latest commit of you upstream $upstream"
-    echo "use -f to force the release on your current HEAD"
+    echo "please update your working copy first"
     exit 1
 fi
 
