@@ -32,6 +32,11 @@ fi
 # version is not allowed to start with a letter
 echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
 
+echo "# make sure jq supports the --exit-status option"
+echo "{}" | jq . --exit-status || exit 1
+
+
+
 # Check whether travis finished the build, something like:
 while curl -s 'https://api.travis-ci.org/repos/hybris/zenboot/builds' |\
     jq --exit-status -r '.[0].state != "finished"'; do
