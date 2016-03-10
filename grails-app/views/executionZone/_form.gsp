@@ -5,7 +5,7 @@
 		<g:message code="executionZone.type.label" default="Type" />
 	</label>
 	<div class="controls">
-		<g:select id="type" name="type.id" from="${org.zenboot.portal.processing.ExecutionZoneType.list()}" optionKey="id" required="" value="${executionZoneInstance?.type?.id}" class="many-to-one" />
+		<g:select id="type" name="type.id" from="${org.zenboot.portal.processing.ExecutionZoneType.list().sort { it.name } }" optionKey="id" required="" value="${executionZoneInstance?.type?.id}" class="many-to-one" />
 		<span class="required-indicator">*</span>
 	</div>
 </div>
