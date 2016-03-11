@@ -476,20 +476,15 @@ class GetReadmeCommand {
     }
 
     private File getReadmeFile() {
-        if (this.readme) {
-            return this.readme
+        if (!this.readme) {
+            this.readme = new File("${this.scriptDir.path}${System.properties['file.separator']}${README_FILENAME}")
         }
-        this.readme = new File("${this.scriptDir.path}${System.properties['file.separator']}${README_FILENAME}")
-        if (!this.readme.exists()) {
-            this.readme.createNewFile()
-            this.readme.write("<!-- TODO: please comment me! -->")
-        }
-        return this.readme
+        this.readme
     }
 
     String getReadmeMarkdown() {
         File readme = this.getReadmeFile()
-        return readme.getText()
+        this.readme.exists() ? readme.text : ""
     }
 
     String getReadmeChecksum() {
@@ -510,7 +505,7 @@ class UpdateReadmeCommand extends GetReadmeCommand {
         if (!this.checksum || this.checksum.empty) {
             this.errors.reject('executionZone.failure.checksumEmpty', null, 'Checksum is empty')
         }
-        if (this.checksum != this.getReadmeFile().text.encodeAsMD5()) {
+        if (this.checksum != this.getReadmeChecksum()) {
             this.errors.reject('executionZone.readme.conflict', null, 'Readme was changed by another user')
         }
         return this.errors.hasErrors()
@@ -518,6 +513,9 @@ class UpdateReadmeCommand extends GetReadmeCommand {
 
     void updateReadme() {
         File readmeFile = this.getReadmeFile()
+        if (!this.readme.exists()) {
+            this.readme.createNewFile()
+        }
         readmeFile.write(this.markdown)
     }
 
