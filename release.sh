@@ -48,9 +48,8 @@ done
 
 date
 echo "# Will now release $1"
-# ------------------verifying versions -----------------
-sed -i -e "s/app.version=.*/app.version=$VERSION/" application.properties
-sed -i -e "s/download\/v[.0-9]*/download\/v$VERSION/" Dockerfile
+sed -i .bak -e "s/app.version=.*/app.version=$VERSION/" application.properties
+sed -i .bak -e "s/download\/v[.0-9]*/download\/v$VERSION/" Dockerfile
 
 git add application.properties
 git add Dockerfile
