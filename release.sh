@@ -29,6 +29,8 @@ if ! git diff --quiet --exit-code $upstream; then
 fi
 
 [ -z "${VERSION:+x}" ]    && echo "# Error: VERSION not present or empty" && exit 2
+
+VERSION=$(echo $VERSION | sed 's/^v//')
 # version is not allowed to start with a letter
 echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
 
