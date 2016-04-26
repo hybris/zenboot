@@ -222,22 +222,10 @@ class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand
     def grailsLinkGenerator
     def params
 
+    Long executionZone
     String url
     String cronExpression
     Set roles = []
-
-    // Long executionZone and AbstractExecutionZoneCommand's execId have the exact same meaning.
-    // Tracking down all the uses of "executionZone" in the code an converting them to execId seems too error-prone
-    // (as we might catch some false ones and introduce more bugs that way),
-    // so it seems safer to introduce an alias:
-    @SuppressWarnings("GroovyUnusedDeclaration")
-    public void setExecutionZone(Long executionZone) {
-        this.execId = executionZone
-    }
-
-    public Long getExecutionZone() {
-        return this.execId
-    }
 
     boolean validate() {
         boolean result = true
