@@ -10,6 +10,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+[ -z "${VERSION:+x}" ]    && echo "# Error: VERSION not present or empty" && exit 2
+
+VERSION=$(echo $VERSION | sed 's/^v//')
+# version is not allowed to start with a letter
+echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
+
 if !docker ps  > /dev/null 2>&1; then
    echo "failed to connect to the docker daemon, is docker(-machine) running and are you allowed to connect?"
    exit 1
@@ -28,11 +34,6 @@ if ! git diff --quiet --exit-code $upstream; then
     exit 1
 fi
 
-[ -z "${VERSION:+x}" ]    && echo "# Error: VERSION not present or empty" && exit 2
-
-VERSION=$(echo $VERSION | sed 's/^v//')
-# version is not allowed to start with a letter
-echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
 
 echo "# make sure jq supports the --exit-status option"
 echo "{}" | jq . --exit-status || exit 1
@@ -58,13 +59,29 @@ git push
 git tag v${VERSION}
 git push origin v${VERSION}
 
-echo "waiting for at last 5 mins ..."
+echo "waiting for travis CI to finish (at least 5 minutes)"
 sleep 300
 while curl -s 'https://api.travis-ci.org/repos/hybris/zenboot/builds' |\
     jq --exit-status -r '.[0].state != "finished"'; do
-  echo "build is still not finished ... waiting ..."
+  echo "build is still not finished. Waiting ..."
   sleep 60
 done
+
+echo "waiting for the artifact to appear on github"
+SUCCESS=false
+for i in $(seq 1 20); do
+    if curl -X HEAD -sf "https://github.com/hybris/zenboot/releases/download/v${VERSION}/zenboot.war" -o /dev/null; then
+        SUCCESS=true
+        break
+    fi
+    sleep 15
+done
+
+if [[ $SUCCESS = false ]]; then
+    echo "failed to get https://github.com/hybris/zenboot/releases/download/v${VERSION}/zenboot.war"
+    exit 1
+fi
+
 docker build -t hybris/zenboot:v${VERSION} .
 echo -n "about to tag the Dockerimage"
 docker tag -f hybris/zenboot:v${VERSION} hybris/zenboot:latest
