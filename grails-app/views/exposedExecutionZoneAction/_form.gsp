@@ -43,7 +43,7 @@
 		<g:message code="exposedExecutionZoneAction.executionZone.label" default="Execution Zone" />
 	</label>
 	<div class="controls">
-		<g:select name="executionZone" from="${ExecutionZone.list()}" optionKey="id"  value="${exposedExecutionZoneActionInstance?.executionZone?.id}" readonly="true" style="width:40%"/>
+		<g:select name="execId" from="${ExecutionZone.list()}" optionKey="id"  value="${exposedExecutionZoneActionInstance?.executionZone?.id}" readonly="true" style="width:40%"/>
 	</div>
 </div>
 
