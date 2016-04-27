@@ -126,7 +126,7 @@
 
 
 			<fieldset class="spacer buttons">
-				<g:hiddenField name="execId" value="${exposedExecutionZoneActionInstance?.id}" />
+				<g:hiddenField name="actionId" value="${exposedExecutionZoneActionInstance?.id}" />
 				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 					<g:link class="btn btn-primary" action="edit" id="${exposedExecutionZoneActionInstance?.id}">
 						<g:message code="default.button.edit.label" default="Edit" />

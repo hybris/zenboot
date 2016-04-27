@@ -1,5 +1,6 @@
 package org.zenboot.portal.processing
 
+import grails.validation.Validateable
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
@@ -56,21 +57,21 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
     def execute = { ExecuteExposedExecutionZoneActionCommand cmd ->
         cmd.parameters = params.parameters
-        def resolvedParams = cmd.executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(params.execId), ControllerUtils.getParameterMap(params))
+        def resolvedParams = cmd.executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(params.actionId), ControllerUtils.getParameterMap(params))
         cmd.exposedExecutionZoneActionParameters = resolvedParams.resolvedParameters
         resolvedParams.missingParameters.each { paramName ->
            cmd.errors.reject('executionZone.parameters.emptyValue', [paramName].asType(Object[]), 'Mandatory parameter is empty')
         }
 
         if (cmd.hasErrors()) {
-            chain(action:'show', id:cmd.execId, model:[cmd:cmd])
+            chain(action:'show', id:cmd.actionId, model:[cmd:cmd])
             return
         } else {
             ExecutionZoneAction action = cmd.getExecutionZoneAction()
             this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
-        redirect(action:"show", id:cmd.execId)
+        redirect(action:"show", id:cmd.actionId)
     }
 
     def index() {
@@ -106,7 +107,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
     def create() {
         //this method can be called in a chain from ExecutionZoneController.createExposedAction()
-        [exposedExecutionZoneActionInstance: chainModel?.exposedExecutionZoneActionInstance ? chainModel.exposedExecutionZoneActionInstance : new ExposedExecutionZoneAction()]
+        [exposedExecutionZoneActionInstance: chainModel?.exposedExecutionZoneActionInstance ?: new ExposedExecutionZoneAction()]
     }
 
     def save = { SaveExposedExecutionZoneActionCommand cmd ->
@@ -167,7 +168,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
         def exposedExecutionZoneActionInstance = cmd.getExecutionZoneAction()
 
         if (!exposedExecutionZoneActionInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.execId])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.actionId])
             redirect(action: "list")
             return
         }
@@ -193,21 +194,21 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     }
 
     def delete() {
-        def exposedExecutionZoneActionInstance = ExposedExecutionZoneAction.get(params.execId)
+        def exposedExecutionZoneActionInstance = ExposedExecutionZoneAction.get(params.actionId)
         if (!exposedExecutionZoneActionInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.execId])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.actionId])
             redirect(action: "list")
             return
         }
 
         try {
             exposedExecutionZoneActionInstance.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.execId])
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.actionId])
             redirect(action: "list")
         }
         catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.execId])
-            redirect(action: "show", id: params.execId)
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.actionId])
+            redirect(action: "show", id: params.actionId)
         }
     }
 
@@ -226,37 +227,24 @@ class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand
     String cronExpression
     Set roles = []
 
-    // Long executionZone and AbstractExecutionZoneCommand's execId have the exact same meaning.
-    // Tracking down all the uses of "executionZone" in the code an converting them to execId seems too error-prone
-    // (as we might catch some false ones and introduce more bugs that way),
-    // so it seems safer to introduce an alias:
-    @SuppressWarnings("GroovyUnusedDeclaration")
-    public void setExecutionZone(Long executionZone) {
-        this.execId = executionZone
-    }
-
-    public Long getExecutionZone() {
-        return this.execId
-    }
-
     boolean validate() {
         boolean result = true
         if (roles.empty) {
-            this.errors.reject('exposedExecutionZoneAction.create.rolesMissing', 'Roles missing')
+            this.getErrors().reject('exposedExecutionZoneAction.create.rolesMissing', 'Roles missing')
             result = false
         }
         if (!url) {
-            this.errors.reject('exposedExecutionZoneAction.create.urlMissing', 'URL is not defined')
+            this.getErrors().reject('exposedExecutionZoneAction.create.urlMissing', 'URL is not defined')
             result = false
         }
-        if (!ExecutionZone.get(this.executionZone)) {
-            this.errors.reject('exposedExecutionZoneAction.create.zoneUnknown', 'ExecutionZone is unknown')
+        if (!ExecutionZone.get(this.execId)) {
+            this.getErrors().reject('exposedExecutionZoneAction.create.zoneUnknown', 'ExecutionZone is unknown')
             result = false
         }
         try {
             URI absoluteUrl = new URI(this.grailsLinkGenerator.link(absolute:true, controller:'exposedExecutionZoneAction', uri: '/' + this.url))
         } catch (URISyntaxException exc) {
-            this.errors.reject('exposedExecutionZoneAction.create.urlInvalid', [url].asType(Object[]), 'URL is invalid')
+            this.getErrors().reject('exposedExecutionZoneAction.create.urlInvalid', [url].asType(Object[]), 'URL is invalid')
             result = false
         }
         return result
@@ -265,7 +253,7 @@ class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {
         ExposedExecutionZoneAction exposedExcZnActn = new ExposedExecutionZoneAction(
-            executionZone: ExecutionZone.get(this.executionZone),
+            executionZone: ExecutionZone.get(this.execId),
             scriptDir: this.scriptDir,
             url:this.url,
             cronExpression:this.cronExpression
@@ -279,10 +267,11 @@ class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand
 }
 
 class UpdateExposedExecutionZoneActionCommand extends SaveExposedExecutionZoneActionCommand {
+    Long actionId
 
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {
-        ExposedExecutionZoneAction exposedExcZnActn = ExposedExecutionZoneAction.get(execId)
+        ExposedExecutionZoneAction exposedExcZnActn = ExposedExecutionZoneAction.get(actionId)
         exposedExcZnActn.url = this.url
         exposedExcZnActn.cronExpression = this.cronExpression
         //set params
@@ -300,18 +289,16 @@ class ExecuteExposedExecutionZoneActionCommand {
 
     def executionZoneService
 
-    Long execId
+    Long actionId
     Map exposedExecutionZoneActionParameters
     Map parameters
 
     static constraints = {
-        execId nullable:false
+        actionId nullable:false
     }
 
-
-
     /*boolean validate() {
-        def resolvedParams = executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(this.execId), ControllerUtils.getParameterMap(params))
+        def resolvedParams = executionZoneService.resolveExposedExecutionZoneActionParameters(ExposedExecutionZoneAction.get(this.actionId), ControllerUtils.getParameterMap(params))
         this.exposedExecutionZoneActionParameters = resolvedParams.resolvedParameters
         resolvedParams.missingParameters.each { paramName ->
             this.errors.reject('executionZone.parameters.emptyValue', [paramName].asType(Object[]), 'Mandatory parameter is empty')
@@ -320,7 +307,7 @@ class ExecuteExposedExecutionZoneActionCommand {
     }*/
 
     ExecutionZoneAction getExecutionZoneAction() {
-        ExposedExecutionZoneAction exposedAction = ExposedExecutionZoneAction.get(this.execId)
+        ExposedExecutionZoneAction exposedAction = ExposedExecutionZoneAction.get(this.actionId)
         return executionZoneService.createExecutionZoneAction(exposedAction, this.exposedExecutionZoneActionParameters)
     }
 }

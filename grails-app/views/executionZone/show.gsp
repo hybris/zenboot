@@ -66,25 +66,11 @@
 									<dt>
 										<g:message code="executionZone.actions.label" default="Actions" />
 									</dt>
-									<dd class="collapsable-list">
-										<a class="collapsed" style="cursor: pointer">
-											<g:message code="executionZone.actions.size" default="{0} actions defined" args="[executionZoneInstance.actions.size()]" />
-											<i class="icon-resize-full"></i>
-										</a>
-										<ul class="unstyled hide">
-											<g:each in="${executionZoneInstance.actions}" var="a" status="status">
-												<li>
-													<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-														<g:link controller="executionZoneAction" action="show" id="${a.id}">
-															${a.toString()}
-														</g:link>
-													</sec:ifAllGranted>
-													<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-														${a.toString()}
-													</sec:ifNotGranted>
-												</li>
-											</g:each>
-										</ul>
+									<dd>
+										<filterpane:filterLink controller="ScriptletBatch" action="list"
+															   values="['executionZoneAction.executionZone.id': executionZoneInstance?.id]">
+											<g:message code="executionZone.actions.size" default="{0} actions executed" args="[executionZoneInstance.actions.size()]" />
+										</filterpane:filterLink>
 									</dd>
 								</g:if>
 
