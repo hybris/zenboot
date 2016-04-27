@@ -26,6 +26,19 @@ if [[ $(git name-rev --name-only HEAD) != master ]]; then
     exit 1
 fi
 
+echo "# make sure jq supports the --exit-status option"
+echo "{}" | jq . --exit-status || exit 1
+
+wait_for_travis() {
+    echo -n "waiting for travis CI to finish"
+    while curl -s 'https://api.travis-ci.org/repos/hybris/zenboot/builds' |\
+        jq --exit-status -r '.[0].state != "finished"' > /dev/null; do
+      echo -n "."
+      sleep 20
+    done
+    echo " done"
+}
+
 git fetch
 upstream=$(git for-each-ref --format='%(upstream:short)' refs/heads/master)
 if ! git diff --quiet --exit-code $upstream; then
@@ -34,18 +47,7 @@ if ! git diff --quiet --exit-code $upstream; then
     exit 1
 fi
 
-
-echo "# make sure jq supports the --exit-status option"
-echo "{}" | jq . --exit-status || exit 1
-
-
-
-# Check whether travis finished the build, something like:
-while curl -s 'https://api.travis-ci.org/repos/hybris/zenboot/builds' |\
-    jq --exit-status -r '.[0].state != "finished"'; do
-  echo "# last travis build is not finished ... waiting ..."
-  sleep 20
-done
+wait_for_travis
 
 date
 echo "# Will now release $1"
@@ -59,23 +61,20 @@ git push
 git tag v${VERSION}
 git push origin v${VERSION}
 
-echo "waiting for travis CI to finish (at least 5 minutes)"
-sleep 300
-while curl -s 'https://api.travis-ci.org/repos/hybris/zenboot/builds' |\
-    jq --exit-status -r '.[0].state != "finished"'; do
-  echo "build is still not finished. Waiting ..."
-  sleep 60
-done
+wait_for_travis
 
 echo "waiting for the artifact to appear on github"
 SUCCESS=false
 for i in $(seq 1 20); do
-    if curl -X HEAD -sf "https://github.com/hybris/zenboot/releases/download/v${VERSION}/zenboot.war" -o /dev/null; then
+    if curl -X HEAD -sf "https://github.com/hybris/zenboot/releases/download/v${VERSION}/zenboot.war" -o /dev/null
+    then
         SUCCESS=true
         break
     fi
+    echo -n "."
     sleep 15
 done
+echo " done"
 
 if [[ $SUCCESS = false ]]; then
     echo "failed to get https://github.com/hybris/zenboot/releases/download/v${VERSION}/zenboot.war"
