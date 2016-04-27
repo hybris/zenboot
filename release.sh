@@ -16,7 +16,7 @@ VERSION=$(echo $VERSION | sed 's/^v//')
 # version is not allowed to start with a letter
 echo $VERSION | egrep -v -q "^[0-9]" && echo "# VERSION needs to start with a digit. The "v" will added inside the script" && exit 2
 
-if !docker ps  > /dev/null 2>&1; then
+if ! docker ps > /dev/null 2>&1; then
    echo "failed to connect to the docker daemon, is docker(-machine) running and are you allowed to connect?"
    exit 1
 fi
