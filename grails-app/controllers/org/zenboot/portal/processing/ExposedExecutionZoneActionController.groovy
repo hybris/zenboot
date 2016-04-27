@@ -106,7 +106,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
     def create() {
         //this method can be called in a chain from ExecutionZoneController.createExposedAction()
-        [exposedExecutionZoneActionInstance: chainModel?.exposedExecutionZoneActionInstance ? chainModel.exposedExecutionZoneActionInstance : new ExposedExecutionZoneAction()]
+        [exposedExecutionZoneActionInstance: chainModel?.exposedExecutionZoneActionInstance ?: new ExposedExecutionZoneAction()]
     }
 
     def save = { SaveExposedExecutionZoneActionCommand cmd ->
