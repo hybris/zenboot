@@ -30,9 +30,6 @@
 			<sec:ifLoggedIn>
 				<ul class="nav nav-tabs">
 					<nav:primary/>
-					<!-- <apNav:renderMenu group="tabs" var="item" mainMenu="true">
-						<g:render template="/layouts/menuItem" model="[item:item]" />
-					</apNav:renderMenu> -->
 				</ul>
 			</sec:ifLoggedIn>
 		</div>
@@ -43,10 +40,6 @@
 			<div class="span2">
 				<ul class="nav nav-pills nav-tabs nav-stacked">
 					<nav:primary/>
-					<!--
-					<apNav:renderMenu group="menu" var="item">
-						<g:render template="/layouts/menuItem" model="[item:item]" />
-					</apNav:renderMenu> -->
 				</ul>
 				<div id="processqueue">
 					<sec:ifLoggedIn>
