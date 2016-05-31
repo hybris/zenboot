@@ -49,13 +49,13 @@ grails.project.dependency.resolution = {
         runtime ":quartz2:0.2.3"
         runtime ":resources:1.2.14"
         runtime ":lesscss-resources:1.3.3"
-        runtime ":spring-security-core:2.0-RC4"
+        runtime ":spring-security-core:2.0.0"
         compile ":webxml:1.4.1"
         runtime ':twitter-bootstrap:2.3.2.2'
         runtime ':console:1.5.0'
 
         //spring security ui specific
-        runtime ":spring-security-ui:1.0-RC2"
+        runtime ":spring-security-ui:1.0-RC3"
         runtime ":famfamfam:1.0.1"
         runtime ":jquery-ui:1.10.4"
 
