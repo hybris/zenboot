@@ -1,0 +1,133 @@
+#header {
+	background-image: url("../images/zenboot_bg.png");
+	background-color: #CFB496;
+	height: 95px;
+	margin-bottom: 10px;
+}
+
+#logo img {
+	margin: 0px;
+	padding: 0px;
+	max-width: none !important;
+}
+
+#title {
+	color: #fff;
+	text-align: center;
+	padding-top: 15px;
+}
+
+#title small {
+	color: #fff;
+	font-size: 16pt;
+}
+
+.alert {
+	margin-top: 15px;
+}
+
+.property-list .fieldcontain .property-label {
+	width: 10%;
+}
+
+.property-list .fieldcontain .property-value {
+	margin-left: 12%;
+}
+
+.spacer {
+	margin-top: 20px;
+}
+
+#processqueue {
+	padding-top: 15px;
+	font-size: 10pt;
+}
+#processqueue .progress {
+	margin: 5px 0 5px 0;
+}
+
+#processqueue > table {
+    table-layout: fixed;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+#footer {
+	color: #999999;
+	font-size: 8pt;
+}
+
+.parameters-table {
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.parameters-table input {
+	width: 96%;
+}
+
+.table td.scriptlet-metadata {
+	margin: 0px;
+	display: none;
+}
+
+.tooltip {
+	cursor: pointer;
+}
+
+.zb-tooltip {
+	cursor: pointer;
+}
+.scriptlet-item-detail table {
+	background: white;
+}
+
+.scriptlet-item-detail table th {
+	font-weight: normal;
+}
+
+.scriptlet-item-detail pre[id$=_logged] {
+	background-color: white;
+}
+
+#scriptDirs a {
+	text-decoration: none;
+}
+
+.readme {
+	height: 400px;
+	margin-top: 10px;
+	border: solid 1px #ccc;
+}
+
+.flow-chart {
+	margin: 10px 0 0 15px;
+}
+
+.flow-chart .flow-element {
+	border: 1px solid #DDDDDD;
+	border-radius: 6px 6px 6px 6px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075);
+	margin: 15px 10px 15px 10px;
+	padding: 8px;
+}
+
+.flow-chart .flow-element-batchplugin {
+	background-color: #E0FFE1
+}
+
+.flow-chart .flow-element-plugin {
+	background-color: #DFE7FF;
+}
+
+.flow-chart .flow-element-element {
+	background-color: #FFF;
+}
+
+.flow-chart .flow-element hr {
+	margin: 2px 0 2px 0;
+}
+
+.flow-chart .legend {
+	font-size: 8pt;
+}
