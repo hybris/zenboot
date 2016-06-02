@@ -9,5 +9,6 @@ enum HostState {
     COMPLETED,
     DISABLED,
     DELETED,
-    BROKEN
+    BROKEN,
+    UNMANAGED
 }
