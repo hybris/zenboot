@@ -35,7 +35,6 @@ public class Host {
         ipAddress(blank:false, length:7..15)
         cname(blank:false)
         macAddress(blank:false)
-        hostname(nullable:false)
         instanceId(blank:false)
         state(nullable:false)
         hostname(nullable:false)
