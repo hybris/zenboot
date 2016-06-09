@@ -81,6 +81,7 @@
 									<dd>
 										<g:render template="hostList" model="['state': HostState.COMPLETED, 'executionZone': executionZoneInstance]" />
 										<g:render template="hostList" model="['state': HostState.CREATED, 'executionZone': executionZoneInstance]" />
+										<g:render template="hostList" model="['state': HostState.UNMANAGED, 'executionZone': executionZoneInstance]" />
 									</dd>
 								</g:if>
 

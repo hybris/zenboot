@@ -15,6 +15,7 @@ class ExecutionZone implements Likeable {
     String qualityStage
     SortedSet processingParameters
     Set actions = []
+    Set hosts = []
     boolean enabled = true
     boolean enableExposedProcessingParameters = true
     Long hostLimit
@@ -114,12 +115,16 @@ class ExecutionZone implements Likeable {
       return this.hosts.findResults() { it.state == HostState.COMPLETED ? it : null  }
     }
 
+    List getCompletedAndUnmanagedHosts() {
+      return this.hosts.findResults() { it.state == HostState.COMPLETED ||  it.state == HostState.UNMANAGED ? it : null  }
+    }
+
     List getNonDeletedHosts() {
       return this.hosts.findResults() { it.state == HostState.DELETED ? null : it  }
     }
 
     List getActiveServiceUrls() {
-      this.getCompletedHosts().findResults() { it.serviceUrls }.flatten()
+      this.getCompletedAndUnmanagedHosts().findResults() { it.serviceUrls }.flatten()
     }
 
 
