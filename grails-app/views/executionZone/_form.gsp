@@ -14,20 +14,11 @@
 	<label class="control-label" for="actions">
 		<g:message code="executionZone.actions.label" default="Actions" />
 	</label>
-	<div class="controls collapsable-list">
-		<a class="collapsed" style="cursor: pointer">
-			<g:message code="executionZone.actions.size" default="{0} actions defined" args="[executionZoneInstance.actions.size()]" />
-			<i class="icon-resize-full"></i>
-		</a>
-		<ul class="unstyled hide">
-			<g:each in="${executionZoneInstance?.actions?}" var="a">
-				<li>
-					<g:link controller="executionZoneAction" action="show" id="${a.id}">
-						${a?.encodeAsHTML()}
-					</g:link>
-				</li>
-			</g:each>
-		</ul>
+	<div class="controls">
+		<filterpane:filterLink controller="ScriptletBatch" action="list"
+								 values="['executionZoneAction.executionZone.id': executionZoneInstance?.id]">
+			<g:message code="executionZone.actions.size" default="{0} actions executed" args="[executionZoneInstance.actions.size()]" />
+		</filterpane:filterLink>
 	</div>
 </div>
 

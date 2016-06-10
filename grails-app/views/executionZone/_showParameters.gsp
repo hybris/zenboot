@@ -26,7 +26,7 @@
 
 				</td>
 				<td>
-					<g:textField name="parameters.value" value="${entry.value}" readonly="${readonly}" />
+					<g:textArea rows="1" cols="60" name="parameters.value" value="${entry.value}" readonly="${readonly}" style="height: 21px; width: 300px"/>
 				</td>
 				<td>
 					<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
