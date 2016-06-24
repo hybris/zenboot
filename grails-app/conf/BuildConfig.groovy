@@ -34,6 +34,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
+        build "org.grails.plugins:codenarc:0.25.2"
         compile ":hibernate:3.6.10.2"
         compile ":version-update:1.2.0"
         compile ":joda-time:1.5"
@@ -77,6 +78,22 @@ grails.war.copyToWebApp = { args ->
     fileset(dir:".") {
         include(name: "zenboot-scripts/**")
     }
+}
+
+codenarc {
+    reports = {
+        CodeNarcXmlReport('xml') {
+            outputFile = 'target/CodeNarcReport.xml'
+            title = 'CodeNarc Report'
+        }
+        CodeNarcHtmlReport('html') {
+            outputFile = 'target/CodeNarcReport.html'
+            title = 'CodeNarc Report'
+        }
+    }
+    ruleSetFiles = [
+        'file:grails-app/conf/codenarc/codenarc.xml'
+    ]
 }
 
 forkConfig = [maxMemory: 1024, minMemory: 64, debug: false, maxPerm: 256]
