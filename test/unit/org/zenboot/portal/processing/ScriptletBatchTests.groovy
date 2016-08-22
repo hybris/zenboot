@@ -2,7 +2,7 @@ package org.zenboot.portal.processing
 
 import grails.test.mixin.*
 import grails.test.mixin.domain.DomainClassUnitTestMixin
-
+import org.apache.commons.logging.Log
 import org.zenboot.portal.processing.Processable.ProcessState
 
 @TestFor(ScriptletBatch)
@@ -34,6 +34,8 @@ class ScriptletBatchTests {
             throw new RuntimeException("something went wrong")
         }
         assertEquals("Process state is wrong", processQueue.state, ProcessState.WAITING)
+
+
         shouldFail(ProcessingException) { processQueue.execute(new ProcessContext()) }
         assertEquals("Process state is wrong", processQueue.state, ProcessState.FAILURE)
 
@@ -102,7 +104,7 @@ class ScriptletBatchTests {
         assertEquals("Wrong count of process units", 3, processQueue.countExecutedProcessables())
     }
 
-    private createProcessUnit(Closure onFailure={}, Closure onSuccess={}, Closure onStart={}, Closure onStop={}, Closure process) {
+    private createProcessUnit(Closure onFailure={ ProcessContext ctx, Throwable exception -> }, Closure onSuccess={}, Closure onStart={}, Closure onStop={}, Closure process) {
         Scriptlet processUnit = new Scriptlet(description:"TestProcessUnit")
         processUnit.onFailure = onFailure
         processUnit.onSuccess = onSuccess
