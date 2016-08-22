@@ -34,8 +34,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
+        runtime ':hibernate:3.6.10.16'
         build "org.grails.plugins:codenarc:0.25.2"
-        compile ":hibernate:3.6.10.2"
         compile ":version-update:1.2.0"
         compile ":joda-time:1.5"
         compile ":asset-pipeline:1.9.3"
@@ -57,6 +57,8 @@ grails.project.dependency.resolution = {
         runtime ":jquery-ui:1.8.15"
 
         build ':tomcat:7.0.42'
+        // with grails 2.3.11, newer tomcat versions than 7.0.42 return 404 for all routes
+        //build ':tomcat:7.0.70'
 
         compile ':likeable:0.1.2'
         compile ":pretty-time:2.1.3.Final-1.0.1"

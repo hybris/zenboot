@@ -2,12 +2,12 @@ class UrlMappings {
 
     static mappings = {
         //default
-        "/$controller/$action?/$id?" {
+        "/$controller/$action?/$id?(.$format)?" {
+        //"/$controller/$action?/$id?" {
             constraints {
                 // apply constraints here
             }
         }
-
 
         //homepage
         "/"(controller:'home', action:'index')
