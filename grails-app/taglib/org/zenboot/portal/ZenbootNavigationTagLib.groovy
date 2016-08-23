@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.io.support.AntPathMatcher
 //import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.zenboot.portal.security.Role
 
+// FIXME keeping this file around as we probably need to re-implement some of its functionality
 class ZenbootNavigationTagLib {
 
     static namespace = "apNav"
@@ -12,6 +13,8 @@ class ZenbootNavigationTagLib {
     def springSecurityService
 
     def renderMenu = { attrs, body ->
+        return
+
         def group = attrs.group ?: '*'
         def var = attrs.var
         def isMainMenu = attrs.mainMenu

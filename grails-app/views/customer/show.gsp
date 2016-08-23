@@ -48,6 +48,7 @@
 				<dt>
 					<g:message code="customer.hosts.label" default="Hosts" />
 				</dt>
+				<dd>
 					<g:each in="${customerInstance.hosts}" var="h">
 						<span class="property-value" aria-labelledby="hosts-label">
 							<g:link controller="host" action="show" id="${h.id}">
@@ -55,6 +56,7 @@
 							</g:link>
 						</span>
 					</g:each>
+				</dd>
 			</g:if>
 			
 		</dl>
