@@ -1,6 +1,7 @@
 package org.zenboot.portal
 
-import org.springframework.security.web.util.AntUrlPathMatcher
+import org.codehaus.groovy.grails.io.support.AntPathMatcher
+//import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.zenboot.portal.security.Role
 
 class ZenbootNavigationTagLib {
@@ -69,11 +70,12 @@ class ZenbootNavigationTagLib {
                 return !springSecurityService.authentication.authorities.intersect(requiredRoles).empty
             } else {
                 def urlPatterns = grailsApplication.config.grails.plugins.springsecurity.controllerAnnotations.staticRules
-                AntUrlPathMatcher urlMatcher = new AntUrlPathMatcher(false)
+                // FIXME test
+                AntPathMatcher urlMatcher = new AntPathMatcher()
                 return urlPatterns.any { String urlPattern, List roles ->
-                    def compiledPattern = urlMatcher.compile(urlPattern)
                     def target = "/${item.controller}/${item.action}"
-                    if (urlMatcher.pathMatchesUrl(compiledPattern, target)) {
+                    if ( urlMatcher.match(urlPattern, target) ) {
+
                         return !springSecurityService.authentication.authorities.intersect(roles).empty
                     }
                 }

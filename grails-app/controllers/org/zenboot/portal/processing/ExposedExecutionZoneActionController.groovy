@@ -1,7 +1,7 @@
 package org.zenboot.portal.processing
 
 import grails.validation.Validateable
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.dao.DataIntegrityViolationException

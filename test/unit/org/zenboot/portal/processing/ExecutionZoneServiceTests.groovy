@@ -3,7 +3,7 @@ package org.zenboot.portal.processing
 import grails.test.GrailsMock
 import grails.test.mixin.*
 import grails.test.mixin.services.ServiceUnitTestMixin
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.junit.*
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadataList

@@ -3,7 +3,7 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.converters.XML
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.grails.plugin.filterpane.FilterPaneUtils
 import org.springframework.context.ApplicationEventPublisher

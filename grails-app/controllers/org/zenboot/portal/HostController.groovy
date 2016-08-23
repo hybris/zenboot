@@ -1,6 +1,6 @@
 package org.zenboot.portal
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import org.grails.plugin.filterpane.FilterPaneUtils
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus

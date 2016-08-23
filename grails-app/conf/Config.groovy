@@ -96,7 +96,8 @@ grails.gorm.default.constraints = {'*'(nullable: true)}
 grails.hibernate.cache.queries = true
 
 // Use spring binder (http://grails.org/doc/2.3.x/guide/upgradingFromPreviousVersionsOfGrails.html)
-grails.databinding.useSpringBinder = true
+// FIXME deprecated with 2.4
+//grails.databinding.useSpringBinder = true
 
 // email configuration
 grails.mail.default.from="zenboot-noreply@yourdomain.com"
@@ -127,19 +128,19 @@ environments {
 }
 
 //Spring security configuration
-grails.plugins.springsecurity.password.algorithm='SHA-512'
-grails.plugins.springsecurity.userLookup.userDomainClassName = 'org.zenboot.portal.security.Person'
-grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'org.zenboot.portal.security.PersonRole'
-grails.plugins.springsecurity.authority.className = 'org.zenboot.portal.security.Role'
-grails.plugins.springsecurity.rejectIfNoRule = true
+grails.plugin.springsecurity.password.algorithm='SHA-512'
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'org.zenboot.portal.security.Person'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.zenboot.portal.security.PersonRole'
+grails.plugin.springsecurity.authority.className = 'org.zenboot.portal.security.Role'
+grails.plugin.springsecurity.rejectIfNoRule = true
 
-grails.plugins.springsecurity.useBasicAuth = true
-grails.plugins.springsecurity.filterChain.chainMap = [
+grails.plugin.springsecurity.useBasicAuth = true
+grails.plugin.springsecurity.filterChain.chainMap = [
     '/rest/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
     '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
  ]
 
-grails.plugins.springsecurity.controllerAnnotations.staticRules = [
+grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/assets/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/js/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/images/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],

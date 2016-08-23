@@ -1,6 +1,6 @@
 package org.zenboot.portal.processing
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.PathResolver
 import org.zenboot.portal.ZenbootException

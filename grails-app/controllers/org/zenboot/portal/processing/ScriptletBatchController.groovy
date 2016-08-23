@@ -3,7 +3,7 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.grails.plugin.filterpane.FilterPaneUtils
 import org.zenboot.portal.security.Role
 
