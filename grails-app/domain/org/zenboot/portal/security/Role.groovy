@@ -22,6 +22,6 @@ class Role {
 
     @Override
     String toString() {
-        return this.authority
+        return this.authority ?: 'Role'
     }
 }
