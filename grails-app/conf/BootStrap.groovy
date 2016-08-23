@@ -12,6 +12,7 @@ class BootStrap {
 
     def executionZoneService
     def grailsApplication
+    def scriptletBatchService
 
     def init = { servletContext ->
         if (Environment.current == Environment.TEST) {
@@ -54,6 +55,8 @@ class BootStrap {
             returnArray['serviceUrls'] = it.serviceUrls
             return returnArray
         }
+
+        this.scriptletBatchService.init()
     }
 
     private setupSecurity() {

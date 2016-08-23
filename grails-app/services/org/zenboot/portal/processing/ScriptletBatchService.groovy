@@ -14,7 +14,6 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     static transactional = false //necessary to avoid duplicate event listener registration
 
     def grailsApplication
-    def executionZoneService
     def executionService
     def springSecurityService
 
@@ -22,6 +21,14 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     def clearCache() {
       scriptletFlowCache = null
+    }
+
+    // break circular dependency
+    // see http://web.archive.org/web/20120420132858/http://jira.grails.org/browse/GRAILS-5080
+    // TODO the circular dependency should really be broken by pulling some common functionality out of one of the services
+    protected def executionZoneService
+    def init() {
+        this.executionZoneService = grailsApplication.mainContext.executionZoneService
     }
 
     def filterByAccessPermission(scriptletBatches) {
