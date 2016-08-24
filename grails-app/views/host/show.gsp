@@ -1,5 +1,6 @@
 <%@ page import="org.zenboot.portal.Host"%>
 <%@ page import="org.zenboot.portal.security.Role"%>
+<% def executionZoneService = grailsApplication.mainContext.getBean("executionZoneService"); %>
 <!doctype html>
 <html>
 <head>
@@ -210,19 +211,19 @@
 				</dd>
 			</g:if>
 		</dl>
-
-
-		<g:form name="markHostForm" action="markHost">
-			<g:hiddenField name="id" value="${hostInstance?.id}" />
-			<g:actionSubmit id="markUnknownButton" action="markHostUnknown"
-							title="prevent the host from being deleted if you accidentally marked it as broken"
-							value="mark unknown" class="btn btn-primary" >
-			</g:actionSubmit>
-			<g:actionSubmit id="markAsBrokenButton" action="markHostBroken"
-							title="trigger deletion of the host after some time"
-							value="mark broken" class="btn btn-danger" >
-			</g:actionSubmit>
-		</g:form>
+		<g:if test="${executionZoneService.userHasAccess(hostInstance.execZone)}">
+			<g:form name="markHostForm" action="markHost">
+				<g:hiddenField name="id" value="${hostInstance?.id}"/>
+				<g:actionSubmit id="markUnknownButton" action="markHostUnknown"
+								title="prevent the host from being deleted if you accidentally marked it as broken"
+								value="mark unknown" class="btn btn-primary">
+				</g:actionSubmit>
+				<g:actionSubmit id="markAsBrokenButton" action="markHostBroken"
+								title="trigger deletion of the host after some time"
+								value="mark broken" class="btn btn-danger">
+				</g:actionSubmit>
+			</g:form>
+		</g:if>
 		<g:form name="hostForm">
 			<fieldset class="buttons">
 				<g:hiddenField name="id" value="${hostInstance?.id}" />
