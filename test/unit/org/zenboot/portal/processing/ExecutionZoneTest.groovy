@@ -1,23 +1,20 @@
 package org.zenboot.portal.processing
 
-import static org.junit.Assert.*
-
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-import grails.test.mixin.domain.DomainClassUnitTestMixin
-import org.junit.*
-
-import org.zenboot.portal.*
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import org.zenboot.portal.Host
+import org.zenboot.portal.HostState
+import org.zenboot.portal.ServiceUrl
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 
 @TestFor(ExecutionZone)
-@TestMixin(DomainClassUnitTestMixin)
 class ExecutionZoneTest {
 
     ExecutionZone ez
+
     void setUp() {
       ez = new ExecutionZone(type: new ExecutionZoneType())
       ez.hosts << new Host(state: HostState.COMPLETED, serviceUrls: new ServiceUrl(urls: ["someUrl"]))
@@ -29,10 +26,6 @@ class ExecutionZoneTest {
       ez.hosts << new Host(state: HostState.DELETED, serviceUrls: new ServiceUrl(urls: ["someOtherUrl"]))
       println "size: " + ez.hosts[0].state
       ez.save()
-    }
-
-    void tearDown() {
-
     }
 
     void testGetCompletedAndUnmanagedHosts() {
