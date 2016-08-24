@@ -1,3 +1,9 @@
+import grails.plugin.springsecurity.SpringSecurityUtils
+
+def isAdmin = { ->
+    SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+}
+
 navigation = {
     base {
         home()
@@ -8,13 +14,17 @@ navigation = {
                 "${it}"(visible: false)
             }
 
-            listExecutionZoneTypes controller: 'executionZoneType', titleText: 'Execution Zone Types', action: 'list'
+            listExecutionZoneTypes(
+                controller: 'executionZoneType', titleText: 'Execution Zone Types', action: 'list', visible: isAdmin
+            )
             ['create', 'show', 'edit'].each {
                 def controller = 'executionZoneType'
                 "${it + controller}"(controller: controller, action: it, visible: false)
             }
 
-            listExposedExecutionZoneActions controller: 'exposedExecutionZoneAction', titleText: 'Exposed Actions', action: 'list'
+            listExposedExecutionZoneActions(
+                controller: 'exposedExecutionZoneAction', titleText: 'Exposed Actions', action: 'list'
+            )
             ['create', 'show', 'edit'].each {
                 def controller = 'exposedExecutionZoneAction'
                 "${it + controller}"(controller: controller, action: it, visible: false)
@@ -46,7 +56,7 @@ navigation = {
                 "${it + controller}"(controller: controller, action: it, visible: false)
             }
         }
-        admin(controller: 'administration', titleText: 'Administration', action: 'index') {
+        admin(controller: 'administration', titleText: 'Administration', action: 'index', visible: isAdmin) {
             users titleText: 'User Management', action: 'user'
             notifications controller: 'userNotification', titleText: 'User Notifications', action: 'list'
             dbConsole titleText: 'DB Console', action: 'dbconsole'

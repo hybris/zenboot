@@ -141,7 +141,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
  ]
 
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-    '/assets/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/assets/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/js/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/images/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/css/**':                              ['IS_AUTHENTICATED_ANONYMOUSLY'],
@@ -168,12 +168,10 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/scriptletBatch/list':                 [Role.ROLE_USER],
     '/executionZone/ajaxGetReadme':         [Role.ROLE_USER],
     //default
+    '/administration':                                  [Role.ROLE_ADMIN],
     '/**':                                  [Role.ROLE_ADMIN],
- ]
-
-grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-   "/console/**":          ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"],
-   "/plugins/console*/**": ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"]
+    "/console/**":          ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"],
+    "/plugins/console*/**": ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"],
 ]
 
 //fix pagination bug in bootstrap
