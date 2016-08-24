@@ -1,59 +1,42 @@
+<g:set var='securityConfig' value='${applicationContext.springSecurityService.securityConfig}'/>
 <html>
-<head>
-<meta name='layout' content='main' />
-<title>
-	<g:message code="springSecurity.login.title" />
-</title>
-</head>
-<body>
-	<h2 class="page-header">
-		<g:message code="springSecurity.login.header" />
-	</h2>
-
-	<g:if test='${flash.message}'>
-		<div class='alert alert-error'>
-			${flash.message}
-		</div>
-	</g:if>
-
-	<g:form url='${postUrl}' method='POST' id='loginForm' class="well form-horizontal" autocomplete='off'>
-    <div class="control-group">
-      <!-- Username -->
-      <label class="control-label"  for="username">
-      	<g:message code="springSecurity.login.username.label" default="Username" />
-      </label>
-      <div class="controls">
-        <g:textField name="j_username" id="username" />
-      </div>
-    </div>
-
-    <div class="control-group">
-      <!-- Password-->
-      <label class="control-label" for="password">
-      	<g:message code="springSecurity.login.password.label" default="Password" />
-      </label>
-      <div class="controls">
-        <g:passwordField name="j_password" id="password" />
-      </div>
-    </div>
-    
-    <div class="control-group">
-    	<label class="control-label" for="remember_me">
-    		<g:message code="springSecurity.login.remember.me.label" default="Remember Me" />
-    	</label>
-    	<div class="controls">
-    		<g:checkBox name="${rememberMeParameter}" id="remember_me" checked="${hasCookie}" />
-    	</div>
-    </div>		
-
-
-		<g:submitButton name="submit" class="btn btn-primary" value="${message(code: "springSecurity.login.button")}" />
-	</g:form>
-
-	<asset:script>
-		(function() {
-			document.forms['loginForm'].elements['j_username'].focus();
-		})();
-	</asset:script>
-</body>
+	<head>
+		<meta name="layout" content="main"/>
+		<s2ui:title messageCode='spring.security.ui.login.title'/>
+		<asset:stylesheet src='spring-security-ui-auth.css'/>
+	</head>
+	<body>
+        <h2 class="page-header"><g:message code='spring.security.ui.login.signin'/></h2>
+        <s2ui:form type='login' focus='username' class='well form-horizontal'>
+            <div>
+                <table>
+                    <div class="control-group">
+                        <label class="control-label" for="username">
+                            <g:message code='spring.security.ui.login.username'/>
+                        </label>
+                        <div class="controls">
+                            <input type="text" name="${securityConfig.apf.usernameParameter}" id="username" size="20"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label  class="control-label" for="password">
+                            <g:message code='spring.security.ui.login.password'/>
+                        </label>
+                        <div class="controls">
+                            <input type="password" name="${securityConfig.apf.passwordParameter}" id="password" size="20"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for='remember_me'>
+                            <g:message code='spring.security.ui.login.rememberme'/>
+                        </label>
+                        <div class="controls">
+                            <input type="checkbox" class="checkbox" name="${securityConfig.rememberMe.parameter}" id="remember_me" checked="checked"/>
+                        </div>
+                    </tr>
+                </table>
+                <g:submitButton name="submit" class="btn btn-primary" id='loginButton' value='${message(code: "springSecurity.login.button")}'/>
+            </div>
+        </s2ui:form>
+	</body>
 </html>
