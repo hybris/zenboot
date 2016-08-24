@@ -15,7 +15,6 @@ import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.RestResult
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
-import org.zenboot.portal.processing.meta.MetadataParameterComparator
 import org.zenboot.portal.processing.meta.ParameterMetadata
 
 class ExecutionZoneController extends AbstractRestController implements ApplicationEventPublisherAware {
@@ -433,7 +432,7 @@ class GetExecutionZoneParametersCommand {
     // FIXME extract, this is bullshit here
     def getExecutionZoneParameters() {
         def execZnParams = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.execId), this.scriptDir).asType(ParameterMetadata[])
-        execZnParams.sort(true, new MetadataParameterComparator())
+        execZnParams.sort { a,b -> a.name <=> b.name }
     }
 }
 
