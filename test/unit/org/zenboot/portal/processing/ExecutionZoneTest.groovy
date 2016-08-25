@@ -20,13 +20,13 @@ class ExecutionZoneTest {
     ExecutionZone ez
     void setUp() {
       ez = new ExecutionZone(type: new ExecutionZoneType())
-      ez.hosts << new Host(state: HostState.COMPLETED, serviceUrls: "someUrl")
-      ez.hosts << new Host(state: HostState.DISABLED, serviceUrls: "yetAnUrl")
-      ez.hosts << new Host(state: HostState.COMPLETED, serviceUrls: "someOtherUrl")
-      ez.hosts << new Host(state: HostState.ACCESSIBLE, serviceUrls: "yetAnotherUrl")
-      ez.hosts << new Host(state: HostState.UNKNOWN, serviceUrls: "wtfUrl")
-      ez.hosts << new Host(state: HostState.UNMANAGED, serviceUrls: "someOtherUrl")
-      ez.hosts << new Host(state: HostState.DELETED, serviceUrls: "someOtherUrl")
+      ez.hosts << new Host(state: HostState.COMPLETED, serviceUrls: new ServiceUrl(urls: ["someUrl"]))
+      ez.hosts << new Host(state: HostState.DISABLED, serviceUrls: new ServiceUrl(urls: ["yetAnUrl"]))
+      ez.hosts << new Host(state: HostState.COMPLETED, serviceUrls: new ServiceUrl(urls: ["someOtherUrl"]))
+      ez.hosts << new Host(state: HostState.ACCESSIBLE, serviceUrls: new ServiceUrl(urls: ["yetAnotherUrl"]))
+      ez.hosts << new Host(state: HostState.UNKNOWN, serviceUrls: new ServiceUrl(urls: ["wtfUrl"]))
+      ez.hosts << new Host(state: HostState.UNMANAGED, serviceUrls: new ServiceUrl(urls: ["someOtherUrl"]))
+      ez.hosts << new Host(state: HostState.DELETED, serviceUrls: new ServiceUrl(urls: ["someOtherUrl"]))
       println "size: " + ez.hosts[0].state
       ez.save()
     }
@@ -41,7 +41,6 @@ class ExecutionZoneTest {
 
     void testGetActiveServiceUrls() {
       assert ez.getActiveServiceUrls().size() == 3
-
     }
 
     void testGetNonDeletedHosts() {
@@ -50,6 +49,5 @@ class ExecutionZoneTest {
 
     void testGetCompletedHosts() {
       assert ez.getCompletedHosts().size() == 2
-
     }
 }
