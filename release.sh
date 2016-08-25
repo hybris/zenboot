@@ -51,8 +51,8 @@ wait_for_travis
 
 date
 echo "# Will now release $1"
-sed -i .bak -e "s/app.version=.*/app.version=$VERSION/" application.properties
-sed -i .bak -e "s/download\/v[.0-9]*/download\/v$VERSION/" Dockerfile
+sed -i.bak -e "s/app.version=.*/app.version=$VERSION/" application.properties
+sed -i.bak -e "s/download\/v[.0-9]*/download\/v$VERSION/" Dockerfile
 
 git add application.properties
 git add Dockerfile
