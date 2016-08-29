@@ -13,7 +13,7 @@ class ExecutionZone implements Likeable {
     String description
     String puppetEnvironment
     String qualityStage
-    SortedSet processingParameters
+    SortedSet processingParameters = [] as SortedSet
     Set actions = []
     Set hosts = []
     boolean enabled = true
