@@ -251,7 +251,7 @@
 
 				 			<fieldset class="spacer buttons">
 
-				 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Zone')}" disabled="${!executionZoneInstance?.enabled}" />
+				 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Action')}" disabled="${!executionZoneInstance?.enabled}" />
 				 				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 									<g:actionSubmit class="btn btn-inverse" action="createExposedAction" value="${message(code: 'executionZone.button.createExposedAction.label', default: 'Expose Action')}" disabled="${!executionZoneInstance?.enabled}" />
 								</sec:ifAllGranted>
