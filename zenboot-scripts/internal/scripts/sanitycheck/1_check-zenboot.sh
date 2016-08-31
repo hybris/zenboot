@@ -17,6 +17,5 @@ if [ "$HTTP_CODE" = "200" ]; then
   exit 0
 else
   echo "# Zenboot is not running ($HTTP_CODE) :("  >&2a
-  sleep 3
   exit 2
 fi
