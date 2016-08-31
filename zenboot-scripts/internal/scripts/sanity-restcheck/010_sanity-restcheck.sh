@@ -9,7 +9,7 @@ URL="http://${NODENAME}:${PORT}/zenboot/rest/sanitycheck"
 
 test_setup
 # First call it to verify that this job get created
-assert_http_code $URL 201 "POST" "Content-Type:text/xml" "sanitycheck:sanitycheck"
+assert_http_code $URL 201 "POST" "Accept: text/xml" "sanitycheck:sanitycheck"
 
 echo "# Make a second call "
 TMPFILE=`tempfile`

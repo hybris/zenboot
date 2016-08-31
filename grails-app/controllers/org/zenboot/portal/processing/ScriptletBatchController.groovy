@@ -95,7 +95,7 @@ class ScriptletBatchController {
         ScriptletBatch batch = cmd.getScriptletBatch()
         if (batch.isRunning()) {
             response.setStatus(HttpStatus.OK.value())
-            request.withFormat {
+            withFormat {
                 json {
                     def  result = []
                     batch.processables.each { Processable proc ->

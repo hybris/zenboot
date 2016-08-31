@@ -174,7 +174,6 @@
                     var interval = setInterval(function() {
 			                $.ajax({
 			                    url : '<g:createLink action="ajaxSteps" params="[scriptletId:scriptletBatchInstance?.id]" />',
-			                    contentType: 'application/json',
 			                    dataType: 'json'
 			                }).success(function(data) {
                         if($('#autorefresh').is(':checked')){
