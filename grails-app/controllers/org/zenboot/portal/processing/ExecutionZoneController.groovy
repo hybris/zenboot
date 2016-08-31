@@ -394,6 +394,9 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 }
 
 class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
+    static constraints = {
+        importFrom AbstractExecutionZoneCommand
+    }
 
     @Override
     ExecutionZoneAction getExecutionZoneAction() {
@@ -403,6 +406,9 @@ class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
 }
 
 class ExposeExecutionZoneCommand extends AbstractExecutionZoneCommand {
+    static constraints = {
+        importFrom AbstractExecutionZoneCommand
+    }
 
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {

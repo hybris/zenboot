@@ -16,8 +16,8 @@ abstract class AbstractExecutionZoneCommand {
 
     static constraints = {
         execZoneParameters nullable: true
-        execId nullable:false
-        scriptDir nullable:false, validator: { value, commandObj ->
+        parameters nullable: true
+        scriptDir validator: { value, commandObj ->
             if (!value.exists()) {
                 return "executionZone.failure.scriptDirNotExist"
             }
