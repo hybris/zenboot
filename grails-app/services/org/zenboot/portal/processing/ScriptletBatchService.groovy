@@ -92,7 +92,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             try {
               batch.execute(processContext)
             } catch (Exception e) {
-              log.error("Catched Exception: ",e)
+              log.error("Caught Exception: ",e)
               batch.exceptionMessage = e.getMessage()
               batch.exceptionClass = e.getClass()
               batch.cancel()
