@@ -65,9 +65,7 @@ grails.project.dependency.resolution = {
         runtime ":famfamfam:1.0.1"
         runtime ":jquery-ui:1.8.15"
 
-        //build ':tomcat:7.0.42'
-        // with grails 2.3.11, newer tomcat versions than 7.0.42 return 404 for all routes
-        build ':tomcat:7.0.70'
+        build ':tomcat:8.0.33'
 
         compile ':likeable:0.4.0'
         compile ":pretty-time:2.1.3.Final-1.0.1"
