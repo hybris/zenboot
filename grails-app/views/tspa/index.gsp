@@ -11,7 +11,6 @@
             $http({
                 method: 'GET',
                 url: '/zenboot/rest/executionzones\?max\=100000',
-                //headers: {'Content-Type': 'application/json'},
                 headers: {'Content-Type': "application/json"},
                 data: "" // this is needed see http://stackoverflow.com/questions/24895290/content-type-header-not-being-set-with-angular-http
             }).success(function(data) {

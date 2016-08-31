@@ -40,6 +40,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
 
     def execute(ExecuteExecutionZoneCommand cmd) {
+        def executionZone = ExecutionZone.get(cmd.execId)
         flash.action = 'execute'
         executionZoneService.setParameters(cmd, params.parameters)
         log.info("cmd setParameters:" + params.inspect())
@@ -153,8 +154,10 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             parameters.putAll 'filter.enabled': true, 'filter.op.enabled': 'Equal'
 
             request.withFormat {
-                html { redirect(action: "list", params: parameters) }
-                json { render(action: "list", params: parameters) }
+                html {
+                    return redirect(action: "list", params: parameters)
+                }
+                json { }
             }
         }
 
@@ -170,7 +173,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             favs = true
         }
 
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.max = params.max ?: 10
 
         def executionZones = []
         def executionZoneCount = 0
