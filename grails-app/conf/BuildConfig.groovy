@@ -32,6 +32,13 @@ grails.project.dependency.resolution = {
     dependencies {
         compile 'org.jyaml:jyaml:1.3'
         compile 'mysql:mysql-connector-java:5.1.21'
+
+        test "org.gebish:geb-spock:0.13.1"
+        test "org.seleniumhq.selenium:selenium-support:2.52.0"
+        test "org.seleniumhq.selenium:selenium-chrome-driver:2.52.0"
+        test ("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1") {
+            excludes "org.apache.httpcomponents:httpclient", "commons-logging:commons-logging"
+        }
     }
 
     plugins {
@@ -71,7 +78,9 @@ grails.project.dependency.resolution = {
         compile ":pretty-time:2.1.3.Final-1.0.1"
 
         compile ':audit-logging:1.1.0'
-        compile "org.grails.plugins:filterpane:2.5.0"
+        compile ":filterpane:2.5.0"
+
+        test ":geb:0.13.1"
     }
 }
 
