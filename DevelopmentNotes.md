@@ -3,9 +3,41 @@ Development Notes
 
 These are some notes to understand the code.
 
-#### some general hints
+### running the tests 
 to run a specific test-class:
+
+```
 ./grailsw test-app -unit Foo
+```
+
+##### run the functional tests
+
+all:
+
+```
+./grailsw ./grailsw test-app functional: -inline
+```
+
+just the api tests:
+
+```
+./grailsw test-app functional: 'org.zenboot.portal.api.**.*' -inline
+```
+
+just the browser tests:
+
+```
+./grailsw test-app functional: 'org.zenboot.portal.geb.**.*' -inline
+```
+
+it is recommended to keep the app running when developing functional tests, so
+```
+./grailsw
+
+run-app
+
+
+```
 
 #### the log4j-setup
 This [event-definition)[http://grails.github.io/grails-doc/2.3.x/guide/commandLine.html#events]
@@ -17,6 +49,7 @@ takes care that the a log4j.properties in the classpath is recognized.
 Important is the difference between grail-specific-stuff and everything else. See
 the log4j.properties. To switch to debug-logging, change
 log4j.appender.console.threshold to debug
+
 
 
 

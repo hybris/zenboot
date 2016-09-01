@@ -6,7 +6,7 @@ class ShowExecutionZonePage extends Page {
     static url = 'executionZone/show/1'
 
     static at = {
-        title == "ShowExecutionZonePage ExecutionZone"
+        title == "Show ExecutionZone"
     }
 
     static content = {
