@@ -1,6 +1,7 @@
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.remote.DesiredCapabilities
 
 driver = {
     def driverInstance = new ChromeDriver()
@@ -16,7 +17,11 @@ environments {
             //see http://stackoverflow.com/questions/9822717 for more details
             FirefoxProfile profile = new FirefoxProfile()
             profile.setPreference("intl.accept_languages", "en-us")
-            def driverInstance = new FirefoxDriver(profile)
+            DesiredCapabilities capabilities = DesiredCapabilities.firefox()
+            capabilities.setCapability("marionette", true)
+            capabilities.setCapability("firefox_profile", profile)
+
+            def driverInstance = new FirefoxDriver(capabilities)
             driverInstance.manage().window().maximize()
             driverInstance
         }

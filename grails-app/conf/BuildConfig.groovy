@@ -34,9 +34,9 @@ grails.project.dependency.resolution = {
         compile 'mysql:mysql-connector-java:5.1.21'
 
         test "org.gebish:geb-spock:0.13.1"
-        test "org.seleniumhq.selenium:selenium-support:2.53.1"
-        test "org.seleniumhq.selenium:selenium-chrome-driver:2.53.1"
-        test "org.seleniumhq.selenium:selenium-firefox-driver:2.53.1"
+        test "org.seleniumhq.selenium:selenium-support:3.0.0-beta2"
+        test "org.seleniumhq.selenium:selenium-chrome-driver:3.0.0-beta2"
+        test "org.seleniumhq.selenium:selenium-firefox-driver:3.0.0-beta2"
         test ("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1") {
             excludes "org.apache.httpcomponents:httpclient", "commons-logging:commons-logging"
         }
