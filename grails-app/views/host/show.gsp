@@ -1,6 +1,6 @@
 <%@ page import="org.zenboot.portal.Host"%>
 <%@ page import="org.zenboot.portal.security.Role"%>
-<% def executionZoneService = grailsApplication.mainContext.getBean("executionZoneService"); %>
+<% def accessService = grailsApplication.mainContext.getBean("accessService"); %>
 <!doctype html>
 <html>
 <head>
@@ -211,7 +211,7 @@
 				</dd>
 			</g:if>
 		</dl>
-		<g:if test="${executionZoneService.userHasAccess(hostInstance.execZone)}">
+		<g:if test="${accessService.userHasAccess(hostInstance.execZone)}">
 			<g:form name="markHostForm" action="markHost">
 				<g:hiddenField name="id" value="${hostInstance?.id}"/>
 				<g:actionSubmit id="markUnknownButton" action="markHostUnknown"

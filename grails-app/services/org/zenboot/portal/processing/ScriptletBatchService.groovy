@@ -17,6 +17,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     def grailsApplication
     def executionService
     def springSecurityService
+    def accessService
 
     def scriptletFlowCache
 
@@ -34,10 +35,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     def filterByAccessPermission(scriptletBatches) {
         def hasAccess = { zone ->
-            executionZoneService.hasAccess(
-                    springSecurityService.currentUser.getAuthorities(),
-                    zone
-            )
+            accessService.userHasAccess(zone)
         }.memoize() // caching ftw
 
         scriptletBatches.findAll  { ScriptletBatch batch ->

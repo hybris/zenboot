@@ -10,7 +10,7 @@ class HostController extends AbstractRestController {
     def filterPaneService
 
     static allowedMethods = [update: "POST", delete: "POST", markHostBroken: "POST", markHostUnknown: "POST"]
-    def executionZoneService
+    def accessService
 
     def rest = {
         Host host = Host.findById(params.id)
@@ -136,7 +136,7 @@ class HostController extends AbstractRestController {
 
         def executionZoneInstance = hostInstance.execZone
 
-        if (!executionZoneService.userHasAccess(executionZoneInstance)) {
+        if (!accessService.userHasAccess(executionZoneInstance)) {
             return render(view: "/login/denied")
         }
 

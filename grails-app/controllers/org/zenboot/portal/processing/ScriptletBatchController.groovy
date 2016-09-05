@@ -15,6 +15,7 @@ class ScriptletBatchController {
 
     def PageRenderer groovyPageRenderer
     def executionZoneService
+    def accessService
     def springSecurityService
     def scriptletBatchService
     def filterPaneService
@@ -127,7 +128,7 @@ class ScriptletBatchController {
           redirect(action: "list")
           return
         } else if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-          if (!executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), scriptletBatchInstance.executionZoneAction.executionZone)) {
+          if (!accessService.userHasAccess(scriptletBatchInstance.executionZoneAction.executionZone)) {
             flash.message = message(code: 'default.no.access.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
             redirect(action: "list")
             return

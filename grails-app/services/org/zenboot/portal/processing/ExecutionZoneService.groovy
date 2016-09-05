@@ -26,6 +26,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     def applicationEventPublisher
     def springSecurityService
     def hostService
+    def accessService
 
     void synchronizeExecutionZoneTypes() {
         //type name is the key to be able to resolve a type by name quickly
@@ -81,8 +82,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     public List filterByAccessPermission(executionZoneInstanceList) {
         executionZoneInstanceList.findAll() { executionZone ->
-            Set<Role> authorities = springSecurityService.currentUser.getAuthorities()
-            this.hasAccess(authorities, executionZone)
+            accessService.userHasAccess(executionZone)
         }
     }
 
@@ -386,30 +386,6 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         }
 
         return result
-    }
-
-    boolean hasAccess(Role role, ExecutionZone executionZone) {
-      def expression = role.executionZoneAccessExpression
-      try {
-        return Eval.me("executionZone",executionZone,expression == null ? "" : expression)
-      } catch (Exception e) {
-        this.log.error("executionZoneAccessExpression for role '"+ role + " with " + expression +"' is throwing an exception", e)
-        return false
-      }
-    }
-
-    boolean hasAccess(Set roles, ExecutionZone zone) {
-      for (role in roles) {
-        if (hasAccess(role,zone)) {
-          return true
-        }
-      }
-      return false
-    }
-
-    boolean userHasAccess(ExecutionZone zone) {
-        SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
-                hasAccess(springSecurityService.currentUser.getAuthorities(), zone)
     }
 
     boolean canEdit(Role role, ProcessingParameter parameter) {

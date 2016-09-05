@@ -21,6 +21,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
     def applicationEventPublisher
     def executionZoneService
+    def accessService
     def springSecurityService
     def filterPaneService
 
@@ -254,7 +255,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
     def showModel(executionZoneInstance) {
         if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) &&
-              !executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZoneInstance)) {
+              !accessService.userHasAccess(executionZoneInstance)) {
           render(view: "/login/denied")
           return
         }
