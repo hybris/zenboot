@@ -20,6 +20,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     static final String JOBS_DIR = 'jobs'
     static final String PLUGINS_DIR = 'plugins'
 
+    def runTimeAttributesService
     def grailsApplication
     def scriptletBatchService
     def applicationEventPublisher
@@ -78,17 +79,10 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 		}
 	}
 
-    List getRuntimeAttributes() {
-        return this.normalizeRuntimeAttributes(grailsApplication.config.zenboot.processing.attributes.toString().split(",").asType(List))
-    }
-
-    private List normalizeRuntimeAttributes(List attributes) {
-        return attributes*.trim()*.toLowerCase()
-    }
-
     public List filterByAccessPermission(executionZoneInstanceList) {
         executionZoneInstanceList.findAll() { executionZone ->
-            this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
+            Set<Role> authorities = springSecurityService.currentUser.getAuthorities()
+            this.hasAccess(authorities, executionZone)
         }
     }
 
@@ -180,9 +174,9 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         }
 
         if (runtimeAttributes) {
-            execAction.runtimeAttributes.addAll(this.normalizeRuntimeAttributes(runtimeAttributes))
+            execAction.runtimeAttributes.addAll(runTimeAttributesService.normalizeRuntimeAttributes(runtimeAttributes))
         } else {
-            execAction.runtimeAttributes.addAll(this.getRuntimeAttributes())
+            execAction.runtimeAttributes.addAll(runTimeAttributesService.getRuntimeAttributes())
         }
 
         if (!execAction.validate()) {
@@ -257,12 +251,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return new File(path)
     }
 
-    def getScriptletBatchFlow(File scriptDir, ExecutionZoneType type) {
-        return scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), type)
-    }
-
     Set getExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction) {
-        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, this.getRuntimeAttributes(), exposedAction.executionZone.type)
+        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, exposedAction.executionZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
         Set parameters = overlayExecutionZoneParameters(paramMetaList, exposedAction.processingParameters)
         return parameters
@@ -274,7 +264,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
      * TODO the name is misleading, this gets all parameters of a scriptletbatch, not only the ones from the execution zone
      */
     Set getExecutionZoneParameters(ExecutionZone execZone, File scriptDir) {
-        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), execZone.type)
+
+        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, execZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
         Set parameters = overlayExecutionZoneParameters(paramMetaList, execZone.processingParameters)
         return parameters
@@ -329,7 +320,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
             def processParam = new ProcessingParameter(name: originalParameter.name, value: param.value.toString())
             if (!actionParameterEditAllowed(processParam, originalParameter)) {
                 command.errors.reject('executionZone.failure.unallowedEdit',
-                        [originalParameter.name].asType(Object[]),
+                        [originalParameter.name] as Object[],
                         'You are not allowed to edit parameter {0}'
                 )
             }
@@ -408,7 +399,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     }
 
     boolean hasAccess(Set roles, ExecutionZone zone) {
-      for ( role in roles) {
+      for (role in roles) {
         if (hasAccess(role,zone)) {
           return true
         }

@@ -13,6 +13,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     static transactional = false //necessary to avoid duplicate event listener registration
 
+    def runTimeAttributesService
     def grailsApplication
     def executionService
     def springSecurityService
@@ -118,7 +119,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
 	private void synchronizeExposedProcessingParameters(ScriptletBatch batch, ProcessContext processContext) {
         ExecutionZoneAction action = batch.executionZoneAction
-        ScriptletBatchFlow flow = executionZoneService.getScriptletBatchFlow(action.scriptDir, batch.executionZoneAction.executionZone.type)
+        ScriptletBatchFlow flow = getScriptletBatchFlow(action.scriptDir, batch.executionZoneAction.executionZone.type)
 		ParameterMetadataList paramList = flow.getParameterMetadataList()
 
 		def exposedPublishedMetaParams = paramList.parameters.findAll { ParameterMetadata paramMeta ->
@@ -218,6 +219,9 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     }
 
 
+    ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, ExecutionZoneType type) {
+        return this.getScriptletBatchFlow(scriptDir, runTimeAttributesService.getRuntimeAttributes(), type)
+    }
 
     ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, List runtimeAttributes, ExecutionZoneType type) {
         log.debug("cache is:" + scriptletFlowCache)

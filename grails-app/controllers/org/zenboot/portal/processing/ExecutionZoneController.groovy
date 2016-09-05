@@ -446,8 +446,7 @@ class GetExecutionZoneParametersCommand {
 }
 
 class GetScriptletBatchFlow {
-
-    def executionZoneService
+    def scriptletBatchService
 
     Long execId
     File scriptDir
@@ -461,7 +460,7 @@ class GetScriptletBatchFlow {
     }
 
     ScriptletBatchFlow getScriptletBatchFlow() {
-        this.executionZoneService.getScriptletBatchFlow(this.scriptDir, ExecutionZone.get(execId).type)
+        return scriptletBatchService.getScriptletBatchFlow(this.scriptDir,  ExecutionZone.get(execId).type)
     }
 }
 

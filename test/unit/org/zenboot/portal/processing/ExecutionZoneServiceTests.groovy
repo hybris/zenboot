@@ -31,6 +31,9 @@ class ExecutionZoneServiceTests {
         scriptletBatchService.demand.getScriptletBatchFlow() { a,b,c ->
             scriptletBatchFlow.createMock()
         }
+        scriptletBatchService.demand.getScriptletBatchFlow() { a,b ->
+            scriptletBatchFlow.createMock()
+        }
         service.scriptletBatchService = scriptletBatchService.createMock()
 
         // this is discouraged, but mockFor did not work for SpringSecurityUtils
