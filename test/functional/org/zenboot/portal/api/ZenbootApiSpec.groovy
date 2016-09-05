@@ -4,8 +4,8 @@ import groovyx.net.http.RESTClient
 import spock.lang.Specification
 
 abstract class ZenbootApiSpec extends Specification {
-    def baseUrl = System.properties.get('grails.testing.functional.baseUrl') ?: 'http://localhost:8080/zenboot'
-    def http
+    def baseUrl = System.properties.get('grails.testing.functional.baseUrl') ?: 'http://localhost:8080/zenboot/'
+    RESTClient http
 
     def setup() {
         http = new RESTClient(baseUrl)

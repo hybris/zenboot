@@ -3,7 +3,7 @@ Development Notes
 
 These are some notes to understand the code.
 
-### running the tests 
+### running the tests
 to run a specific test-class:
 
 ```
