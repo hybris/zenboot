@@ -15,11 +15,6 @@ class BootStrap {
     def scriptDirectoryService
 
     def init = { servletContext ->
-        if (Environment.current == Environment.TEST) {
-            //no initialization needed for testing
-            return
-        }
-
         //create fundamental user groups
         this.setupSecurity()
 
@@ -109,7 +104,7 @@ class BootStrap {
             exposedAction = new ExposedExecutionZoneAction(
                 executionZone: execZoneSanity,
                 scriptDir : new File("${scriptDirectoryService.getScriptDir(sanityType)}${System.properties['file.separator']}sanitycheck"),
-                roles: Role.findByAuthority(Role.ROLE_SANITYCHECK),
+                roles: Role.findAll(),
                 url: "sanitycheck",
             )
             exposedAction.save()
