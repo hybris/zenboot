@@ -14,12 +14,6 @@ import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.processing.meta.ParameterMetadata
 
 class ExecutionZoneService implements ApplicationEventPublisherAware {
-
-
-    static final String SCRIPTS_DIR = 'scripts'
-    static final String JOBS_DIR = 'jobs'
-    static final String PLUGINS_DIR = 'plugins'
-
     def runTimeAttributesService
     def grailsApplication
     def scriptletBatchService
@@ -27,6 +21,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     def springSecurityService
     def hostService
     def accessService
+    def scriptDirectoryService
 
     void synchronizeExecutionZoneTypes() {
         //type name is the key to be able to resolve a type by name quickly
@@ -44,7 +39,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     private Set getEnabledExecutionZoneTypes(Map execZoneTypes) {
         Set enabledTypes = []
 
-        File scriptDir = this.getZenbootScriptsDir()
+        File scriptDir = scriptDirectoryService.getZenbootScriptsDir()
         scriptDir.eachDir { File directory ->
 
             if (execZoneTypes.containsKey(directory.name)) {
@@ -120,7 +115,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     /** convenience-method if you only have a stackname instead of a File (directory)
      */
     void createAndPublishExecutionZoneAction(ExecutionZone execZone, String stackName, Map processParameters=null, List runtimeAttributes=null) {
-      File stackDir = new File(getZenbootScriptsDir().getAbsolutePath() + "/"+ execZone.type.name + "/scripts/"+stackName)
+        File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
+            + "/" + execZone.type.name + "/scripts/" + stackName)
       createAndPublishExecutionZoneAction(execZone, stackDir, processParameters, runtimeAttributes)
     }
 
@@ -186,71 +182,6 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         execAction.save(flush:true)
         return execAction
     }
-
-    File getZenbootScriptsDir() {
-        File scriptDir = new File(PathResolver.getAbsolutePath(grailsApplication.config.zenboot.processing.scriptDir))
-        if (!scriptDir.exists() || !scriptDir.isDirectory()) {
-            throw new ExecutionZoneException("Could not find script directory ${scriptDir}")
-        }
-        return scriptDir
-    }
-
-    File getPluginDir(ExecutionZoneType type) {
-        return this.getDir(type, PLUGINS_DIR)
-    }
-
-    File getJobDir(ExecutionZoneType type) {
-        return this.getDir(type, JOBS_DIR)
-    }
-
-    File getScriptDir(ExecutionZoneType type) {
-        return this.getDir(type, SCRIPTS_DIR)
-    }
-
-    List getScriptDirs(ExecutionZoneType type) {
-        List scriptDirs = []
-        File scriptDir = this.getScriptDir(type)
-        if (scriptDir.exists()) {
-            scriptDir.eachDir {
-                scriptDirs << it
-            }
-        }
-        return scriptDirs.sort()
-    }
-
-    /**
-     * returns a List of Directories
-     */
-    List getScriptDirs(ExecutionZoneType type, String filter) {
-      List scriptDirs = []
-      File scriptDir = this.getScriptDir(type)
-      if (scriptDir.exists()) {
-        scriptDir.eachDir {
-          File metaFile = new File(it, ".meta.yaml")
-          if (metaFile.exists()) {
-            def yaml = Yaml.load(metaFile)
-            if (yaml['ui-script-types'].contains(filter)) {
-              scriptDirs << it
-            }
-          } else {
-            if (filter.equals("misc")) {
-              scriptDirs << it
-            }
-          }
-        }
-
-      }
-      return scriptDirs.sort()
-    }
-
-    private File getDir(ExecutionZoneType type, String subDir) {
-        String path = "${this.getZenbootScriptsDir()}${System.properties['file.separator']}${type.name}"
-        if (!subDir.isEmpty()) {
-            path = "${path}${System.properties['file.separator']}${subDir}"
-        }
-        return new File(path)
-    }
-
     Set getExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction) {
         ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, exposedAction.executionZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList

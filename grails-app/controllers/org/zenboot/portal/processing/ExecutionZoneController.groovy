@@ -24,6 +24,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     def accessService
     def springSecurityService
     def filterPaneService
+    def scriptDirectoryService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -265,13 +266,12 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         }
 
 
-        List scriptDirs = this.executionZoneService.getScriptDirs(executionZoneInstance.type)
+        List scriptDirs = scriptDirectoryService.getScriptDirs(executionZoneInstance.type)
 
         def structuredScriptDirs = [:]
-        structuredScriptDirs["create"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"create")
-        structuredScriptDirs["update"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"update")
-        structuredScriptDirs["delete"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"delete")
-        structuredScriptDirs["misc"]   = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"misc")
+        ['create', 'update', 'delete', 'misc'].each {
+            structuredScriptDirs[it] = scriptDirectoryService.getScriptDirs(executionZoneInstance.type, it)
+        }
 
         def userEditableFilteredParameters = []
         def userNonEditableFilteredParameters = []

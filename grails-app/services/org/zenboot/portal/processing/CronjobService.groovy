@@ -12,6 +12,7 @@ class CronjobService implements ApplicationEventPublisherAware {
     def applicationEventPublisher
     def springSecurityService
     def executionZoneService
+    def scriptDirectoryService
 
     void executeJobs(CronjobExpression cronExpression) {
         List jobs = this.getJobList(cronExpression)
@@ -40,7 +41,7 @@ class CronjobService implements ApplicationEventPublisherAware {
 		def exposedActions = ExposedExecutionZoneAction.findAllByCronExpression(cronExpression.toString())
 
 		exposedActions.each { ExposedExecutionZoneAction exposedAction ->
-            PluginResolver jobResolver = new PluginResolver(executionZoneService.getJobDir(exposedAction.executionZone.type))
+            PluginResolver jobResolver = new PluginResolver(scriptDirectoryService.getJobDir(exposedAction.executionZone.type))
 			File cronJob = jobResolver.resolveScriptletBatchPlugin(exposedAction.scriptDir)
 			if (!cronJob) {
 				log.warn("No cronjob found for exposed action ${exposedAction.scriptDir}")

@@ -18,19 +18,12 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     def executionService
     def springSecurityService
     def accessService
+    def scriptDirectoryService
 
     def scriptletFlowCache
 
     def clearCache() {
       scriptletFlowCache = null
-    }
-
-    // break circular dependency
-    // see http://web.archive.org/web/20120420132858/http://jira.grails.org/browse/GRAILS-5080
-    // TODO the circular dependency should really be broken by pulling some common functionality out of one of the services
-    protected def executionZoneService
-    def init() {
-        this.executionZoneService = grailsApplication.mainContext.executionZoneService
     }
 
     def filterByAccessPermission(scriptletBatches) {
@@ -177,7 +170,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }
         ScriptletBatch batch = new ScriptletBatch(description: "${user?.username} : ${action.executionZone.type} : ${action.scriptDir.name} ${action.executionZone.description? action.executionZone.description : "" }", executionZoneAction:action, user:user, comment:comment)
 
-        PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(action.executionZone.type))
+        PluginResolver pluginResolver = new PluginResolver(scriptDirectoryService.getPluginDir(action.executionZone.type))
         File pluginFile = pluginResolver.resolveScriptletBatchPlugin(batch, action.runtimeAttributes)
         if (pluginFile) {
             executionService.injectPlugins(pluginFile, batch)
@@ -196,7 +189,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     private List<Scriptlet> addScriptlets(ScriptletBatch batch, List runtimeAttributes) {
         ScriptResolver scriptsResolver = new ScriptResolver(batch.executionZoneAction.scriptDir)
-        PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(batch.executionZoneAction.executionZone.type))
+        PluginResolver pluginResolver = new PluginResolver(scriptDirectoryService.getPluginDir(batch.executionZoneAction.executionZone.type))
 
         scriptsResolver.resolve(runtimeAttributes).each { File file ->
             Scriptlet scriptlet = new Scriptlet(description:file.name, file:file)
@@ -231,7 +224,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
         if (scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()] == null || type.devMode ) {
           ScriptResolver scriptResolver = new ScriptResolver(scriptDir)
-          String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ExecutionZoneService.PLUGINS_DIR}"
+          String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ScriptDirectoryService.PLUGINS_DIR}"
           PluginResolver pluginResolver = new PluginResolver(new File(pathPluginDir))
 
           ScriptletBatchFlow flow = new ScriptletBatchFlow()

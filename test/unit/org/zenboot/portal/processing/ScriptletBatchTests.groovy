@@ -2,7 +2,6 @@ package org.zenboot.portal.processing
 
 import grails.test.mixin.*
 import grails.test.mixin.domain.DomainClassUnitTestMixin
-import org.apache.commons.logging.Log
 import org.zenboot.portal.processing.Processable.ProcessState
 
 @TestFor(ScriptletBatch)

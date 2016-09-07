@@ -1,6 +1,5 @@
 package org.zenboot.portal.processing
 
-import org.apache.log4j.*
 import org.zenboot.portal.processing.Processable.ProcessState
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.Host

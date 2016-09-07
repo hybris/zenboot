@@ -12,7 +12,7 @@ class BootStrap {
 
     def executionZoneService
     def grailsApplication
-    def scriptletBatchService
+    def scriptDirectoryService
 
     def init = { servletContext ->
         if (Environment.current == Environment.TEST) {
@@ -55,8 +55,6 @@ class BootStrap {
             returnArray['serviceUrls'] = it.serviceUrls
             return returnArray
         }
-
-        this.scriptletBatchService.init()
     }
 
     private setupSecurity() {
@@ -110,7 +108,7 @@ class BootStrap {
         if (!exposedAction) {
             exposedAction = new ExposedExecutionZoneAction(
                 executionZone: execZoneSanity,
-                scriptDir : new File("${executionZoneService.getScriptDir(sanityType)}${System.properties['file.separator']}sanitycheck"),
+                scriptDir : new File("${scriptDirectoryService.getScriptDir(sanityType)}${System.properties['file.separator']}sanitycheck"),
                 roles: Role.findByAuthority(Role.ROLE_SANITYCHECK),
                 url: "sanitycheck",
             )
