@@ -361,20 +361,29 @@
         $.ajax({
             url : '<g:createLink action="ajaxGetParameters" params="[execId:executionZoneInstance?.id]" />&scriptDir=' + encodeURI($(this).val()),
             beforeSend : function() {
+                if ($('#showZone input[name=enabled]')) {
+                    $('[name="_action_execute"],[name="_action_createExposedAction"]').attr("disabled", "disabled");
+                }
                 $('#scriptDirs input:radio').attr("disabled", "disabled");
                 $('#parameters').slideUp('fast');
                 $('#parametersSpinner').fadeIn('fast');
             },
             success: function(data) {
+                if ($('#showZone input[name=enabled]')) {
+                    $('[name="_action_execute"],[name="_action_createExposedAction"]').removeAttr("disabled");
+                }
             	$('#parametersSpinner').hide();
             	$('#parameters').html(data).slideDown('slow');
             	zenboot.enableParameterList();
             	$('#scriptDirs input:radio').removeAttr('disabled');
             },
             error: function(jqHXR, status, error) {
-		        	$('#parametersSpinner').hide();
-		        	$("#parameters").html('<div class="alert alert-error">Some ERROR occured: ' + error + '</div>').slideDown('slow');
-		        	$('#scriptDirs input:radio').removeAttr('disabled');
+                if ($('#showZone input[name=enabled]')) {
+                    $('[name="_action_execute"],[name="_action_createExposedAction"]').removeAttr("disabled");
+                }
+                $('#parametersSpinner').hide();
+                $("#parameters").html('<div class="alert alert-error">Some ERROR occured: ' + error + '</div>').slideDown('slow');
+                $('#scriptDirs input:radio').removeAttr('disabled');
             }
         });
     });
