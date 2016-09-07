@@ -42,7 +42,7 @@
 
 		<div class="accordion" id="execution-show-accordion">
 			<div class="accordion-group">
-				<div class="accordion-heading">
+				<div class="accordion-heading" id="accordion-toggle-show">
       		<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#showZone">
         		<g:message code="default.show.label" args="[entityName]" /> (${executionZoneInstance?.type} : ${executionZoneInstance?.description} )
       		</a>
@@ -162,11 +162,11 @@
 							<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
 
 							<fieldset class="spacer buttons">
-								<filterpane:filterLink controller="ScriptletBatch" action="list" class="btn"
+								<filterpane:filterLink controller="ScriptletBatch" action="list" class="btn listScriptLetBatchesForZoneButton"
 													   values="['executionZoneAction.executionZone.id': executionZoneInstance?.id]">
 									<g:message code="executionZone.showExecutedActions.label" default="Log" />
                                 </filterpane:filterLink>
-								<filterpane:filterLink controller="Host" action="list" class="btn"
+								<filterpane:filterLink controller="Host" action="list" class="btn listHostsForZoneButton"
 													   values="['execZone.id': executionZoneInstance?.id]">
 									<g:message code="executionZone.showExecutedActions.label" default="Hosts" />
 								</filterpane:filterLink>
@@ -177,7 +177,7 @@
 				</div>
 			</div>
 			<div class="accordion-group">
-				<div class="accordion-heading">
+				<div class="accordion-heading" id="accordion-toggle-service-urls">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#execZoneUrls">
 						<g:message code="executionZone.execZoneUrls.label" default="Service Urls" />
 					</a>
@@ -191,7 +191,7 @@
 				</div>
 			</div>
 			<div class="accordion-group">
-				<div class="accordion-heading">
+				<div class="accordion-heading" id="accordion-toggle-execute-script">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#executeScript">
         		<g:message code="executionZone.execAction.label" default="Execute Script" />
       		</a>
@@ -262,7 +262,7 @@
 			</div>
 			<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 				<div class="accordion-group">
-					<div class="accordion-heading">
+					<div class="accordion-heading" id="accordion-toggle-">
 						<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#editExecZone">
 	        				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
 	      				</a>

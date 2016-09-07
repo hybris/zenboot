@@ -7,7 +7,7 @@ abstract class ZenbootGebSpec extends GebReportingSpec  {
     void login() {
         to LoginPage
 
-        username.value 'admin'
+        username.value 'zenboot'
         password.value 'zenboot'
         loginButton.click()
     }
