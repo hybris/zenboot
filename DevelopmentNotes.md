@@ -30,14 +30,24 @@ just the browser tests:
 ./grailsw test-app functional: 'org.zenboot.portal.geb.**.*' -inline
 ```
 
-it is recommended to keep the app running when developing functional tests, so
+Note that browsertests default to chrome and need the "chromedriver" binary to be installed.
+See `GebConfig.groovy` to change to e.g. Firefox. See http://www.gebish.org/ for more documentation
+on how to write tests.
+
+it is recommended to keep the app running when developing functional tests, so e.g.
 ```
 ./grailsw
 
-run-app
+grails> run-app
 
+ ...
 
+grails> test-app functional: org.zenboot.portal.geb.**.* -baseUrl=http://localhost:8080/zenboot/
 ```
+
+Note: this might fail for the first time, as grails executes the integration tests (although
+it was asked to execute the functional tests only) which try to access the same db as `run-app`.
+Just run it again in this case.
 
 #### the log4j-setup
 This [event-definition)[http://grails.github.io/grails-doc/2.3.x/guide/commandLine.html#events]
