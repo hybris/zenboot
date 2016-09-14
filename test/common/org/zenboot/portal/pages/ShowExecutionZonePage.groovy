@@ -13,10 +13,10 @@ class ShowExecutionZonePage extends Page {
         showZone { $('#showZone') }
         executeScript { $('#executeScript') }
 
-        sanityCheckRadioButton { $('input', value: endsWith('sanitycheck')) }
-        sleepScriptRadioButton { $('input', value: endsWith('sleep-a-bit')) }
+        sanityCheckRadioButton(wait: true) { $('input', value: endsWith('sanitycheck')) }
+        sleepScriptRadioButton(wait: true) { $('input', value: endsWith('sleep-a-bit')) }
 
-        executeButton { $('input', type: 'submit', name: "_action_execute") }
+        executeButton(wait: true) { $('input', type: 'submit', name: "_action_execute") }
 
         errorList(required: false) { $('.alert.alert-error').find('ul > li') }
 

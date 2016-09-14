@@ -26,12 +26,14 @@ mkdir -p zenboot-scripts/mytest/plugins
 
 ``` bash
 apt-get update
-apt-get install unzip git wget openjdk-7-jdk
+apt-get install unzip git wget openjdk-8-jdk
 export JAVA_HOME=/usr/lib/jvm/default-java
 git clone https://github.com/hybris/zenboot.git
 cd zenboot
 ./grailsw run-app
 ```
+
+Make sure that default-java points to the newly installed openjdk-8-jdk installation. Otherwise grails will fail.
 
 ## Use and understand the example-type
 The example-type should show you the abilities of booting machines and the functionality
