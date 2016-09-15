@@ -1,14 +1,12 @@
 package org.zenboot.portal.processing
 
-import grails.validation.Validateable
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.ControllerUtils
-import org.zenboot.portal.processing.meta.MetadataParameterComparator
 import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.security.Role
 
@@ -139,7 +137,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
 
         [
             exposedExecutionZoneActionInstance: exposedExecutionZoneActionInstance,
-            exposedExecutionZoneActionParameters:metadataParams.sort(new MetadataParameterComparator()),
+            exposedExecutionZoneActionParameters: metadataParams.sort { a,b -> a.name <=> b.name },
             containsInvisibleParameters: metadataParams.any { ParameterMetadata metadataParam ->
                 !metadataParam.visible
             }

@@ -1,9 +1,10 @@
 import grails.converters.JSON
-import grails.plugins.springsecurity.Secured;
 
 import javax.servlet.http.HttpServletResponse
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
+
+import org.springframework.security.access.annotation.Secured
 
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException

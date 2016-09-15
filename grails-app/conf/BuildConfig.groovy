@@ -2,6 +2,7 @@ grails.servlet.version = "2.5" // Change depending on target container complianc
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
+grails.project.work.dir = "target/work"
 grails.project.target.level = 1.6
 grails.project.source.level = 1.6
 grails.project.war.file = "target/${appName}.war"
@@ -17,6 +18,7 @@ grails.project.dependency.resolution = {
     }
     log "error" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     checksums true // Whether to verify checksums on resolve
+    //legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
 
     repositories {
         inherits true // Whether to inherit repository definitions from plugins
@@ -25,46 +27,61 @@ grails.project.dependency.resolution = {
         grailsCentral()
         mavenCentral()
         mavenLocal()
-        mavenRepo "http://repository.codehaus.org"
     }
 
     dependencies {
         compile 'org.jyaml:jyaml:1.3'
         compile 'mysql:mysql-connector-java:5.1.21'
+
+        test "org.gebish:geb-spock:0.13.1"
+        test "org.seleniumhq.selenium:selenium-support:3.0.0-beta2"
+        test "org.seleniumhq.selenium:selenium-chrome-driver:3.0.0-beta2"
+        test "org.seleniumhq.selenium:selenium-firefox-driver:3.0.0-beta2"
+        test ("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1") {
+            excludes "org.apache.httpcomponents:httpclient", "commons-logging:commons-logging"
+        }
     }
 
     plugins {
-        runtime ':hibernate:3.6.10.16'
-        build "org.grails.plugins:codenarc:0.25.2"
-        compile ":version-update:1.2.0"
+        runtime ':hibernate:3.6.10.18'
+
+        // TODO
+        //runtime ':hibernate4:4.3.5.2'
+        build ":codenarc:0.25.2"
+        compile ":version-update:1.6.0"
         compile ":joda-time:1.5"
-        compile ":asset-pipeline:1.9.3"
-        runtime ":jquery:1.7.2"
+        compile ":asset-pipeline:2.11.0"
+        runtime ":jquery:1.11.1"
         //runtime ":yui-minify-resources:0.1.5"
         //compile ":cache-headers:1.1.5"
         runtime ":executor:0.3"
-        runtime ":mail:1.0"
-        runtime ":navigation:1.3.2"
-        runtime ":quartz2:0.2.3"
-        runtime ":spring-security-core:1.2.7.3"
+        runtime ":mail:1.0.7"
+        runtime ":platform-core:1.0.0"
+        runtime ":quartz2:2.1.6.2"
+        runtime ":spring-security-core:2.0.0"
+
+
+        String springSecurityVersion = '3.2.9.RELEASE'
+
         compile ":webxml:1.4.1"
         runtime ':twitter-bootstrap:2.3.2.2'
-        runtime ':console:1.5.0'
+        runtime ':console:1.5.11'
 
         //spring security ui specific
-        runtime ":spring-security-ui:0.2"
+        runtime ":spring-security-ui:1.0-RC3"
+        // TODO needed?
         runtime ":famfamfam:1.0.1"
         runtime ":jquery-ui:1.8.15"
 
-        build ':tomcat:7.0.42'
-        // with grails 2.3.11, newer tomcat versions than 7.0.42 return 404 for all routes
-        //build ':tomcat:7.0.70'
+        build ':tomcat:8.0.33'
 
-        compile ':likeable:0.1.2'
+        compile ':likeable:0.4.0'
         compile ":pretty-time:2.1.3.Final-1.0.1"
 
         compile ':audit-logging:1.1.0'
-        compile "org.grails.plugins:filterpane:2.4.2"
+        compile ":filterpane:2.5.0"
+
+        test ":geb:0.13.1"
     }
 }
 

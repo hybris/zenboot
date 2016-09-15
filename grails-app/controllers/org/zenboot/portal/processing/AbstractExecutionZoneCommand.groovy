@@ -14,9 +14,20 @@ abstract class AbstractExecutionZoneCommand {
     Map parameters
 
 
+    @SuppressWarnings("GroovyAssignabilityCheck")
     static constraints = {
-        execId nullable:false
-        scriptDir nullable:false, validator: { value, commandObj ->
+        execZoneParameters nullable: true
+        parameters nullable: true
+        execId validator: { value ->
+            def executionZone = ExecutionZone.get(value)
+            if (!executionZone) {
+                return "executionZone.does.not.exist"
+            }
+            if (!executionZone.enabled) {
+                return "executionZone.disabled"
+            }
+        }
+        scriptDir validator: { value, commandObj ->
             if (!value.exists()) {
                 return "executionZone.failure.scriptDirNotExist"
             }

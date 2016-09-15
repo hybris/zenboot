@@ -20,7 +20,7 @@
 			</div>
 		</g:if>
 
-		<table class="table table-striped">
+		<table class="table table-striped" id="scriptlet-batch-list">
 			<thead>
 				<tr>
 					<g:sortableColumn property="description" title="${message(code: 'scriptletBatch.description.label', default: 'Description')}" />

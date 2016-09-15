@@ -35,11 +35,7 @@
 	<div class="row-fluid">
 		<div class="span9 offset3">
 			<sec:ifLoggedIn>
-				<ul class="nav nav-tabs">
-					<apNav:renderMenu group="tabs" var="item" mainMenu="true">
-						<g:render template="/layouts/menuItem" model="[item:item]" />
-					</apNav:renderMenu>
-				</ul>
+				<nav:primary scope="base" class="nav nav-tabs"/>
 			</sec:ifLoggedIn>
 		</div>
 	</div>
@@ -47,11 +43,7 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span3">
-				<ul class="nav nav-pills nav-tabs nav-stacked">
-					<apNav:renderMenu group="menu" var="item">
-						<g:render template="/layouts/menuItem" model="[item:item]" />
-					</apNav:renderMenu>
-				</ul>
+				<nav:secondary scope="base" class="nav nav-pills nav-tabs nav-stacked"/>
 				<div id="processqueue">
 					<sec:ifLoggedIn>
 						<g:include action="ajaxList" controller="scriptletBatch" />

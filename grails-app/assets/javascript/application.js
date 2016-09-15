@@ -1,4 +1,4 @@
-//= require jquery/jquery-1.7.2.js
+//= require jquery
 //= require bootstrap
 //= require epiceditor/js/epiceditor.min.js
 //= require jquery.winFocus.js

@@ -6,7 +6,7 @@ import org.codehaus.groovy.grails.web.context.ServletContextHolder
 
 class PathResolver {
 
-    static String getAbosolutePath(String path) {
+    static String getAbsolutePath(String path) {
         if (path.startsWith('/')) {
             return path
         }

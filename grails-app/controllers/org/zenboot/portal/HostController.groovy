@@ -1,6 +1,6 @@
 package org.zenboot.portal
 
-import grails.plugins.springsecurity.Secured
+import grails.plugin.springsecurity.annotation.Secured
 import org.grails.plugin.filterpane.FilterPaneUtils
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -10,7 +10,7 @@ class HostController extends AbstractRestController {
     def filterPaneService
 
     static allowedMethods = [update: "POST", delete: "POST", markHostBroken: "POST", markHostUnknown: "POST"]
-    def executionZoneService
+    def accessService
 
     def rest = {
         Host host = Host.findById(params.id)
@@ -136,7 +136,7 @@ class HostController extends AbstractRestController {
 
         def executionZoneInstance = hostInstance.execZone
 
-        if (!executionZoneService.userHasAccess(executionZoneInstance)) {
+        if (!accessService.userHasAccess(executionZoneInstance)) {
             return render(view: "/login/denied")
         }
 

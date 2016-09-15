@@ -1,6 +1,6 @@
 package org.zenboot.portal.processing
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.PathResolver
 import org.zenboot.portal.ZenbootException
@@ -14,17 +14,14 @@ import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.processing.meta.ParameterMetadata
 
 class ExecutionZoneService implements ApplicationEventPublisherAware {
-
-
-    static final String SCRIPTS_DIR = 'scripts'
-    static final String JOBS_DIR = 'jobs'
-    static final String PLUGINS_DIR = 'plugins'
-
+    def runTimeAttributesService
     def grailsApplication
     def scriptletBatchService
     def applicationEventPublisher
     def springSecurityService
     def hostService
+    def accessService
+    def scriptDirectoryService
 
     void synchronizeExecutionZoneTypes() {
         //type name is the key to be able to resolve a type by name quickly
@@ -42,7 +39,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     private Set getEnabledExecutionZoneTypes(Map execZoneTypes) {
         Set enabledTypes = []
 
-        File scriptDir = this.getZenbootScriptsDir()
+        File scriptDir = scriptDirectoryService.getZenbootScriptsDir()
         scriptDir.eachDir { File directory ->
 
             if (execZoneTypes.containsKey(directory.name)) {
@@ -78,17 +75,9 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 		}
 	}
 
-    List getRuntimeAttributes() {
-        return this.normalizeRuntimeAttributes(grailsApplication.config.zenboot.processing.attributes.toString().split(",").asType(List))
-    }
-
-    private List normalizeRuntimeAttributes(List attributes) {
-        return attributes*.trim()*.toLowerCase()
-    }
-
     public List filterByAccessPermission(executionZoneInstanceList) {
         executionZoneInstanceList.findAll() { executionZone ->
-            this.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZone)
+            accessService.userHasAccess(executionZone)
         }
     }
 
@@ -126,7 +115,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     /** convenience-method if you only have a stackname instead of a File (directory)
      */
     void createAndPublishExecutionZoneAction(ExecutionZone execZone, String stackName, Map processParameters=null, List runtimeAttributes=null) {
-      File stackDir = new File(getZenbootScriptsDir().getAbsolutePath() + "/"+ execZone.type.name + "/scripts/"+stackName)
+        File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
+            + "/" + execZone.type.name + "/scripts/" + stackName)
       createAndPublishExecutionZoneAction(execZone, stackDir, processParameters, runtimeAttributes)
     }
 
@@ -180,9 +170,9 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         }
 
         if (runtimeAttributes) {
-            execAction.runtimeAttributes.addAll(this.normalizeRuntimeAttributes(runtimeAttributes))
+            execAction.runtimeAttributes.addAll(runTimeAttributesService.normalizeRuntimeAttributes(runtimeAttributes))
         } else {
-            execAction.runtimeAttributes.addAll(this.getRuntimeAttributes())
+            execAction.runtimeAttributes.addAll(runTimeAttributesService.getRuntimeAttributes())
         }
 
         if (!execAction.validate()) {
@@ -192,77 +182,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         execAction.save(flush:true)
         return execAction
     }
-
-    File getZenbootScriptsDir() {
-        File scriptDir = new File(PathResolver.getAbosolutePath(grailsApplication.config.zenboot.processing.scriptDir))
-        if (!scriptDir.exists() || !scriptDir.isDirectory()) {
-            throw new ExecutionZoneException("Could not find script directory ${scriptDir}")
-        }
-        return scriptDir
-    }
-
-    File getPluginDir(ExecutionZoneType type) {
-        return this.getDir(type, PLUGINS_DIR)
-    }
-
-    File getJobDir(ExecutionZoneType type) {
-        return this.getDir(type, JOBS_DIR)
-    }
-
-    File getScriptDir(ExecutionZoneType type) {
-        return this.getDir(type, SCRIPTS_DIR)
-    }
-
-    List getScriptDirs(ExecutionZoneType type) {
-        List scriptDirs = []
-        File scriptDir = this.getScriptDir(type)
-        if (scriptDir.exists()) {
-            scriptDir.eachDir {
-                scriptDirs << it
-            }
-        }
-        return scriptDirs.sort()
-    }
-
-    /**
-     * returns a List of Directories
-     */
-    List getScriptDirs(ExecutionZoneType type, String filter) {
-      List scriptDirs = []
-      File scriptDir = this.getScriptDir(type)
-      if (scriptDir.exists()) {
-        scriptDir.eachDir {
-          File metaFile = new File(it, ".meta.yaml")
-          if (metaFile.exists()) {
-            def yaml = Yaml.load(metaFile)
-            if (yaml['ui-script-types'].contains(filter)) {
-              scriptDirs << it
-            }
-          } else {
-            if (filter.equals("misc")) {
-              scriptDirs << it
-            }
-          }
-        }
-
-      }
-      return scriptDirs.sort()
-    }
-
-    private File getDir(ExecutionZoneType type, String subDir) {
-        String path = "${this.getZenbootScriptsDir()}${System.properties['file.separator']}${type.name}"
-        if (!subDir.isEmpty()) {
-            path = "${path}${System.properties['file.separator']}${subDir}"
-        }
-        return new File(path)
-    }
-
-    def getScriptletBatchFlow(File scriptDir, ExecutionZoneType type) {
-        return scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), type)
-    }
-
     Set getExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction) {
-        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, this.getRuntimeAttributes(), exposedAction.executionZone.type)
+        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, exposedAction.executionZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
         Set parameters = overlayExecutionZoneParameters(paramMetaList, exposedAction.processingParameters)
         return parameters
@@ -274,7 +195,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
      * TODO the name is misleading, this gets all parameters of a scriptletbatch, not only the ones from the execution zone
      */
     Set getExecutionZoneParameters(ExecutionZone execZone, File scriptDir) {
-        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, this.getRuntimeAttributes(), execZone.type)
+
+        ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(scriptDir, execZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
         Set parameters = overlayExecutionZoneParameters(paramMetaList, execZone.processingParameters)
         return parameters
@@ -329,7 +251,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
             def processParam = new ProcessingParameter(name: originalParameter.name, value: param.value.toString())
             if (!actionParameterEditAllowed(processParam, originalParameter)) {
                 command.errors.reject('executionZone.failure.unallowedEdit',
-                        [originalParameter.name].asType(Object[]),
+                        [originalParameter.name] as Object[],
                         'You are not allowed to edit parameter {0}'
                 )
             }
@@ -395,30 +317,6 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         }
 
         return result
-    }
-
-    boolean hasAccess(Role role, ExecutionZone executionZone) {
-      def expression = role.executionZoneAccessExpression
-      try {
-        return Eval.me("executionZone",executionZone,expression == null ? "" : expression)
-      } catch (Exception e) {
-        this.log.error("executionZoneAccessExpression for role '"+ role + " with " + expression +"' is throwing an exception", e)
-        return false
-      }
-    }
-
-    boolean hasAccess(Set roles, ExecutionZone zone) {
-      for ( role in roles) {
-        if (hasAccess(role,zone)) {
-          return true
-        }
-      }
-      return false
-    }
-
-    boolean userHasAccess(ExecutionZone zone) {
-        SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
-                hasAccess(springSecurityService.currentUser.getAuthorities(), zone)
     }
 
     boolean canEdit(Role role, ProcessingParameter parameter) {

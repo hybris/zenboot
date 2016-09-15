@@ -52,10 +52,8 @@ wait_for_travis
 date
 echo "# Will now release $1"
 sed -i.bak -e "s/app.version=.*/app.version=$VERSION/" application.properties
-sed -i.bak -e "s/download\/v[.0-9]*/download\/v$VERSION/" Dockerfile
 
 git add application.properties
-git add Dockerfile
 git commit -m "Release v${VERSION}"
 git push
 git tag v${VERSION}
@@ -81,9 +79,10 @@ if [[ $SUCCESS = false ]]; then
     exit 1
 fi
 
-docker build -t hybris/zenboot:v${VERSION} .
-echo -n "about to tag the Dockerimage"
+docker build -t hybris/zenboot:v${VERSION} --build-arg VERSION=$VERSION .
+echo "tagging the image"
 docker tag -f hybris/zenboot:v${VERSION} hybris/zenboot:latest
+echo "pushing"
 docker push hybris/zenboot:latest
 docker push hybris/zenboot:v${VERSION}
 date

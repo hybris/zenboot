@@ -13,10 +13,12 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     static transactional = false //necessary to avoid duplicate event listener registration
 
+    def runTimeAttributesService
     def grailsApplication
-    def executionZoneService
     def executionService
     def springSecurityService
+    def accessService
+    def scriptDirectoryService
 
     def scriptletFlowCache
 
@@ -26,10 +28,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     def filterByAccessPermission(scriptletBatches) {
         def hasAccess = { zone ->
-            executionZoneService.hasAccess(
-                    springSecurityService.currentUser.getAuthorities(),
-                    zone
-            )
+            accessService.userHasAccess(zone)
         }.memoize() // caching ftw
 
         scriptletBatches.findAll  { ScriptletBatch batch ->
@@ -85,9 +84,9 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             try {
               batch.execute(processContext)
             } catch (Exception e) {
-              log.error("Catched Exception: ",e)
+              log.error("Caught Exception: ",e)
               batch.exceptionMessage = e.getMessage()
-              batch.exceptionClass = e.getClass()
+              batch.exceptionClass = e.getClass().toString()
               batch.cancel()
             }
 
@@ -111,7 +110,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
 	private void synchronizeExposedProcessingParameters(ScriptletBatch batch, ProcessContext processContext) {
         ExecutionZoneAction action = batch.executionZoneAction
-        ScriptletBatchFlow flow = executionZoneService.getScriptletBatchFlow(action.scriptDir, batch.executionZoneAction.executionZone.type)
+        ScriptletBatchFlow flow = getScriptletBatchFlow(action.scriptDir, batch.executionZoneAction.executionZone.type)
 		ParameterMetadataList paramList = flow.getParameterMetadataList()
 
 		def exposedPublishedMetaParams = paramList.parameters.findAll { ParameterMetadata paramMeta ->
@@ -171,7 +170,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }
         ScriptletBatch batch = new ScriptletBatch(description: "${user?.username} : ${action.executionZone.type} : ${action.scriptDir.name} ${action.executionZone.description? action.executionZone.description : "" }", executionZoneAction:action, user:user, comment:comment)
 
-        PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(action.executionZone.type))
+        PluginResolver pluginResolver = new PluginResolver(scriptDirectoryService.getPluginDir(action.executionZone.type))
         File pluginFile = pluginResolver.resolveScriptletBatchPlugin(batch, action.runtimeAttributes)
         if (pluginFile) {
             executionService.injectPlugins(pluginFile, batch)
@@ -190,7 +189,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
     private List<Scriptlet> addScriptlets(ScriptletBatch batch, List runtimeAttributes) {
         ScriptResolver scriptsResolver = new ScriptResolver(batch.executionZoneAction.scriptDir)
-        PluginResolver pluginResolver = new PluginResolver(executionZoneService.getPluginDir(batch.executionZoneAction.executionZone.type))
+        PluginResolver pluginResolver = new PluginResolver(scriptDirectoryService.getPluginDir(batch.executionZoneAction.executionZone.type))
 
         scriptsResolver.resolve(runtimeAttributes).each { File file ->
             Scriptlet scriptlet = new Scriptlet(description:file.name, file:file)
@@ -211,6 +210,9 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     }
 
 
+    ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, ExecutionZoneType type) {
+        return this.getScriptletBatchFlow(scriptDir, runTimeAttributesService.getRuntimeAttributes(), type)
+    }
 
     ScriptletBatchFlow getScriptletBatchFlow(File scriptDir, List runtimeAttributes, ExecutionZoneType type) {
         log.debug("cache is:" + scriptletFlowCache)
@@ -222,7 +224,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
         if (scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()] == null || type.devMode ) {
           ScriptResolver scriptResolver = new ScriptResolver(scriptDir)
-          String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ExecutionZoneService.PLUGINS_DIR}"
+          String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ScriptDirectoryService.PLUGINS_DIR}"
           PluginResolver pluginResolver = new PluginResolver(new File(pathPluginDir))
 
           ScriptletBatchFlow flow = new ScriptletBatchFlow()

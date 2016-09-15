@@ -1,0 +1,5 @@
+*
+!zenboot.properties
+!docker-provisioning/ansible.cfg
+!target/*.war
+!docker-provisioning/setenv.sh

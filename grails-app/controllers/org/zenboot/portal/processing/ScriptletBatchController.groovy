@@ -3,7 +3,7 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.grails.plugin.filterpane.FilterPaneUtils
 import org.zenboot.portal.security.Role
 
@@ -15,6 +15,7 @@ class ScriptletBatchController {
 
     def PageRenderer groovyPageRenderer
     def executionZoneService
+    def accessService
     def springSecurityService
     def scriptletBatchService
     def filterPaneService
@@ -95,7 +96,7 @@ class ScriptletBatchController {
         ScriptletBatch batch = cmd.getScriptletBatch()
         if (batch.isRunning()) {
             response.setStatus(HttpStatus.OK.value())
-            request.withFormat {
+            withFormat {
                 json {
                     def  result = []
                     batch.processables.each { Processable proc ->
@@ -127,7 +128,7 @@ class ScriptletBatchController {
           redirect(action: "list")
           return
         } else if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-          if (!executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), scriptletBatchInstance.executionZoneAction.executionZone)) {
+          if (!accessService.userHasAccess(scriptletBatchInstance.executionZoneAction.executionZone)) {
             flash.message = message(code: 'default.no.access.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
             redirect(action: "list")
             return

@@ -38,6 +38,6 @@ class Person {
 
     @Override
     String toString() {
-        return this.username
+        return this.username ?: 'Person'
     }
 }

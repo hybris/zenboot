@@ -3,7 +3,7 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.converters.XML
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.grails.plugin.filterpane.FilterPaneUtils
 import org.springframework.context.ApplicationEventPublisher
@@ -15,15 +15,16 @@ import org.zenboot.portal.security.Role
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.RestResult
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
-import org.zenboot.portal.processing.meta.MetadataParameterComparator
 import org.zenboot.portal.processing.meta.ParameterMetadata
 
 class ExecutionZoneController extends AbstractRestController implements ApplicationEventPublisherAware {
 
     def applicationEventPublisher
     def executionZoneService
+    def accessService
     def springSecurityService
     def filterPaneService
+    def scriptDirectoryService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -41,6 +42,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
 
     def execute(ExecuteExecutionZoneCommand cmd) {
+        def executionZone = ExecutionZone.get(cmd.execId)
         flash.action = 'execute'
         executionZoneService.setParameters(cmd, params.parameters)
         log.info("cmd setParameters:" + params.inspect())
@@ -154,8 +156,10 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             parameters.putAll 'filter.enabled': true, 'filter.op.enabled': 'Equal'
 
             request.withFormat {
-                html { redirect(action: "list", params: parameters) }
-                json { render(action: "list", params: parameters) }
+                html {
+                    return redirect(action: "list", params: parameters)
+                }
+                json { }
             }
         }
 
@@ -171,7 +175,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             favs = true
         }
 
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        params.max = params.max ?: 10
 
         def executionZones = []
         def executionZoneCount = 0
@@ -252,7 +256,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
     def showModel(executionZoneInstance) {
         if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) &&
-              !executionZoneService.hasAccess(springSecurityService.currentUser.getAuthorities(), executionZoneInstance)) {
+              !accessService.userHasAccess(executionZoneInstance)) {
           render(view: "/login/denied")
           return
         }
@@ -262,13 +266,12 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         }
 
 
-        List scriptDirs = this.executionZoneService.getScriptDirs(executionZoneInstance.type)
+        List scriptDirs = scriptDirectoryService.getScriptDirs(executionZoneInstance.type)
 
         def structuredScriptDirs = [:]
-        structuredScriptDirs["create"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"create")
-        structuredScriptDirs["update"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"update")
-        structuredScriptDirs["delete"] = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"delete")
-        structuredScriptDirs["misc"]   = this.executionZoneService.getScriptDirs(executionZoneInstance.type,"misc")
+        ['create', 'update', 'delete', 'misc'].each {
+            structuredScriptDirs[it] = scriptDirectoryService.getScriptDirs(executionZoneInstance.type, it)
+        }
 
         def userEditableFilteredParameters = []
         def userNonEditableFilteredParameters = []
@@ -395,6 +398,9 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 }
 
 class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
+    static constraints = {
+        importFrom AbstractExecutionZoneCommand
+    }
 
     @Override
     ExecutionZoneAction getExecutionZoneAction() {
@@ -404,6 +410,9 @@ class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
 }
 
 class ExposeExecutionZoneCommand extends AbstractExecutionZoneCommand {
+    static constraints = {
+        importFrom AbstractExecutionZoneCommand
+    }
 
     @Override
     ExposedExecutionZoneAction getExecutionZoneAction() {
@@ -433,13 +442,12 @@ class GetExecutionZoneParametersCommand {
     // FIXME extract, this is bullshit here
     def getExecutionZoneParameters() {
         def execZnParams = this.executionZoneService.getExecutionZoneParameters(ExecutionZone.get(this.execId), this.scriptDir).asType(ParameterMetadata[])
-        execZnParams.sort(true, new MetadataParameterComparator())
+        execZnParams.sort { a,b -> a.name <=> b.name }
     }
 }
 
 class GetScriptletBatchFlow {
-
-    def executionZoneService
+    def scriptletBatchService
 
     Long execId
     File scriptDir
@@ -453,7 +461,7 @@ class GetScriptletBatchFlow {
     }
 
     ScriptletBatchFlow getScriptletBatchFlow() {
-        this.executionZoneService.getScriptletBatchFlow(this.scriptDir, ExecutionZone.get(execId).type)
+        return scriptletBatchService.getScriptletBatchFlow(this.scriptDir,  ExecutionZone.get(execId).type)
     }
 }
 

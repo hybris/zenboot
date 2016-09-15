@@ -18,7 +18,6 @@ class UrlMappings {
         "/rest/executionzones"(controller: "executionZone", action: "list")
         "/rest/executionzones/$id"(controller:'executionZone', action:'rest')
         "/rest/actions/$id/status"(controller:'executionZoneAction', action:'rest')
-        "/rest/hiera/$puppetEnvironment/$qualityStage?"(controller:'hieraRest', action:'rest')
         "/rest/templates/$action?/$id?" (controller:'template')
         "/rest/properties/$puppetEnvironment/$qualityStage?"(controller:'propertiesRest', action:'rest')
         "/rest/$url?"(controller:'exposedExecutionZoneAction', action:'rest')

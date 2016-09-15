@@ -12,13 +12,9 @@ class BootStrap {
 
     def executionZoneService
     def grailsApplication
+    def scriptDirectoryService
 
     def init = { servletContext ->
-        if (Environment.current == Environment.TEST) {
-            //no initialization needed for testing
-            return
-        }
-
         //create fundamental user groups
         this.setupSecurity()
 
@@ -107,8 +103,8 @@ class BootStrap {
         if (!exposedAction) {
             exposedAction = new ExposedExecutionZoneAction(
                 executionZone: execZoneSanity,
-                scriptDir : new File("${executionZoneService.getScriptDir(sanityType)}${System.properties['file.separator']}sanitycheck"),
-                roles: Role.findByAuthority(Role.ROLE_SANITYCHECK),
+                scriptDir : new File("${scriptDirectoryService.getScriptDir(sanityType)}${System.properties['file.separator']}sanitycheck"),
+                roles: Role.findAll(),
                 url: "sanitycheck",
             )
             exposedAction.save()

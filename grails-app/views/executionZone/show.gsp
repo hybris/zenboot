@@ -42,7 +42,7 @@
 
 		<div class="accordion" id="execution-show-accordion">
 			<div class="accordion-group">
-				<div class="accordion-heading">
+				<div class="accordion-heading" id="accordion-toggle-show">
       		<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#showZone">
         		<g:message code="default.show.label" args="[entityName]" /> (${executionZoneInstance?.type} : ${executionZoneInstance?.description} )
       		</a>
@@ -162,11 +162,11 @@
 							<g:hiddenField name="execId" value="${executionZoneInstance?.id}" />
 
 							<fieldset class="spacer buttons">
-								<filterpane:filterLink controller="ScriptletBatch" action="list" class="btn"
+								<filterpane:filterLink controller="ScriptletBatch" action="list" class="btn listScriptLetBatchesForZoneButton"
 													   values="['executionZoneAction.executionZone.id': executionZoneInstance?.id]">
 									<g:message code="executionZone.showExecutedActions.label" default="Log" />
                                 </filterpane:filterLink>
-								<filterpane:filterLink controller="Host" action="list" class="btn"
+								<filterpane:filterLink controller="Host" action="list" class="btn listHostsForZoneButton"
 													   values="['execZone.id': executionZoneInstance?.id]">
 									<g:message code="executionZone.showExecutedActions.label" default="Hosts" />
 								</filterpane:filterLink>
@@ -177,7 +177,7 @@
 				</div>
 			</div>
 			<div class="accordion-group">
-				<div class="accordion-heading">
+				<div class="accordion-heading" id="accordion-toggle-service-urls">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#execZoneUrls">
 						<g:message code="executionZone.execZoneUrls.label" default="Service Urls" />
 					</a>
@@ -191,7 +191,7 @@
 				</div>
 			</div>
 			<div class="accordion-group">
-				<div class="accordion-heading">
+				<div class="accordion-heading" id="accordion-toggle-execute-script">
 					<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#executeScript">
         		<g:message code="executionZone.execAction.label" default="Execute Script" />
       		</a>
@@ -251,7 +251,7 @@
 
 				 			<fieldset class="spacer buttons">
 
-				 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Zone')}" disabled="${!executionZoneInstance?.enabled}" />
+				 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Action')}" disabled="${!executionZoneInstance?.enabled}" />
 				 				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 									<g:actionSubmit class="btn btn-inverse" action="createExposedAction" value="${message(code: 'executionZone.button.createExposedAction.label', default: 'Expose Action')}" disabled="${!executionZoneInstance?.enabled}" />
 								</sec:ifAllGranted>
@@ -262,7 +262,7 @@
 			</div>
 			<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 				<div class="accordion-group">
-					<div class="accordion-heading">
+					<div class="accordion-heading" id="accordion-toggle-">
 						<a class="accordion-toggle" data-toggle="collapse" data-parent="#execution-show-accordion" href="#editExecZone">
 	        				<g:message code="executionZone.editExecZone.label" default="Edit Execution Zone and Parameters" />
 	      				</a>
@@ -361,20 +361,29 @@
         $.ajax({
             url : '<g:createLink action="ajaxGetParameters" params="[execId:executionZoneInstance?.id]" />&scriptDir=' + encodeURI($(this).val()),
             beforeSend : function() {
+                if ($('#showZone input[name=enabled]')) {
+                    $('[name="_action_execute"],[name="_action_createExposedAction"]').attr("disabled", "disabled");
+                }
                 $('#scriptDirs input:radio').attr("disabled", "disabled");
                 $('#parameters').slideUp('fast');
                 $('#parametersSpinner').fadeIn('fast');
             },
             success: function(data) {
+                if ($('#showZone input[name=enabled]')) {
+                    $('[name="_action_execute"],[name="_action_createExposedAction"]').removeAttr("disabled");
+                }
             	$('#parametersSpinner').hide();
             	$('#parameters').html(data).slideDown('slow');
             	zenboot.enableParameterList();
             	$('#scriptDirs input:radio').removeAttr('disabled');
             },
             error: function(jqHXR, status, error) {
-		        	$('#parametersSpinner').hide();
-		        	$("#parameters").html('<div class="alert alert-error">Some ERROR occured: ' + error + '</div>').slideDown('slow');
-		        	$('#scriptDirs input:radio').removeAttr('disabled');
+                if ($('#showZone input[name=enabled]')) {
+                    $('[name="_action_execute"],[name="_action_createExposedAction"]').removeAttr("disabled");
+                }
+                $('#parametersSpinner').hide();
+                $("#parameters").html('<div class="alert alert-error">Some ERROR occured: ' + error + '</div>').slideDown('slow');
+                $('#scriptDirs input:radio').removeAttr('disabled');
             }
         });
     });

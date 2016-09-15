@@ -23,8 +23,9 @@ grails.config.locations = [
 
 grails.project.groupId = 'org.zenboot.portal' // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
-grails.mime.use.accept.header = false
-grails.mime.types = [ html: [
+grails.mime.use.accept.header = true
+grails.mime.types = [
+    html: [
         'text/html',
         'application/xhtml+xml'
     ],
@@ -95,9 +96,6 @@ grails.gorm.default.constraints = {'*'(nullable: true)}
 // enable query caching by default
 grails.hibernate.cache.queries = true
 
-// Use spring binder (http://grails.org/doc/2.3.x/guide/upgradingFromPreviousVersionsOfGrails.html)
-grails.databinding.useSpringBinder = true
-
 // email configuration
 grails.mail.default.from="zenboot-noreply@yourdomain.com"
 
@@ -127,20 +125,20 @@ environments {
 }
 
 //Spring security configuration
-grails.plugins.springsecurity.password.algorithm='SHA-512'
-grails.plugins.springsecurity.userLookup.userDomainClassName = 'org.zenboot.portal.security.Person'
-grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'org.zenboot.portal.security.PersonRole'
-grails.plugins.springsecurity.authority.className = 'org.zenboot.portal.security.Role'
-grails.plugins.springsecurity.rejectIfNoRule = true
+grails.plugin.springsecurity.password.algorithm='SHA-512'
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'org.zenboot.portal.security.Person'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.zenboot.portal.security.PersonRole'
+grails.plugin.springsecurity.authority.className = 'org.zenboot.portal.security.Role'
+grails.plugin.springsecurity.rejectIfNoRule = true
 
-grails.plugins.springsecurity.useBasicAuth = true
-grails.plugins.springsecurity.filterChain.chainMap = [
+grails.plugin.springsecurity.useBasicAuth = true
+grails.plugin.springsecurity.filterChain.chainMap = [
     '/rest/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
     '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
  ]
 
-grails.plugins.springsecurity.controllerAnnotations.staticRules = [
-    '/assets/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
+grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+    '/assets/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/js/**':                               ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/images/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/css/**':                              ['IS_AUTHENTICATED_ANONYMOUSLY'],
@@ -167,12 +165,10 @@ grails.plugins.springsecurity.controllerAnnotations.staticRules = [
     '/scriptletBatch/list':                 [Role.ROLE_USER],
     '/executionZone/ajaxGetReadme':         [Role.ROLE_USER],
     //default
+    '/administration':                                  [Role.ROLE_ADMIN],
     '/**':                                  [Role.ROLE_ADMIN],
- ]
-
-grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-   "/console/**":          ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"],
-   "/plugins/console*/**": ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"]
+    "/console/**":          ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"],
+    "/plugins/console*/**": ["hasRole('ROLE_ADMIN') && (hasIpAddress('127.0.0.1') || hasIpAddress('::1'))"],
 ]
 
 //fix pagination bug in bootstrap
