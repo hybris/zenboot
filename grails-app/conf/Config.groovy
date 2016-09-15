@@ -96,10 +96,6 @@ grails.gorm.default.constraints = {'*'(nullable: true)}
 // enable query caching by default
 grails.hibernate.cache.queries = true
 
-// Use spring binder (http://grails.org/doc/2.3.x/guide/upgradingFromPreviousVersionsOfGrails.html)
-// FIXME deprecated with 2.4
-//grails.databinding.useSpringBinder = true
-
 // email configuration
 grails.mail.default.from="zenboot-noreply@yourdomain.com"
 

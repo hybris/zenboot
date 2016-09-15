@@ -9,7 +9,7 @@ Zenboot - orchestrate your scripts
 * Use it e.g. to provision manually, bootstrap all your environments, storing
 all the servers in the DB
 * or fullfill your orchestration-needs, expose scripts via REST
-* based on grails 2.3.1
+* based on grails 2.5
 
 ## Go with Docker
 

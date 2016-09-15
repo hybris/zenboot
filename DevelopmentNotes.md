@@ -50,7 +50,7 @@ it was asked to execute the functional tests only) which try to access the same 
 Just run it again in this case.
 
 #### the log4j-setup
-This [event-definition)[http://grails.github.io/grails-doc/2.3.x/guide/commandLine.html#events]
+This [event-definition)[http://grails.github.io/grails-doc/2.5.x/guide/commandLine.html#events]
 in [_Events.groovy](https://github.com/hybris/zenboot/blob/master/scripts/_Events.groovy#L6-L10)
 takes care that the log4j.properties on the root-dir gets copied in the classpath
 This definition in [resources.groovy:6-11](https://github.com/hybris/zenboot/blob/master/grails-app/conf/spring/resources.groovy#L6-L11)
