@@ -1,3 +1,5 @@
+import org.zenboot.portal.security.ZenbootUserDetailsContextMapper
+
 import java.util.concurrent.Executors;
 
 import org.zenboot.portal.security.AdminRoleVoter;
@@ -27,4 +29,9 @@ beans = {
 
     //Spring security role hierarchy voter
     roleVoter(AdminRoleVoter, ref('roleHierarchy'))
+
+    // map ldap users to db users
+    ldapUserDetailsMapper(ZenbootUserDetailsContextMapper) {
+        // bean attributes
+    }
 }

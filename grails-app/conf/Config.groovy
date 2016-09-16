@@ -13,11 +13,12 @@ import org.zenboot.portal.security.Role
 // }
 
 grails.config.locations = [
-    "file:${basedir}/grails-app/conf/NavigationConfig.groovy", //won't work in WAR
-    "classpath:NavigationConfig.groovy", //copied to classpath in scripts/_Events.groovy
     "file:${basedir}/zenboot.properties", //won't work in WAR
+    "classpath:SecurityConfig.groovy",
     "classpath:zenboot.properties", //${basedir}/*.properties (except log4.properties) is automatically copied to classpath by Grails
+    "file:/etc/zenboot/SecurityConfig.groovy",
     "file:/etc/zenboot/zenboot.properties",         // Mainly for Docker-Usage
+    "file:${userHome}/SecurityConfig.groovy",
     "file:${userHome}/zenboot/zenboot.Docker.properties"  // Mainly for Docker-Usage
 ]
 
@@ -203,3 +204,15 @@ grails {
     }
 }
 remove this line */
+// deactivate ldap as a default
+// to activate it, copy SecurityConfigExample.groovy to SecurityConfig.groovy and edit its values
+// see http://grails-plugins.github.io/grails-spring-security-ldap/v2/guide for details
+grails {
+    plugin {
+        springsecurity {
+            ldap {
+                active = false
+            }
+        }
+    }
+}
