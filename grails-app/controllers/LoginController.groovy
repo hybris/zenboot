@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletResponse
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 
-import org.springframework.security.access.annotation.Secured
+import grails.plugin.springsecurity.annotation.Secured
 
 import org.springframework.security.authentication.AccountExpiredException
 import org.springframework.security.authentication.CredentialsExpiredException

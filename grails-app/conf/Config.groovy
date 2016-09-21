@@ -126,6 +126,7 @@ environments {
 
 //Spring security configuration
 grails.plugin.springsecurity.password.algorithm='SHA-512'
+grails.plugin.springsecurity.password.hash.iterations = 1
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'org.zenboot.portal.security.Person'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.zenboot.portal.security.PersonRole'
 grails.plugin.springsecurity.authority.className = 'org.zenboot.portal.security.Role'
