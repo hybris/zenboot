@@ -132,6 +132,14 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.zenboot.po
 grails.plugin.springsecurity.authority.className = 'org.zenboot.portal.security.Role'
 grails.plugin.springsecurity.rejectIfNoRule = true
 
+grails.plugin.springsecurity.secureChannel.useHeaderCheckChannelSecurity = true
+grails.plugin.springsecurity.portMapper.httpPort = 8080
+grails.plugin.springsecurity.portMapper.httpsPort = 443
+grails.plugin.springsecurity.secureChannel.secureHeaderName = 'X-Forwarded-Proto'
+grails.plugin.springsecurity.secureChannel.secureHeaderValue = 'http'
+grails.plugin.springsecurity.secureChannel.insecureHeaderName = 'X-Forwarded-Proto'
+grails.plugin.springsecurity.secureChannel.insecureHeaderValue = 'https'
+
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.filterChain.chainMap = [
     '/rest/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
