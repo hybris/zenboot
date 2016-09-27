@@ -16,12 +16,20 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper
 class ZenbootUserDetailsContextMapper implements UserDetailsContextMapper {
     UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection ldapAuthorities) {
         try {
-            Person person = Person.findByUsername(username)
+            // toLowerCase(), because LDAP is not context-sensitive, but probably the DB is
+            // so let's not end up with 2 Person depending on how the person logs in
+            Person person = Person.findByUsername(username.toLowerCase())
+
+            // Are you interested in that bloody LDAP-Object?!
+            //println("DISPLAYNAME: "+ctx.getAttributeSortedStringSet("DISPLAYNAMEPRINTABLE")[0])
+
             def roles = []
             Person.withTransaction {
                 if (!person) {
                     person = new Person(
-                        username: username,
+                        username: username.toLowerCase(),
+                        // probably would be cool to do something like this:
+                        // fullName: ctx.getAttributeSortedStringSet("DISPLAYNAMEPRINTABLE")[0],
                         enabled: true,
                         password: RandomStringUtils.randomAlphanumeric(30) // if LDAP is switched off, users should not be able to log in
                     )
@@ -36,7 +44,7 @@ class ZenbootUserDetailsContextMapper implements UserDetailsContextMapper {
 
             def authorities = roles.collect { new SimpleGrantedAuthority(it.authority) }
 
-            def userDetails = new ZenbootUserDetails(username, '', person.enabled, true, true, true, authorities, person.id)
+            def userDetails = new ZenbootUserDetails(username.toLowerCase(), '', person.enabled, true, true, true, authorities, person.id)
             return userDetails
         } catch (e) {
             log.error("failed to map user ${username}", e)
@@ -48,7 +56,3 @@ class ZenbootUserDetailsContextMapper implements UserDetailsContextMapper {
         throw new IllegalStateException("Only retrieving data from AD is currently supported")
     }
 }
-
-
-
-
