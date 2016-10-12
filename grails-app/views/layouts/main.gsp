@@ -23,7 +23,7 @@
 		<div class="span4" style="text-align: right; padding: 5px 10px 0 0; color: white;" id="authentication">
 			<sec:ifLoggedIn>
 				<g:message code="login.welcome" default="Welcome" />
-				<sec:username /> (<g:link controller='logout' style="color:white;">Logout</g:link>)
+				${sec.loggedInUserInfo(field: 'displayname')} (<g:link controller='logout' style="color:white;">Logout</g:link>)
 			</sec:ifLoggedIn>
 		</div>
 	</div>

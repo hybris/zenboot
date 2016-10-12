@@ -21,7 +21,7 @@ class ZenbootUserDetailsContextMapper implements UserDetailsContextMapper {
             Person person = Person.findByUsername(username.toLowerCase())
 
             // Are you interested in that bloody LDAP-Object?!
-            //println("DISPLAYNAME: "+ctx.getAttributeSortedStringSet("DISPLAYNAMEPRINTABLE")[0])
+            println("DISPLAYNAME: "+ctx.getAttributeSortedStringSet("DISPLAYNAMEPRINTABLE")[0])
 
             def roles = []
             Person.withTransaction {
@@ -32,11 +32,13 @@ class ZenbootUserDetailsContextMapper implements UserDetailsContextMapper {
                         // fullName: ctx.getAttributeSortedStringSet("DISPLAYNAMEPRINTABLE")[0],
                         enabled: true,
                         password: RandomStringUtils.randomAlphanumeric(30) // if LDAP is switched off, users should not be able to log in
+                        displayname: ctx.getAttributeSortedStringSet("DISPLAYNAMEPRINTABLE")[0]
                     )
                     person.save(flush: true)
                     PersonRole.create(person, Role.findByAuthority(Role.ROLE_USER), true)
                 } else {
                     // TODO update details (e.g. firstname, lastname, email) when we support these
+
                 }
 
                 roles = person.getAuthorities()
@@ -44,7 +46,7 @@ class ZenbootUserDetailsContextMapper implements UserDetailsContextMapper {
 
             def authorities = roles.collect { new SimpleGrantedAuthority(it.authority) }
 
-            def userDetails = new ZenbootUserDetails(username.toLowerCase(), '', person.enabled, true, true, true, authorities, person.id)
+            def userDetails = new ZenbootUserDetails(username.toLowerCase()'', person.enabled, true, true, true, authorities, person.id)
             return userDetails
         } catch (e) {
             log.error("failed to map user ${username}", e)

@@ -168,7 +168,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         if (this.log.debugEnabled) {
             this.log.debug("Build scriptlet batch for action ${action}")
         }
-        ScriptletBatch batch = new ScriptletBatch(description: "${user?.username} : ${action.executionZone.type} : ${action.scriptDir.name} ${action.executionZone.description? action.executionZone.description : "" }", executionZoneAction:action, user:user, comment:comment)
+        ScriptletBatch batch = new ScriptletBatch(description: "${user?.displayname} : ${action.executionZone.type} : ${action.scriptDir.name} ${action.executionZone.description? action.executionZone.description : "" }", executionZoneAction:action, user:user, comment:comment)
 
         PluginResolver pluginResolver = new PluginResolver(scriptDirectoryService.getPluginDir(action.executionZone.type))
         File pluginFile = pluginResolver.resolveScriptletBatchPlugin(batch, action.runtimeAttributes)
