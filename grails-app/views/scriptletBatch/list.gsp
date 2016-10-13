@@ -23,6 +23,7 @@
 		<table class="table table-striped" id="scriptlet-batch-list">
 			<thead>
 				<tr>
+					<g:sortableColumn property="user" title="${message(code: 'scriptletBatch.user.label', default: 'User')}" />
 					<g:sortableColumn property="description" title="${message(code: 'scriptletBatch.description.label', default: 'Description')}" />
 					<g:sortableColumn property="creationDate" title="${message(code: 'scriptletBatch.creationDate.label', default: 'Creation Date')}" />
 					<g:sortableColumn property="endDate" title="${message(code: 'scriptletBatch.endDate.label', default: 'End Date')}" />
@@ -34,6 +35,11 @@
 			<tbody>
 				<g:each in="${scriptletBatchInstanceList}" status="i" var="scriptletBatchInstance">
 					<tr>
+						<td>
+                            <a href="mailto:${fieldValue(bean: scriptletBatchInstance, field: "user.email")}">
+								${scriptletBatchInstance.user?.displayName ?: scriptletBatchInstance.user?.username}
+							</a>
+						</td>
 						<td>
 							<g:link action="show" id="${scriptletBatchInstance.id}">
 								${fieldValue(bean: scriptletBatchInstance, field: "description")}
