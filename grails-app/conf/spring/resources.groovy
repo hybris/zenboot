@@ -1,4 +1,5 @@
 import org.zenboot.portal.security.ZenbootUserDetailsContextMapper
+import org.zenboot.portal.security.ZenbootUserDetailsService
 
 import java.util.concurrent.Executors;
 
@@ -34,4 +35,6 @@ beans = {
     ldapUserDetailsMapper(ZenbootUserDetailsContextMapper) {
         // bean attributes
     }
+
+    userDetailsService(ZenbootUserDetailsService)
 }
