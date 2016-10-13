@@ -68,7 +68,7 @@
 
 		<filterpane:filterPane domain="ScriptletBatch" action="list" formMethod="get"
 							   excludeProperties=""
-							   associatedProperties="executionZoneAction.executionZone.description, executionZoneAction.executionZone.id"/>
+							   associatedProperties="executionZoneAction.executionZone.description, executionZoneAction.executionZone.id, user.email, user.username, user.displayName"/>
 		<filterpane:isFiltered>
 			<h4>Current Filters:</h4>
 			<filterpane:currentCriteria domainBean="ScriptletBatch" action="list" fullAssociationPathFieldNames="no"/>
