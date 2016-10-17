@@ -7,10 +7,12 @@ class PluginResolver {
     private List plugins = []
 
     PluginResolver(File pluginDir) {
-        if (!pluginDir.exists()) {
-            throw new ProcessingException("Plugin directory '${pluginDir.path}' not found")
-        }
         this.pluginDir = pluginDir
+        if (!pluginDir.exists()) {
+            this.plugins = []
+            return
+        }
+
         pluginDir.eachFile { File file ->
             if (file.name.endsWith(".groovy")) {
                 this.plugins << file

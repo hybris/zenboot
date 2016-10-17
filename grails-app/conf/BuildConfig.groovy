@@ -59,7 +59,7 @@ grails.project.dependency.resolution = {
         runtime ":platform-core:1.0.0"
         runtime ":quartz2:2.1.6.2"
         runtime ":spring-security-core:2.0.0"
-
+        compile ":spring-security-ldap:2.0.1"
 
         String springSecurityVersion = '3.2.9.RELEASE'
 

@@ -39,9 +39,29 @@
 					<g:if test='${users.empty}'>
 					<g:message code='spring.security.ui.role_no_users'/>
 					</g:if>
-					<g:each var='u' in='${users}'>
-						<g:link controller='user' action='edit' id='${u.id}'>${uiPropertiesStrategy.getProperty(u, 'username')}</g:link><br/>
-					</g:each>
+					<table>
+						<thead>
+							<tr>
+								<td><g:message code="username" default="Username"/></td>
+								<td><g:message code='displayName' default='Display Name'/></td>
+								<td><g:message code='email' default='Email'/></td>
+							</tr>
+						</thead>
+						<tbody>
+							<g:each var='u' in='${users}'>
+								<tr>
+									<g:each var='p' in='${["username", "displayName", "email"]}'>
+										<td>
+											<g:link controller='user' action='edit' id='${u.id}'>
+												${uiPropertiesStrategy.getProperty(u, p)}
+											</g:link>
+											<br/>
+										</td>
+									</g:each>
+								</tr>
+							</g:each>
+						</tbody>
+					</table>
 				</s2ui:tab>
 			</s2ui:tabs>
 			<div style='float:left; margin-top: 10px;'>
