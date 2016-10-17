@@ -18,7 +18,7 @@ grails.config.locations = [
     "classpath:zenboot.properties", //${basedir}/*.properties (except log4.properties) is automatically copied to classpath by Grails
     "file:/etc/zenboot/SecurityConfig.groovy",
     "file:/etc/zenboot/zenboot.properties",         // Mainly for Docker-Usage
-    "file:${userHome}/SecurityConfig.groovy",
+    "file:${userHome}/zenboot/SecurityConfig.groovy",
     "file:${userHome}/zenboot/zenboot.Docker.properties"  // Mainly for Docker-Usage
 ]
 

@@ -68,7 +68,7 @@ will get deleted automatically
 [WorkInProgress]
 
 ## Connect to LDP
-zenboot supports LDAP since v0.12.0. This is for authentication only. Whenever
+zenboot supports LDAP since v0.12.1. This is for authentication only. Whenever
 someone logs in who can be authenticated via LDAP with the given settings,
 the user will be created on the fly and added to the User-Role.
 
