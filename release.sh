@@ -51,7 +51,7 @@ wait_for_travis
 
 date
 echo "# Will now release $1"
-sed -i '' -e "s/app.version=.*/app.version=$VERSION/" application.properties
+sed -i'.bak' -e "s/app.version=.*/app.version=$VERSION/" application.properties
 
 git add application.properties
 git commit -m "Release v${VERSION}"
