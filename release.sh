@@ -81,7 +81,7 @@ fi
 
 docker build -t hybris/zenboot:v${VERSION} --build-arg VERSION=$VERSION .
 echo "tagging the image"
-docker tag -f hybris/zenboot:v${VERSION} hybris/zenboot:latest
+docker tag hybris/zenboot:v${VERSION} hybris/zenboot:latest
 echo "pushing"
 docker push hybris/zenboot:latest
 docker push hybris/zenboot:v${VERSION}
