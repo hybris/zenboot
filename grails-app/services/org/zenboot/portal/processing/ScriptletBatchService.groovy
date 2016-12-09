@@ -8,6 +8,7 @@ import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.zenboot.portal.security.Person
+import org.zenboot.portal.processing.ProcessingException
 
 class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
@@ -32,7 +33,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }.memoize() // caching ftw
 
         scriptletBatches.findAll  { ScriptletBatch batch ->
-            hasAccess(batch.executionZoneAction.executionZone)
+            batch ? hasAccess(batch.executionZoneAction.executionZone) : false
         }
     }
 
@@ -83,8 +84,12 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             processContext.scriptletBatch=batch
             try {
               batch.execute(processContext)
+            } catch (ProcessingException e) {
+              batch.exceptionMessage = e.getMessage()
+              batch.exceptionClass = e.getClass().toString()
+              batch.cancel()
             } catch (Exception e) {
-              log.error("Caught Exception: ",e)
+              //log.error("Caught Exception: ",e)
               batch.exceptionMessage = e.getMessage()
               batch.exceptionClass = e.getClass().toString()
               batch.cancel()

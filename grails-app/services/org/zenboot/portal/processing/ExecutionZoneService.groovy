@@ -205,7 +205,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     boolean actionParameterEditAllowed(parameter, originalParameter) {
         originalParameter?.value == null ||
                 originalParameter?.value == "" ||
-                originalParameter?.value == parameter?.value ||
+                // multiline-support therefore replace newlines before comparison
+                originalParameter?.value.replaceAll("[\\\t|\\\n|\\\r]","") == parameter?.value ||
                 canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
     }
 
@@ -215,7 +216,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         command.execZoneParameters = ControllerUtils.getParameterMap(parameters ?: [:], "key", "value")
 
         def originalParameters = getExecutionZoneParameters(executionZone, command.scriptDir)
-                
+
         if (command.containsInvisibleParameters) {
 
             originalParameters.each { ParameterMetadata originalParameter ->
@@ -224,7 +225,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
                 }
             }
         }
-        
+
         command.execZoneParameters.each { key, value ->
             if (!value) {
                 command.errors.reject(
@@ -252,7 +253,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
             if (!actionParameterEditAllowed(processParam, originalParameter)) {
                 command.errors.reject('executionZone.failure.unallowedEdit',
                         [originalParameter.name] as Object[],
-                        'You are not allowed to edit parameter {0}'
+                        'You are not allowed to edittt parameter {0}'
                 )
             }
         }

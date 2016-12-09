@@ -52,7 +52,7 @@ abstract class Processable {
             } catch (Exception exc) {
                 handledException = exc
                 this.failure(ctx, exc)
-                this.log.warn("Process failed with handled exception", exc)
+                this.log.warn("Process failed with handled exception " + exc.getMessage())
             } finally {
                 this.stop(ctx)
             }
