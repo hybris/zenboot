@@ -1,14 +1,73 @@
 <%@ page import="org.zenboot.portal.security.Role"%>
+<asset:script>
+function prettyPrint(id) {
+	try {
+		var ugly = document.getElementById(id).value;
+		var obj = JSON.parse(ugly);
+		var pretty = JSON.stringify(obj, undefined, 4);
+		document.getElementById(id+"json").innerHTML = pretty
+	} catch(e) {
+		document.getElementById(id+"json").innerHTML = e + id;
+	}
+}
+
+var textareaResize = function(source, dest) {
+    var resizeInt = null;
+
+    // the handler function
+    var resizeEvent = function() {
+        dest.outerWidth( source.outerWidth() );
+        dest.outerHeight(source.outerHeight());
+    };
+
+    // This provides a "real-time" (actually 15 fps)
+    // event, while resizing.
+    // Unfortunately, mousedown is not fired on Chrome when
+    // clicking on the resize area, so the real-time effect
+    // does not work under Chrome.
+    source.on("mousedown", function(e) {
+        resizeInt = setInterval(resizeEvent, 1000/15);
+    });
+
+    // The mouseup event stops the interval,
+    // then call the resize event one last time.
+    // We listen for the whole window because in some cases,
+    // the mouse pointer may be on the outside of the textarea.
+    $(window).on("mouseup", function(e) {
+        if (resizeInt !== null) {
+            clearInterval(resizeInt);
+        }
+        resizeEvent();
+    });
+};
+
+function fitToContent(id, maxHeight)
+{
+   var text = id && id.style ? id : document.getElementById(id);
+   if ( !text )
+      return;
+
+   var adjustedHeight = text.clientHeight;
+   if ( !maxHeight || maxHeight > adjustedHeight )
+   {
+      adjustedHeight = Math.max(text.scrollHeight, adjustedHeight);
+      if ( maxHeight )
+         adjustedHeight = Math.min(maxHeight, adjustedHeight);
+      if ( adjustedHeight > text.clientHeight )
+         text.style.height = adjustedHeight + "px";
+   }
+}
+</asset:script>
 
 <table class="table table-striped parameters-table">
 	<thead>
 		<tr>
-			<th style="width: 30%">Key</th>
-			<th style="width: 30%">Value</th>
-			<th style="width: 30%">Description</th>
+			<th style="width: 44%">Key</th>
+			<th style="width: 40%">Value</th>
+			<th style="width: 10%">Description</th>
 			<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-				<th style="width: 5%">Expose</th>
-				<th style="width: 5%">Publish</th>
+				<th style="width: 3%">Expose</th>
+				<th style="width: 3%">Publish</th>
 		  </sec:ifAllGranted>
 			<th></th>
 		</tr>
@@ -26,7 +85,19 @@
 
 				</td>
 				<td>
-					<g:textArea rows="1" cols="60" name="parameters.value" value="${entry.value}" readonly="${readonly}" style="height: 21px; width: 300px"/>
+					<g:textArea rows="1" cols="60" id="${entry.name}" name="parameters.value" value="${entry.value}" readonly="${readonly}" style="height: 21px; width: 300px"/>
+					<g:if test="${entry.name.endsWith('JSON')}">
+						<g:textArea rows="1" cols="60" id="${entry.name}json" name="${entry.name}" value="" readonly="true" style="height: 21px; width: 300px"/>
+						<asset:script>
+							prettyPrint("${entry.name}")
+							$('#${entry.name}').on('keyup blur', function() {
+								prettyPrint(${entry.name})
+							})
+							textareaResize($("#${entry.name}"), $("#${entry.name}json"));
+							fitToContent("${entry.name}" , 500 )
+						</asset:script>
+					</g:if>
+
 				</td>
 				<td>
 					<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
@@ -133,7 +204,9 @@
 
 
 <asset:script>
+
 $(document).ready(function() {
+
     zenboot.enableProcessingParameterButtons(function() {
         //fire resize event to refresh copy-button position
         $(window).trigger("resize");

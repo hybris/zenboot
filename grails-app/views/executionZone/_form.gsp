@@ -103,7 +103,9 @@
 	<label class="control-label" for="parameters">
 		<g:message code="executionZone.parameters.label" default="Parameters" />
 	</label>
-	<div class="controls">
-		<g:render template="showParameters" model="[parameters:executionZoneInstance.processingParameters]" />
-	</div>
+	<div><!-- Let's have that row empty, start at the next line but then use the whole width--></div>
+</div>
+
+<div >
+	<g:render template="showParameters" model="[parameters:executionZoneInstance.processingParameters]" />
 </div>
