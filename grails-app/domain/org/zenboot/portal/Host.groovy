@@ -18,6 +18,7 @@ public class Host {
     Hostname hostname
     List dnsEntries = []
     Customer owner
+    String iaasUser
     Environment environment
 
     static belongsTo = [execZone:ExecutionZone]

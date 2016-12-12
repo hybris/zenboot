@@ -1,5 +1,6 @@
 <%@ page import="org.zenboot.portal.Host"%>
-<div class="control-group fieldcontain">
+<%@ page import="org.zenboot.portal.security.Role"%>
+<div class="fieldcontain">
 	<label class="control-label" for="type">
 		<g:message code="host.type.label" default="Type" />
 	</label>
@@ -8,39 +9,12 @@
 	</div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: hostInstance, field: 'ipAddress', 'error')} ">
-	<label class="control-label" for="ipAddress">
-		<g:message code="host.ipAddress.label" default="Ip Address" />
+<div class="control-group fieldcontain ${hasErrors(bean: hostInstance, field: 'instanceId', 'error')} ">
+	<label class="control-label" for="instanceId">
+		<g:message code="host.instanceId.label" default="Instance Id" />
 	</label>
 	<div class="controls">
-		<g:textField name="ipAddress" value="${hostInstance?.ipAddress}" readonly="true" />
-	</div>
-</div>
-
-<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'cname', 'error')} ">
-	<label class="control-label" for="cname">
-		<g:message code="host.cname.label" default="Cname" />
-	</label>
-	<div class="controls">
-		<g:textField name="cname" value="${hostInstance?.cname}" readonly="true" />
-	</div>
-</div>
-
-<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'macAddress', 'error')} ">
-	<label class="control-label" for="macAddress">
-		<g:message code="host.macAddress.label" default="Mac Address" />
-	</label>
-	<div class="controls">
-		<g:textField name="macAddress" value="${hostInstance?.macAddress}" readonly="true" />
-	</div>
-</div>
-
-<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'datacenter', 'error')} ">
-	<label class="control-label" for="datacenter">
-		<g:message code="host.datacenter.label" default="Datacenter" />
-	</label>
-	<div class="controls">
-		<g:textField name="datacenter" value="${hostInstance?.datacenter}" readonly="true" />
+		<g:textField name="instanceId" value="${hostInstance?.instanceId}" readonly="true" />
 	</div>
 </div>
 
@@ -54,12 +28,58 @@
 	</div>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'instanceId', 'error')} ">
-	<label class="control-label" for="instanceId">
-		<g:message code="host.instanceId.label" default="Instance Id" />
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'cname', 'error')} ">
+	<label class="control-label" for="cname">
+		<g:message code="host.cname.label" default="Cname" />
 	</label>
 	<div class="controls">
-		<g:textField name="instanceId" value="${hostInstance?.instanceId}" readonly="true" />
+		<g:textField name="cname" value="${hostInstance?.cname}" readonly="true" />
+	</div>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'ipAddress', 'error')} ">
+	<label class="control-label" for="ipAddress">
+		<g:message code="host.ipAddress.label" default="Ip Address" />
+	</label>
+	<div class="controls">
+		<g:textField name="ipAddress" value="${hostInstance?.ipAddress}" readonly="true" />
+	</div>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'macAddress', 'error')} ">
+	<label class="control-label" for="macAddress">
+		<g:message code="host.macAddress.label" default="Mac Address" />
+	</label>
+	<div class="controls">
+		<g:textField name="macAddress" value="${hostInstance?.macAddress}" readonly="true" />
+	</div>
+</div>
+
+<div class="control-group fieldcontain ${hasErrors(bean: hostInstance, field: 'iaasUser', 'error')} ">
+	<label class="control-label" for="iaasUser">
+		<g:message code="host.iaasUser.label" default="IaaS User" />
+	</label>
+	<div class="controls">
+		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+			<g:textField name="iaasUser" value="${hostInstance?.iaasUser}" />
+		</sec:ifAllGranted>
+		<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+			<g:textField name="iaasUser" value="${hostInstance?.iaasUser}" readonly="true" />
+		</sec:ifNotGranted>
+	</div>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'datacenter', 'error')} ">
+	<label class="control-label" for="datacenter">
+		<g:message code="host.datacenter.label" default="Datacenter" />
+	</label>
+	<div class="controls">
+		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+			<g:textField name="datacenter" value="${hostInstance?.datacenter}" />
+		</sec:ifAllGranted>
+		<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+			<g:textField name="datacenter" value="${hostInstance?.datacenter}" readonly="true" />
+		</sec:ifNotGranted>
 	</div>
 </div>
 
@@ -69,7 +89,12 @@
 		<span class="required-indicator">*</span>
 	</label>
 	<div class="controls">
-		<g:select name="state" from="${org.zenboot.portal.HostState?.values()}" keys="${org.zenboot.portal.HostState.values()*.name()}" required="" value="${hostInstance?.state?.name()}" readonly="true" />
+		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+			<g:select name="state" from="${org.zenboot.portal.HostState?.values()}" keys="${org.zenboot.portal.HostState.values()*.name()}" required="" value="${hostInstance?.state?.name()}" />
+		</sec:ifAllGranted>
+		<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
+			<g:select name="state" from="${org.zenboot.portal.HostState?.values()}" keys="${org.zenboot.portal.HostState.values()*.name()}" required="" value="${hostInstance?.state?.name()}" readonly="true" />#
+		</sec:ifNotGranted>
 	</div>
 </div>
 
@@ -79,6 +104,16 @@
 	</label>
 	<div class="controls">
 		<g:datePicker name="creationDate" precision="day" value="${hostInstance?.creationDate}" default="none" noSelection="['': '']" readonly="readonly" />
+	</div>
+</div>
+
+
+<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'expiryDate', 'error')} ">
+	<label class="control-label" for="expiryDate">
+		<g:message code="host.expiryDate.label" default="Expiry Date" />
+	</label>
+	<div class="controls">
+		<g:datePicker name="expiryDate" precision="day" value="${hostInstance?.expiryDate}" default="none" noSelection="['': '']" />
 	</div>
 </div>
 
@@ -99,20 +134,12 @@
 	</div>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'expiryDate', 'error')} ">
-	<label class="control-label" for="expiryDate">
-		<g:message code="host.expiryDate.label" default="Expiry Date" />
-	</label>
-	<div class="controls">
-		<g:datePicker name="expiryDate" precision="day" value="${hostInstance?.expiryDate}" default="none" noSelection="['': '']" />
-	</div>
-</div>
 
 <div class="fieldcontain ${hasErrors(bean: hostInstance, field: 'owner', 'error')} ">
 	<label class="control-label" for="owner">
 		<g:message code="host.owner.label" default="Owner" />
 	</label>
 	<div class="controls">
-		<g:select id="owner" name="owner.id" from="${org.zenboot.portal.Customer.list()}" optionKey="id" value="${hostInstance?.owner?.id}" class="many-to-one" noSelection="['null': '']" readonly="true" />
+		<g:select id="owner" name="owner.id" from="${org.zenboot.portal.Customer.list()}" optionKey="id" value="${hostInstance?.owner?.id}" class="many-to-one" noSelection="['null': '']"  />
 	</div>
 </div>

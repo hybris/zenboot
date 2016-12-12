@@ -36,12 +36,21 @@
 				${hostInstance?.class.getSimpleName()}
 			</dd>
 
-			<g:if test="${hostInstance?.ipAddress}">
+			<g:if test="${hostInstance?.instanceId}">
 				<dt>
-					<g:message code="host.ipAddress.label" default="Ip Address" />
+					<g:message code="host.instanceId.label" default="Instance Id" />
 				</dt>
 				<dd>
-					<g:fieldValue bean="${hostInstance}" field="ipAddress" />
+					<g:fieldValue bean="${hostInstance}" field="instanceId" />
+				</dd>
+			</g:if>
+
+			<g:if test="${hostInstance?.hostname}">
+				<dt>
+					<g:message code="host.hostname.label" default="Hostname" />
+				</dt>
+				<dd>
+					${hostInstance?.hostname?.encodeAsHTML()}
 				</dd>
 			</g:if>
 
@@ -54,21 +63,21 @@
 				</dd>
 			</g:if>
 
-			<g:if test="${hostInstance?.macAddress}">
-				<dt>
-					<g:message code="host.macAddress.label" default="Mac Address" />
-				</dt>
-				<dd>
-					<g:fieldValue bean="${hostInstance}" field="macAddress" />
-				</dd>
-			</g:if>
-
 			<g:if test="${hostInstance?.datacenter}">
 				<dt>
 					<g:message code="host.datacenter.label" default="Datacenter" />
 				</dt>
 				<dd>
 					<g:fieldValue bean="${hostInstance}" field="datacenter" />
+				</dd>
+			</g:if>
+
+			<g:if test="${hostInstance?.iaasUser}">
+				<dt>
+					<g:message code="host.iaasUser.label" default="IaaS User" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="iaasUser" />
 				</dd>
 			</g:if>
 
@@ -123,24 +132,6 @@
 			</dd>
 		</g:if>
 
-			<g:if test="${hostInstance?.hostname}">
-				<dt>
-					<g:message code="host.hostname.label" default="Hostname" />
-				</dt>
-				<dd>
-					${hostInstance?.hostname?.encodeAsHTML()}
-				</dd>
-			</g:if>
-
-			<g:if test="${hostInstance?.instanceId}">
-				<dt>
-					<g:message code="host.instanceId.label" default="Instance Id" />
-				</dt>
-				<dd>
-					<g:fieldValue bean="${hostInstance}" field="instanceId" />
-				</dd>
-			</g:if>
-
 			<g:if test="${hostInstance?.state}">
 				<dt>
 					<g:message code="host.state.label" default="State" />
@@ -172,6 +163,24 @@
 							</g:link>
 						</span>
 					</g:each>
+				</dd>
+			</g:if>
+
+			<g:if test="${hostInstance?.ipAddress}">
+				<dt>
+					<g:message code="host.ipAddress.label" default="Ip Address" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="ipAddress" />
+				</dd>
+			</g:if>
+
+			<g:if test="${hostInstance?.macAddress}">
+				<dt>
+					<g:message code="host.macAddress.label" default="Mac Address" />
+				</dt>
+				<dd>
+					<g:fieldValue bean="${hostInstance}" field="macAddress" />
 				</dd>
 			</g:if>
 
