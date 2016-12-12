@@ -5,9 +5,9 @@ zenboot.refreshInterval = null
 
 zenboot.startProcessQueue = function(url, refreshRate) {
 	zenboot.refreshInterval = setInterval(function() {
-	    if (!zenboot.hasFocus) {
-	        return;
-	    }
+		if (!zenboot.hasFocus) {
+			return;
+		}
 
 		$.ajax({
 			url : url
@@ -152,35 +152,35 @@ zenboot.disableCopyButton = function() {
 }
 
 zenboot.enableParameterList = function() {
-    zenboot.enableTooltip()
+	zenboot.enableTooltip()
 
-    $('.details-parameter-button').click(function() {
-        $(this).parents('tr').next().find('.scriptlet-metadata').fadeToggle('fast')
-    });
+	$('.details-parameter-button').click(function() {
+		$(this).parents('tr').next().find('.scriptlet-metadata').fadeToggle('fast')
+	});
 
-    $('.add-exec-parameter-button').click(function() {
-        zenboot.addParameter()
-    });
+	$('.add-exec-parameter-button').click(function() {
+		zenboot.addParameter()
+	});
 
-    $('.remove-parameter-button').click(function() {
-        $(this).parents('tr').next().remove();
-        $(this).parents('tr').remove();
-    });
+	$('.remove-parameter-button').click(function() {
+		$(this).parents('tr').next().remove();
+		$(this).parents('tr').remove();
+	});
 
-    $('.accept-parameter-button').click(function() {
-        var input = $(this).parents('tr').prev().find("input[name=parameters\\.value]");
-        input.val($(this).attr('rel'));
-        if ($(this).parents('span').hasClass('scriptlet')) {
-            input.parent().removeClass('info').addClass('success')
-        } else {
-            input.parent().removeClass('success').addClass('info')
-        }
-    });
+	$('.accept-parameter-button').click(function() {
+		var input = $(this).parents('tr').prev().find("input[name=parameters\\.value]");
+		input.val($(this).attr('rel'));
+		if ($(this).parents('span').hasClass('scriptlet')) {
+			input.parent().removeClass('info').addClass('success')
+		} else {
+			input.parent().removeClass('success').addClass('info')
+		}
+	});
 
-    //remove all marker classes after a input field value has changed (no overlay, no defaultValue)
-    $("input[name=parameters\\.value]").change(function() {
-        $(this).parent().removeClass('info').removeClass('success')
-    })
+	//remove all marker classes after a input field value has changed (no overlay, no defaultValue)
+	$("input[name=parameters\\.value]").change(function() {
+		$(this).parent().removeClass('info').removeClass('success')
+	})
 }
 
 zenboot.prepareAjaxLoading = function(targetNodeId, spinnerNodeId) {
@@ -200,116 +200,116 @@ zenboot.finalizeAjaxLoading = function(targetNodeId, spinnerNodeId) {
 }
 
 zenboot.loadTemplateFrom = function(url) {
-    $.ajax({
-        url : url,
-        dataType: "json",
-        beforeSend : function() {
-        	$('#templateParametersSpinner').fadeIn('fast');
-        	$("#templateForm :input").attr("disabled", "disabled");
-        },
-        success: function(data) {
-        	$('#templateParametersSpinner').hide();
-        	$('input#name').val(data.template.name);
-        	$('#templateForm').attr("action", data.template.updateUrl);
-        	$("#templateForm :submit").attr("name", "_action_update")
-        	$("#template_versions").html("");
-      		$("#templateForm a#showFileButton").removeAttr('disabled');
-     			$("#templateForm a#showFileButton").off('click');
-      		$("#templateForm a#showFileButton").click( function(e) {
-        		zenboot.loadTextAreaContent(data.template.showFileUrl, $('#show-file-field'));
-        		$("#show-file-name").html(data.template.name);
-      		  $('#show-file').modal("show");
-      		});
+	$.ajax({
+		url : url,
+		dataType: "json",
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+			$("#templateForm :input").attr("disabled", "disabled");
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
+			$('input#name').val(data.template.name);
+			$('#templateForm').attr("action", data.template.updateUrl);
+			$("#templateForm :submit").attr("name", "_action_update")
+			$("#template_versions").html("");
+			$("#templateForm a#showFileButton").removeAttr('disabled');
+			$("#templateForm a#showFileButton").off('click');
+			$("#templateForm a#showFileButton").click( function(e) {
+				zenboot.loadTextAreaContent(data.template.showFileUrl, $('#show-file-field'));
+				$("#show-file-name").html(data.template.name);
+				$('#show-file').modal("show");
+			});
 
-        	$.each(data.template.versions.reverse(), function(index, version){
-        		$("#template_versions").append($("<option>").val(version.url).html(version.create + " (" + version.user + ")"));
-        	});
+			$.each(data.template.versions.reverse(), function(index, version){
+				$("#template_versions").append($("<option>").val(version.url).html(version.create + " (" + version.user + ")"));
+			});
 
-        	$('.delete_template').removeAttr('disabled');
-        	$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
+			$('.delete_template').removeAttr('disabled');
+			$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
 
-        	zenboot.loadTemplate(data.template.url);
-        	$('#templateForm :input').removeAttr('disabled');
-        	$("#templateForm a#cancelbtn").removeAttr('disabled');
-        },
-        error: function(jqHXR, status, error) {
-	        $('#templateParametersSpinner').hide();
-	        $('#templateForm :input').removeAttr('disabled');
-        }
-    });
+			zenboot.loadTemplate(data.template.url);
+			$('#templateForm :input').removeAttr('disabled');
+			$("#templateForm a#cancelbtn").removeAttr('disabled');
+		},
+		error: function(jqHXR, status, error) {
+			$('#templateParametersSpinner').hide();
+			$('#templateForm :input').removeAttr('disabled');
+		}
+	});
 }
 
 zenboot.loadTemplate = function(url) {
-    $.ajax({
-        url : url,
-        dataType: "json",
-        beforeSend : function() {
-        	$('#templateParametersSpinner').fadeIn('fast');
-        	$("#templateForm :input").attr("disabled", "disabled");
-        },
-        success: function(data) {
-        	$('#templateParametersSpinner').hide();
-        	zenboot.loadTextAreaContent(data.version.url, $('textarea#template'));
-        	zenboot.loadPlaceholderContent(data.version.commentUrl, $('textarea#message'));
-        	$('#templateForm :input').removeAttr('disabled');
-        },
-        error: function(jqHXR, status, error) {
-	        $('#templateParametersSpinner').hide();
-	        $('#templateForm :input').removeAttr('disabled');
-        }
-    });
+	$.ajax({
+		url : url,
+		dataType: "json",
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+			$("#templateForm :input").attr("disabled", "disabled");
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
+			zenboot.loadTextAreaContent(data.version.url, $('textarea#template'));
+			zenboot.loadPlaceholderContent(data.version.commentUrl, $('textarea#message'));
+			$('#templateForm :input').removeAttr('disabled');
+		},
+		error: function(jqHXR, status, error) {
+			$('#templateParametersSpinner').hide();
+			$('#templateForm :input').removeAttr('disabled');
+		}
+	});
 }
 
 zenboot.loadTextAreaContent = function(url, textArea) {
-    $.ajax({
-        url : url,
-        beforeSend : function() {
-        	$('#templateParametersSpinner').fadeIn('fast');
-        	$("#templateForm :input").attr("disabled", "disabled");
-        },
-        success: function(data) {
-        	$('#templateParametersSpinner').hide();
-        	textArea.val(data);
-        	$('#templateForm :input').removeAttr('disabled');
-        },
-        error: function(jqHXR, status, error) {
-	        $('#templateParametersSpinner').hide();
-	        $('#templateForm :input').removeAttr('disabled');
-        }
-    });
+	$.ajax({
+		url : url,
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+			$("#templateForm :input").attr("disabled", "disabled");
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
+			textArea.val(data);
+			$('#templateForm :input').removeAttr('disabled');
+		},
+		error: function(jqHXR, status, error) {
+			$('#templateParametersSpinner').hide();
+			$('#templateForm :input').removeAttr('disabled');
+		}
+	});
 }
 
 zenboot.loadPlaceholderContent = function(url, textArea) {
-    $.ajax({
-        url : url,
-        beforeSend : function() {
-        	$('#templateParametersSpinner').fadeIn('fast');
-        	$("#templateForm :input").attr("disabled", "disabled");
-        },
-        success: function(data) {
-        	$('#templateParametersSpinner').hide();
-        	textArea.val("");
-        	textArea.attr('placeholder',data);
-        	$('#templateForm :input').removeAttr('disabled');
-        },
-        error: function(jqHXR, status, error) {
-	        $('#templateParametersSpinner').hide();
-	        $('#templateForm :input').removeAttr('disabled');
-        }
-    });
+	$.ajax({
+		url : url,
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+			$("#templateForm :input").attr("disabled", "disabled");
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
+			textArea.val("");
+			textArea.attr('placeholder',data);
+			$('#templateForm :input').removeAttr('disabled');
+		},
+		error: function(jqHXR, status, error) {
+			$('#templateParametersSpinner').hide();
+			$('#templateForm :input').removeAttr('disabled');
+		}
+	});
 }
 
 zenboot.templateCancel = function(link) {
-  $('#templateParametersSpinner').hide();
-  $('#templateForm').attr("action", link);
+	$('#templateParametersSpinner').hide();
+	$('#templateForm').attr("action", link);
 	$("#templateForm input#name").val("");
 	$('.delete_template').attr("disabled", "disabled");
 	$("#template_versions").attr("disabled", "disabled");
 	$("#templateForm textarea#template").val("");
 	$("#templateForm textarea#message").val("");
-  placeholder = $("#templateForm textarea#message").attr("data-placeholder");
-  $("#templateForm select#template_versions").html("");
-  $("#templateForm textarea#message").attr("placeholder", placeholder);
+	placeholder = $("#templateForm textarea#message").attr("data-placeholder");
+	$("#templateForm select#template_versions").html("");
+	$("#templateForm textarea#message").attr("placeholder", placeholder);
 	$("#templateForm :submit").attr("name", "save");
 	$("#templateForm a#cancelbtn").attr("disabled", "disabled");
 	$("#templateForm a#showFileButton").attr("disabled", "disabled");
@@ -318,136 +318,179 @@ zenboot.templateCancel = function(link) {
 }
 
 zenboot.templateSave = function(url){
-    $.ajax({
-        url : $('#templateForm').attr("action"),
-        data : $('#templateForm').serialize(),
-        dataType: "json",
-        type: "POST",
-        beforeSend : function() {
-        	$('#templateParametersSpinner').fadeIn('fast');
-        	$("#templateForm :input").attr("disabled", "disabled");
-        },
-        success: function(data) {
-        	$('#templateParametersSpinner').hide();
-        	$('input#name').val(data.template.name);
-        	$('#templateForm').attr("action", data.template.updateUrl);
-        	$("#templateForm :submit").attr("name", "_action_update")
-        	$("#template_versions").html("");
+	$.ajax({
+		url : $('#templateForm').attr("action"),
+		data : $('#templateForm').serialize(),
+		dataType: "json",
+		type: "POST",
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+			$("#templateForm :input").attr("disabled", "disabled");
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
+			$('input#name').val(data.template.name);
+			$('#templateForm').attr("action", data.template.updateUrl);
+			$("#templateForm :submit").attr("name", "_action_update")
+			$("#template_versions").html("");
 
-        	$.each(data.template.versions.reverse(), function(index, version){
-        		$("#template_versions").append($("<option>").val(version.url).html(version.create + " (" + version.user + ")"));
-        	});
+			$.each(data.template.versions.reverse(), function(index, version){
+				$("#template_versions").append($("<option>").val(version.url).html(version.create + " (" + version.user + ")"));
+			});
 
-        	$('.delete_template').removeAttr('disabled');
-        	$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
+			$('.delete_template').removeAttr('disabled');
+			$('#template-remove form').attr("action", data.template.deleteTemplateUrl);
 
-        	zenboot.loadTemplate(data.template.url);
+			zenboot.loadTemplate(data.template.url);
 
-        	$('#templateForm :input').removeAttr('disabled');
-        	$("#templateForm a#cancelbtn").removeAttr('disabled');
+			$('#templateForm :input').removeAttr('disabled');
+			$("#templateForm a#cancelbtn").removeAttr('disabled');
 
-            $("#template_messages").html("<div class='alert alert-info'>" + data.template.message + "</div>")
-            if ( "warning" in data.template  && data.template.warning != null && data.template.warning.length > 0){
-                $("#template_messages").append("<div class='alert alert-error'>" + data.template.warning + "</div>")
-            }
+			$("#template_messages").html("<div class='alert alert-info'>" + data.template.message + "</div>")
+			if ( "warning" in data.template  && data.template.warning != null && data.template.warning.length > 0){
+				$("#template_messages").append("<div class='alert alert-error'>" + data.template.warning + "</div>")
+			}
 
-        	zenboot.loadTemplateList(url);
-        },
-        error: function(jqHXR, status, error) {
-	        $('#templateParametersSpinner').hide();
-	        $('#templateForm :input').removeAttr('disabled');
-        	$("#template_messages").html("<div class='alert alert-error'>" + jqHXR.responseText + "</div>")
-        }
-    });
+			zenboot.loadTemplateList(url);
+		},
+		error: function(jqHXR, status, error) {
+			$('#templateParametersSpinner').hide();
+			$('#templateForm :input').removeAttr('disabled');
+			$("#template_messages").html("<div class='alert alert-error'>" + jqHXR.responseText + "</div>")
+		}
+	});
 }
 
 zenboot.templateRemove = function(url){
-    $.ajax({
-        url : $('#templateRemoveForm').attr("action"),
-        data : $('#templateRemoveForm').serialize(),
-        type: "POST",
-        beforeSend : function() {
-        	$('#templateParametersSpinner').fadeIn('fast');
-        	$("#templateForm :input").attr("disabled", "disabled");
-        },
-        success: function(data) {
-        	$('#templateParametersSpinner').hide();
+	$.ajax({
+		url : $('#templateRemoveForm').attr("action"),
+		data : $('#templateRemoveForm').serialize(),
+		type: "POST",
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+			$("#templateForm :input").attr("disabled", "disabled");
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
 
-        	$('#templateForm :input').removeAttr('disabled');
-        	$("#template_messages").html("<div class='alert alert-info'>" + data + "</div>")
-        	zenboot.loadTemplateList(url);
-        },
-        error: function(jqHXR, status, error) {
+			$('#templateForm :input').removeAttr('disabled');
+			$("#template_messages").html("<div class='alert alert-info'>" + data + "</div>")
+			zenboot.loadTemplateList(url);
+		},
+		error: function(jqHXR, status, error) {
 
-	        $('#templateParametersSpinner').hide();
-	        $('#templateForm :input').removeAttr('disabled');
-        	$("#template_messages").html("<div class='alert alert-error'>" + jqHXR.responseText + "</div>")
-        }
-    });
+			$('#templateParametersSpinner').hide();
+			$('#templateForm :input').removeAttr('disabled');
+			$("#template_messages").html("<div class='alert alert-error'>" + jqHXR.responseText + "</div>")
+		}
+	});
 }
 
 zenboot.loadTemplateList = function(url){
-    $.ajax({
-      url : url,
-      dataType: "json",
-      beforeSend : function() {
-      	$('#templateParametersSpinner').fadeIn('fast');
-      	$("#executionZone_templates").attr("disabled", "disabled");
-      },
-      success: function(data) {
-      	$('#templateParametersSpinner').hide();
-      	$("#executionZone_templates").html("");
-      	$.each(data, function(index, template){
-      		$("#executionZone_templates").append($("<option>").val(template.id).html(template.name));
-      	});
+	$.ajax({
+		url : url,
+		dataType: "json",
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+			$("#executionZone_templates").attr("disabled", "disabled");
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
+			$("#executionZone_templates").html("");
+			$.each(data, function(index, template){
+				$("#executionZone_templates").append($("<option>").val(template.id).html(template.name));
+			});
 
-      	$("#executionZone_templates").removeAttr('disabled');
+			$("#executionZone_templates").removeAttr('disabled');
 
-      },
-      error: function(jqHXR, status, error) {
-        alert("ERROR");
-        $('#templateParametersSpinner').hide();
-        $('#templateForm :input').removeAttr('disabled');
-      }
-    });
+		},
+		error: function(jqHXR, status, error) {
+			alert("ERROR");
+			$('#templateParametersSpinner').hide();
+			$('#templateForm :input').removeAttr('disabled');
+		}
+	});
 }
 
 zenboot.templateCheck = function(url){
-    $.ajax({
-      url : url,
-      dataType: "json",
-      beforeSend : function() {
-      	$('#templateParametersSpinner').fadeIn('fast');
-      },
-      success: function(data) {
-      	$('#templateParametersSpinner').hide();
-      	$("#check-templates-field").html("");
-      	$.each(data, function(index, param){
-      		$("#check-templates-field").append(param.name + "\n");
-      	});
-      	$('#check-templates').modal('show');
+	$.ajax({
+		url : url,
+		dataType: "json",
+		beforeSend : function() {
+			$('#templateParametersSpinner').fadeIn('fast');
+		},
+		success: function(data) {
+			$('#templateParametersSpinner').hide();
+			$("#check-templates-field").html("");
+			$.each(data, function(index, param){
+				$("#check-templates-field").append(param.name + "\n");
+			});
+			$('#check-templates').modal('show');
 
 
-      },
-      error: function(jqHXR, status, error) {
-        alert("ERROR");
-        $('#templateParametersSpinner').hide();
-      }
-    });
+		},
+		error: function(jqHXR, status, error) {
+			alert("ERROR");
+			$('#templateParametersSpinner').hide();
+		}
+	});
 }
+
+zenboot.prettyPrint = function(element) {
+	try {
+		var error_field = element.parent().find(".parameter_json_errors");
+		var ugly = element.val();
+		var obj = JSON.parse(ugly);
+		var pretty = JSON.stringify(obj, undefined, 4);
+
+		error_field.val("JSON parsing successfull");
+	} catch(e) {
+		error_field.val(e);
+	}
+};
+
+zenboot.fitToContent = function (elements, maxHeight)
+{
+	elements.each(function(i, text) {
+		if (!text) {
+			return;
+		}
+		var adjustedHeight = text.clientHeight;
+		if (!maxHeight || maxHeight > adjustedHeight)
+		{
+			adjustedHeight = Math.max(text.scrollHeight, adjustedHeight);
+			if (maxHeight) {
+				adjustedHeight = Math.min(maxHeight, adjustedHeight);
+			}
+			if (adjustedHeight > text.clientHeight) {
+				text.style.height = adjustedHeight + "px";
+			}
+		}
+	});
+
+};
+
+zenboot.initExecutionZoneShowParameters = function() {
+	$(".parameter_json_content").on('keyup blur', function(event) {
+		zenboot.prettyPrint($(event.target));
+	}).each(function(i, element) {
+		zenboot.prettyPrint($(element));
+	});
+	zenboot.fitToContent($(".parameter_json_content"), 500);
+};
 
 $(document).ready(function() {
 	zenboot.enableCollapsableList()
-    zenboot.hasFocus = true;
+	zenboot.hasFocus = true;
 
 	$.winFocus({
-        blur: function(event) {
-            zenboot.hasFocus = false;
-        },
-        focus: function(event) {
-            zenboot.hasFocus = true;
-        }
-    });
+		blur: function(event) {
+			zenboot.hasFocus = false;
+		},
+		focus: function(event) {
+			zenboot.hasFocus = true;
+		}
+	});
 });
 
 $(document).unload(function() {
