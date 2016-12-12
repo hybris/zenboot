@@ -436,6 +436,8 @@ zenboot.templateCheck = function(url){
 	});
 }
 
+// next three functions used at _showParameters in order to have JSON parsing
+
 zenboot.prettyPrint = function(element) {
 	try {
 		var error_field = element.parent().find(".parameter_json_errors");
@@ -443,9 +445,15 @@ zenboot.prettyPrint = function(element) {
 		var obj = JSON.parse(ugly);
 		var pretty = JSON.stringify(obj, undefined, 4);
 
-		error_field.val("JSON parsing successfull");
+		error_field.text("JSON parsing successfull");
+		error_field.each(function(i, element) {
+			element.style.color="black";
+		});
 	} catch(e) {
-		error_field.val(e);
+		error_field.text(e);
+		error_field.each(function(i, element) {
+			element.style.color="red";
+		});
 	}
 };
 

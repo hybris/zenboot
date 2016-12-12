@@ -34,7 +34,8 @@
 						value="${entry.value}" readonly="${readonly}" style="height: 21px; width: 300px"/>
 
 					<g:if test="${entry.name.endsWith('JSON')}">
-						<g:textArea class="parameter_json_errors" rows="1" cols="60" id="${entry.name}json" name="${entry.name}" value="" readonly="true" style="height: 21px; width: 300px"/>
+						
+						<div class="parameter_json_errors" rows="1" cols="60" ></div>
 					</g:if>
 
 				</td>
