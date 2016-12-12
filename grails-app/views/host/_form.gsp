@@ -60,12 +60,7 @@
 		<g:message code="host.iaasUser.label" default="IaaS User" />
 	</label>
 	<div class="controls">
-		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-			<g:textField name="iaasUser" value="${hostInstance?.iaasUser}" />
-		</sec:ifAllGranted>
-		<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-			<g:textField name="iaasUser" value="${hostInstance?.iaasUser}" readonly="true" />
-		</sec:ifNotGranted>
+		<g:textField name="iaasUser" value="${hostInstance?.iaasUser}" />
 	</div>
 </div>
 
@@ -74,12 +69,7 @@
 		<g:message code="host.datacenter.label" default="Datacenter" />
 	</label>
 	<div class="controls">
-		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-			<g:textField name="datacenter" value="${hostInstance?.datacenter}" />
-		</sec:ifAllGranted>
-		<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-			<g:textField name="datacenter" value="${hostInstance?.datacenter}" readonly="true" />
-		</sec:ifNotGranted>
+		<g:textField name="datacenter" value="${hostInstance?.datacenter}" />
 	</div>
 </div>
 
@@ -89,12 +79,7 @@
 		<span class="required-indicator">*</span>
 	</label>
 	<div class="controls">
-		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-			<g:select name="state" from="${org.zenboot.portal.HostState?.values()}" keys="${org.zenboot.portal.HostState.values()*.name()}" required="" value="${hostInstance?.state?.name()}" />
-		</sec:ifAllGranted>
-		<sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
-			<g:select name="state" from="${org.zenboot.portal.HostState?.values()}" keys="${org.zenboot.portal.HostState.values()*.name()}" required="" value="${hostInstance?.state?.name()}" readonly="true" />#
-		</sec:ifNotGranted>
+		<g:select name="state" from="${org.zenboot.portal.HostState?.values()}" keys="${org.zenboot.portal.HostState.values()*.name()}" required="" value="${hostInstance?.state?.name()}" />
 	</div>
 </div>
 
