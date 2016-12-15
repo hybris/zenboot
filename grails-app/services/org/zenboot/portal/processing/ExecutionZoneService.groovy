@@ -206,7 +206,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         originalParameter?.value == null ||
                 originalParameter?.value == "" ||
                 // multiline-support therefore replace newlines before comparison
-                originalParameter?.value.replaceAll("[\\\t|\\\n|\\\r]","") == parameter?.value ||
+                originalParameter?.value?.replaceAll("[\\\t|\\\n|\\\r]","") == parameter?.value ||
                 canEdit(springSecurityService.currentUser.getAuthorities(), parameter)
     }
 

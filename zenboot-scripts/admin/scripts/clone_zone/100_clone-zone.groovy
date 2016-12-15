@@ -10,6 +10,8 @@ import org.zenboot.portal.processing.ProcessingException
 import org.ho.yaml.Yaml
 
 @Parameters([
+  @Parameter(name="EXECID", description="ID of the ExecutionZone", type=ParameterType.CONSUME),
+  @Parameter(name="EMERGENCY", description="ID of the ExecutionZone", type=ParameterType.CONSUME, defaultValue="no"),
 ])
 
 class CreateExecutionZoneType {
@@ -21,16 +23,31 @@ class CreateExecutionZoneType {
 
     executionZoneService = grailsApplication.mainContext.getBean(ExecutionZoneService.class)
 
-    def params = ["description" : ctx.execZone.description, "type" : ExecutionZoneType.findByName(ctx.execZone.type.name), processingParameters: [:] ]
-    ExecutionZone execZone = executionZoneService.createExecutionZone(params)
-    ctx.execZone.processingParameters.each() {
-      execZone.addProcessingParameter(it.name,it.value)
+    def oldZone = ExecutionZone.findById(ctx.parameters['EXECID'])
+    if (!oldZone) {
+      throw new ProcessingException("ExecutionZone already exists with Domain " + ctx.parameters['DOMAIN'])
+    }
+
+    def params = ["description" : oldZone.description, "type" : ExecutionZoneType.findByName(oldZone.type.name), processingParameters: [:] ]
+    ExecutionZone newZone = executionZoneService.createExecutionZone(params)
+    oldZone.processingParameters.each() {
+      newZone.addProcessingParameter(it.name,it.value)
     }
     // mark it as somehow broken, even in the description
-    ctx.execZone.description = "(br) " + ctx.execZone.description
-    ctx.execZone.enabled = false
-    ctx.execZone.save()
-
-
+    if (ctx.parameters['EMERGENCY'].toBoolean()) {
+      // mark the old zone broken
+      oldZone.description = "(br) " + oldZone.description
+      oldZone.enabled = false
+      oldZone.save()
+    } else {
+      // "unify" the new zone
+      newZone.description = "copy of " + oldZone.description
+      def domain = newZone.processingParameters.find { it.name == 'DOMAIN' }
+      if (domain) {
+        domain.value = "copyof"+domain.value
+        domain.save()
+      }
+      newZone.save()
+    }
   }
 }
