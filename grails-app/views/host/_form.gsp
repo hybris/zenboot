@@ -33,7 +33,7 @@
 		<g:message code="host.cname.label" default="Cname" />
 	</label>
 	<div class="controls">
-		<g:textField name="cname" value="${hostInstance?.cname}" readonly="true" />
+		<g:textField name="cname" value="${hostInstance?.cname}" />
 	</div>
 </div>
 
@@ -42,7 +42,7 @@
 		<g:message code="host.ipAddress.label" default="Ip Address" />
 	</label>
 	<div class="controls">
-		<g:textField name="ipAddress" value="${hostInstance?.ipAddress}" readonly="true" />
+		<g:textField name="ipAddress" value="${hostInstance?.ipAddress}" />
 	</div>
 </div>
 
@@ -51,7 +51,7 @@
 		<g:message code="host.macAddress.label" default="Mac Address" />
 	</label>
 	<div class="controls">
-		<g:textField name="macAddress" value="${hostInstance?.macAddress}" readonly="true" />
+		<g:textField name="macAddress" value="${hostInstance?.macAddress}" />
 	</div>
 </div>
 
