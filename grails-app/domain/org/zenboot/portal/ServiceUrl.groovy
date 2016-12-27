@@ -9,4 +9,9 @@ class ServiceUrl implements Comparable<ServiceUrl> {
   int compareTo(ServiceUrl o) {
     this.url <=> o.url
   }
+
+  @Override
+  public String toString() {
+    "ServiceUrl{url='$url'}"
+  }
 }

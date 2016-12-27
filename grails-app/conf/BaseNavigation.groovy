@@ -44,13 +44,15 @@ navigation = {
                 "${it}"(visible: false)
             }
 
-            listDnsEntries controller: 'dnsEntry', titleText: 'DNS', action: 'list'
+            listServiceUrls controller: 'serviceUrl', titleText: 'ServiceUrl', action: 'list'
+
+            listDnsEntries controller: 'dnsEntry', titleText: 'DNS', action: 'list', visible: isAdmin
             ['edit', 'show'].each {
                 def controller = 'dnsEntry'
                 "${it + controller}"(controller: controller, action: it, visible: false)
             }
 
-            listCustomers controller: 'customer', titleText: 'Customer', action: 'list'
+            listCustomers controller: 'customer', titleText: 'Customer', action: 'list', visible: isAdmin
             ['edit', 'show'].each {
                 def controller = 'customer'
                 "${it + controller}"(controller: controller, action: it, visible: false)

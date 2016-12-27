@@ -170,6 +170,10 @@
 													   values="['execZone.id': executionZoneInstance?.id]">
 									<g:message code="executionZone.showExecutedActions.label" default="Hosts" />
 								</filterpane:filterLink>
+								<filterpane:filterLink controller="ServiceUrl" action="list" class="btn listScriptLetBatchesForZoneButton"
+													   values="['owner.execZone.id': executionZoneInstance?.id]">
+									<g:message code="executionZone.showServiceUrls.label" default="ServiceUrls" />
+								</filterpane:filterLink>
 							</fieldset>
 
 						</g:form>
