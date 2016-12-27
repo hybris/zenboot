@@ -1,4 +1,3 @@
-<%@ page defaultCodec="none"%>
 <%@ page import="org.zenboot.portal.processing.ExecutionZone"%>
 <%@ page import="org.zenboot.portal.security.Role"%>
 <%@ page import="org.zenboot.portal.HostState"%>
