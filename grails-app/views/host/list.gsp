@@ -76,7 +76,7 @@
 
 		<filterpane:filterPane domain="Host" action="list" formMethod="get"
 							   excludeProperties="environment, macAddress, expiryDate"
-							   associatedProperties="execZone.description, execZone.id, hostname.name"/>
+							   associatedProperties="execZone.description, execZone.id, hostname.name, serviceUrls.url"/>
 		<filterpane:isFiltered>
 			<h4>Current Filters:</h4>
 			<filterpane:currentCriteria domainBean="Host" action="list" fullAssociationPathFieldNames="no"/>
