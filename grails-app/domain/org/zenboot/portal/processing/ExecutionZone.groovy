@@ -124,7 +124,7 @@ class ExecutionZone implements Likeable {
     }
 
     List getActiveServiceUrls() {
-      this.getCompletedAndUnmanagedHosts().findResults() { it.serviceUrls }.flatten()
+      this.getCompletedAndUnmanagedHosts().findResults() { it.serviceUrls }.flatten().toSorted()
     }
 
 
