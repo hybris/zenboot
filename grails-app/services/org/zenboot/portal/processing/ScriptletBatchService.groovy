@@ -33,7 +33,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }.memoize() // caching ftw
 
         scriptletBatches.findAll  { ScriptletBatch batch ->
-            batch ? hasAccess(batch.executionZoneAction.executionZone) : false
+            batch?.executionZoneAction?.executionZone &&
+                    hasAccess(batch.executionZoneAction.executionZone)
         }
     }
 
