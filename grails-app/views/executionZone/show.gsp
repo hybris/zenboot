@@ -1,4 +1,3 @@
-<%@ page defaultCodec="none"%>
 <%@ page import="org.zenboot.portal.processing.ExecutionZone"%>
 <%@ page import="org.zenboot.portal.security.Role"%>
 <%@ page import="org.zenboot.portal.HostState"%>
@@ -169,6 +168,10 @@
 								<filterpane:filterLink controller="Host" action="list" class="btn listHostsForZoneButton"
 													   values="['execZone.id': executionZoneInstance?.id]">
 									<g:message code="executionZone.showExecutedActions.label" default="Hosts" />
+								</filterpane:filterLink>
+								<filterpane:filterLink controller="ServiceUrl" action="list" class="btn listScriptLetBatchesForZoneButton"
+													   values="['owner.execZone.id': executionZoneInstance?.id]">
+									<g:message code="executionZone.showServiceUrls.label" default="ServiceUrls" />
 								</filterpane:filterLink>
 							</fieldset>
 
