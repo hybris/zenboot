@@ -10,8 +10,10 @@
 
 FROM debian:jessie
 EXPOSE 8080
-RUN apt-get update && \
+RUN echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \
+    apt-get update && \
     apt-get -y install locales sudo procps wget unzip && \
+    apt-get -y install -t jessie-backports openjdk-8-jdk && \
     echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user \
     && apt-get -y autoremove \
@@ -22,22 +24,14 @@ USER user
 
 LABEL che:server:8080:ref=tomcat8 che:server:8080:protocol=http
 
-ENV JAVA_VERSION=8u101 \
-    JAVA_VERSION_PREFIX=1.8.0_101 \
-    TOMCAT_HOME=/home/user/tomcat \
+ENV TOMCAT_HOME=/home/user/tomcat \
     TOMCAT8_VERSION=8.0.33
 
-ENV JAVA_HOME=/opt/jdk$JAVA_VERSION_PREFIX
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 
 ENV PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
 
-RUN mkdir $TOMCAT_HOME && \
-  wget \
-  --no-cookies \
-  --no-check-certificate \
-  --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-  -qO- \
-  "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-b13/jdk-$JAVA_VERSION-linux-x64.tar.gz" | sudo tar -zx -C /opt/
+RUN mkdir $TOMCAT_HOME
 
 ENV TERM xterm
 
@@ -45,7 +39,7 @@ RUN wget -qO- "http://archive.apache.org/dist/tomcat/tomcat-8/v$TOMCAT8_VERSION/
     rm -rf $TOMCAT_HOME/webapps/*
 
 ENV LANG C.UTF-8
-RUN echo "export JAVA_HOME=/opt/jdk$JAVA_VERSION_PREFIX\nexport M2_HOME=/home/user/apache-maven-$MAVEN_VERSION\nexport TOMCAT_HOME=$TOMCAT_HOME\nexport PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH" >> /home/user/.bashrc && \
+RUN echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64\nexport M2_HOME=/home/user/apache-maven-$MAVEN_VERSION\nexport TOMCAT_HOME=$TOMCAT_HOME\nexport PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH" >> /home/user/.bashrc && \
     sudo localedef -i en_US -f UTF-8 en_US.UTF-8
 
 WORKDIR $TOMCAT_HOME
