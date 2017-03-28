@@ -367,7 +367,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     boolean unallowedZoneParameterEdit(parameter, originalParameter) {
       // multiline-support therefore replace newlines before comparison
         originalParameter?.description != parameter?.description ||
-                (originalParameter?.value?.replaceAll("[\\\t|\\\n|\\\r]","") != parameter?.value &&
+                (originalParameter?.value?.replaceAll("[\\\t|\\\n|\\\r]","") != parameter?.value.replaceAll("[\\\t|\\\n|\\\r]","")  &&
                         !executionZoneService.canEdit(springSecurityService.currentUser.getAuthorities(), parameter))
     }
 
