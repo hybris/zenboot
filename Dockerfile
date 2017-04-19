@@ -43,6 +43,9 @@ RUN echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64\nexport M2_HOME
     sudo localedef -i en_US -f UTF-8 en_US.UTF-8
 
 WORKDIR $TOMCAT_HOME
+RUN CONTENT='<Valve className="org.apache.catalina.valves.ErrorReportValve"\nshowServerInfo="false"\nshowReport="false" />' && \
+    C=$(echo $CONTENT | sed 's/\//\\\//g') && \
+    sed -i "/<\/Host>/ s/.*/${C}\n&/" /home/user/tomcat/conf/server.xml
 
 ##### END tomcat
 
