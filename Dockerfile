@@ -43,6 +43,7 @@ RUN echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64\nexport M2_HOME
     sudo localedef -i en_US -f UTF-8 en_US.UTF-8
 
 WORKDIR $TOMCAT_HOME
+COPY conf/server.xml /home/user/tomcat/conf
 
 ##### END tomcat
 
