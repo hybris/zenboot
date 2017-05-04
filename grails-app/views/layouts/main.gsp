@@ -1,3 +1,4 @@
+<%@ page import="org.zenboot.portal.security.Role"%>
 <!doctype html>
 <html>
 <head>
@@ -60,10 +61,14 @@
 		<div class="row-fluid">
 			<div class="span12" id="footer">
 				<div class="pull-right">
+					<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 					Version
 					<g:meta name="app.version" />
+				    </sec:ifAllGranted>
 					built with Grails
+					<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 					<g:meta name="app.grails.version" />
+					</sec:ifAllGranted>
 				</div>
 			</div>
 		</div>
