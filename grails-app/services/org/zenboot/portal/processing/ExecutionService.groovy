@@ -61,6 +61,9 @@ class ExecutionService {
   */
   private Closure createProcessHandlerBasedClosure(File file, Scriptlet owner) {
       return { ProcessContext ctx ->
+          if (!file.canExecute()) {
+              file.setExecutable(true)
+          }
           ProcessHandler procHandler = new ProcessHandler(
               file.toString(),
               this.grailsApplication.config.zenboot.process.timeout.toInteger() * 1000,

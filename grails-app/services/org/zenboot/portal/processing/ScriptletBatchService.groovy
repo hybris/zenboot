@@ -202,7 +202,6 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         scriptsResolver.resolve(runtimeAttributes).each { File file ->
             Scriptlet scriptlet = new Scriptlet(description:file.name, file:file)
 
-            file.setExecutable(true)
             scriptlet.process = executionService.createProcessClosure(file, scriptlet)
 
             File pluginFile = pluginResolver.resolveScriptletPlugin(scriptlet, batch.executionZoneAction.runtimeAttributes)
