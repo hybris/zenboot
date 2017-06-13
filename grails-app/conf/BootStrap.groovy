@@ -30,6 +30,7 @@ class BootStrap {
             // you can filter here the key-value pairs to output:
             def returnArray = [:]
             returnArray['id'] = it.id
+            returnArray['type'] = it.type.name
             returnArray['description'] = it.description
             returnArray['hosts'] = it.hosts
             returnArray['serviceUrls'] = it.getActiveServiceUrls()
