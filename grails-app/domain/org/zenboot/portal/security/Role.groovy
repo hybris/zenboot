@@ -14,10 +14,17 @@ class Role {
     // is allowed to edit that parameter
     String parameterEditExpression
 
+    transient accessService
+
     static mapping = { cache true }
 
     static constraints = {
         authority blank: false, unique: true
+    }
+
+    def beforeUpdate() {
+      this.log.info("Role.beforeUpdate triggered!!")
+      accessService.invalidateAccessCacheByRole(this)
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.zenboot.portal.security.Role
 class BootStrap {
 
     def executionZoneService
+    def accessService
     def grailsApplication
     def scriptDirectoryService
 
@@ -51,6 +52,8 @@ class BootStrap {
             returnArray['serviceUrls'] = it.serviceUrls
             return returnArray
         }
+
+        accessService.warmAccessCacheAsync()
     }
 
     private setupSecurity() {
