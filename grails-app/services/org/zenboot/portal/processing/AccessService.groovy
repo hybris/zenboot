@@ -3,11 +3,17 @@ package org.zenboot.portal.processing
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
+import org.zenboot.portal.security.PersonRole
 
 @SuppressWarnings("GroovyUnusedDeclaration")
 public class AccessService {
     def springSecurityService
 
+    /* The accessCache is a dynamic datastructure looking like this:
+       {1={1=false, 2=true, 3=false, 4=false}, 2={1=false, 2=false, 3=false, 4=false}}
+       The fist level is a ExecutionZone.id, the second Level is a Person.id and
+       the boolean is the access from that person to that zone
+    */
     def accessCache
 
     private boolean roleHasAccess(Role role, ExecutionZone executionZone) {
@@ -56,8 +62,8 @@ public class AccessService {
     public invalidateAccessCacheByUser(Person user) {
       this.log.info("invalidating ${user} in accessCache")
       if (accessCache != null) {
-        accessCache.each() {
-          it.remove(user.id)
+        accessCache.each() { key, zone ->
+          zone.remove(user.id)
         }
       }
     }
@@ -65,7 +71,7 @@ public class AccessService {
     public invalidateAccessCacheByRole(Role role) {
       this.log.info("invalidating ${role} in accessCache")
       if (accessCache != null) {
-        def users = UserRole.findAllByRole(role).user
+        def users = PersonRole.findAllByRole(role).person
         users.each() {
           invalidateAccessCacheByUser(it)
         }
