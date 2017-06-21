@@ -24,7 +24,9 @@ class Role {
 
     def beforeUpdate() {
       this.log.info("Role.beforeUpdate triggered!!")
-      accessService.invalidateAccessCacheByRole(this)
+      this.withNewSession {
+        accessService.invalidateAccessCacheByRole(this)
+      }
     }
 
     @Override
