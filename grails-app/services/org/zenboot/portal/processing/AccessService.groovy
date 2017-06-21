@@ -5,6 +5,8 @@ import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.security.PersonRole
 
+import java.util.concurrent.ConcurrentHashMap
+
 @SuppressWarnings("GroovyUnusedDeclaration")
 public class AccessService {
     def springSecurityService
@@ -41,11 +43,11 @@ public class AccessService {
     public boolean userHasAccess(Person user, ExecutionZone zone) {
       if (accessCache == null) {
         this.log.info("initializing accessCache")
-        accessCache = [:]
+        accessCache = new ConcurrentHashMap<Long, HashMap>()
       }
       if (accessCache[zone.id] == null) {
         this.log.info("zone ${zone} not found in cache, creating")
-        accessCache[zone.id] = [:]
+        accessCache[zone.id] = new ConcurrentHashMap<Long, Boolean>()
       }
       if (accessCache[zone.id][user.id] == null) {
         def hasAccess = rolesHaveAccess(user.getAuthorities(), zone)
@@ -56,12 +58,14 @@ public class AccessService {
     }
 
     public invalidateAccessCacheByZone(ExecutionZone zone) {
-      accessCache[zone.id] = null
+      if (zone) {
+        accessCache[zone.id] = null
+      }
     }
 
     public invalidateAccessCacheByUser(Person user) {
       this.log.info("invalidating ${user} in accessCache")
-      if (accessCache != null) {
+      if (accessCache) {
         accessCache.each() { key, zone ->
           zone.remove(user.id)
         }
@@ -70,7 +74,7 @@ public class AccessService {
 
     public invalidateAccessCacheByRole(Role role) {
       this.log.info("invalidating ${role} in accessCache")
-      if (accessCache != null) {
+      if (accessCache) {
         def users = PersonRole.findAllByRole(role).person
         users.each() {
           invalidateAccessCacheByUser(it)
@@ -87,7 +91,7 @@ public class AccessService {
           Person.findAll().each() { person ->
             this.log.info("Warming accessCache for person ${person}")
             this.userHasAccess(person, zone)
-            Thread.sleep(500)
+            Thread.sleep(100)
           }
         }
       }
