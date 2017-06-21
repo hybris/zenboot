@@ -12,7 +12,7 @@ class PersonRole implements Serializable {
 	// If someone adds a role to a user, you have to invalidate the user-entry
 	// in the cache
 	def afterInsert() {
-		this.log.info("PersonRole.afterInsert triggered!!")
+		this.log.debug("PersonRole.afterInsert triggered!!")
 		this.withNewSession {
 			accessService.invalidateAccessCacheByUser(this.person)
 		}
@@ -21,7 +21,7 @@ class PersonRole implements Serializable {
 	// If someone removes a Role from a User, you have to invalidate the user-entry
 	// in the cache
 	def afterDelete() {
-		this.log.info("PersonRole.afterDelete triggered!!")
+		this.log.debug("PersonRole.afterDelete triggered!!")
 		this.withNewSession {
 			accessService.invalidateAccessCacheByUser(this.person)
 		}

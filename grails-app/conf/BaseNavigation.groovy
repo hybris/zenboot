@@ -62,7 +62,7 @@ navigation = {
             users titleText: 'User Management', action: 'user'
             notifications controller: 'userNotification', titleText: 'User Notifications', action: 'list'
             dbConsole titleText: 'DB Console', action: 'dbconsole'
-
+            accessCache titleText:'Access Cache', action: 'accessCache'
         }
     }
 }
