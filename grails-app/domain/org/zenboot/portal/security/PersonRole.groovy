@@ -14,7 +14,7 @@ class PersonRole implements Serializable {
 	def afterInsert() {
 		this.log.debug("PersonRole.afterInsert triggered!!")
 		this.withNewSession {
-			accessService.invalidateAccessCacheByUser(this.person)
+			accessService.refreshAccessCacheByUser(this.person)
 		}
 	}
 
@@ -23,7 +23,7 @@ class PersonRole implements Serializable {
 	def afterDelete() {
 		this.log.debug("PersonRole.afterDelete triggered!!")
 		this.withNewSession {
-			accessService.invalidateAccessCacheByUser(this.person)
+			accessService.refreshAccessCacheByUser(this.person)
 		}
 	}
 

@@ -70,6 +70,7 @@ public class AccessService {
         try {
           accessCache[user.id][zone.id] = hasAccess
         } catch (NullPointerException npe) {
+          log.error("userHasAccess threw NPE, returning false")
           return false
         }
 
@@ -78,31 +79,48 @@ public class AccessService {
         def hasAccess = accessCache[user.id][zone.id]
         hasAccess || false
       } catch (NullPointerException npe) {
+        log.error("userHasAccess threw NPE, returning false")
         return false
       }
     }
 
+    /* The cache invalidation methods are not implemented symetrically for
+       practical reasons: Person and PersonRole use afterHooks but
+       the zone-code-hooks not.
+       On the other hand removing a zone is on the second level but
+       removing a person removes potentially hundred of zones.
+       Therefore:
+        * refresh for for Person/Role
+        * invalidate only for a zone
+    */
     public invalidateAccessCacheByZone(ExecutionZone zone) {
       if (zone && accessCache) {
+        this.log.info("invalidating ${zone} in accessCache")
         accessCache.each() { key, user ->
           user.remove(zone.id)
         }
       }
     }
 
-    public invalidateAccessCacheByUser(Person user) {
-      this.log.info("invalidating ${user} in accessCache")
+    public refreshAccessCacheByUser(Person user) {
       if (user && accessCache && accessCache[user.id]) {
+        this.log.info("Refreshing ${user} in accessCache")
+        this.log.info("user has roles "+user.getAuthorities())
         accessCache.remove(user.id)
+        def execZones = ExecutionZone.findAll()
+        execZones.each() { zone ->
+          this.userHasAccess(user, zone)
+        }
+        this.log.info(accessCache[user.id].collect{it.value})
       }
     }
 
-    public invalidateAccessCacheByRole(Role role) {
-      this.log.info("invalidating ${role} in accessCache")
+    public refreshAccessCacheByRole(Role role) {
+      this.log.info("Refreshing ${role} in accessCache")
       if (accessCache) {
         def users = PersonRole.findAllByRole(role).person
         users.each() { user ->
-          invalidateAccessCacheByUser(user)
+          refreshAccessCacheByUser(user)
         }
       }
     }
@@ -114,9 +132,9 @@ public class AccessService {
         def execZones = ExecutionZone.findAll()
         execZones.each() { zone ->
           this.log.info("Warming accessCache for zone ${zone}")
-          Person.findAll().each() { person ->
-            this.log.debug("Warming accessCache for person ${person}")
-            this.userHasAccess(person, zone)
+          Person.findAll().each() { user ->
+            this.log.debug("Warming accessCache for person ${user}")
+            this.userHasAccess(user, zone)
             Thread.sleep(50)
           }
         }

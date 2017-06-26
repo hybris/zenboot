@@ -22,8 +22,8 @@ class Role {
         authority blank: false, unique: true
     }
 
-    def beforeUpdate() {
-      this.log.info("Role.beforeUpdate triggered!!")
+    def afterUpdate() {
+      this.log.info("Role.afterUpdate triggered!!")
       this.withNewSession {
         accessService.invalidateAccessCacheByRole(this)
       }
