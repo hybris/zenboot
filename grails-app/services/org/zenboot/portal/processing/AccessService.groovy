@@ -8,7 +8,7 @@ import org.zenboot.portal.security.PersonRole
 import java.util.concurrent.ConcurrentHashMap
 
 @SuppressWarnings("GroovyUnusedDeclaration")
-public class AccessService {
+class AccessService {
     def springSecurityService
 
     /* The accessCache is a dynamic datastructure looking like this:
@@ -34,54 +34,59 @@ public class AccessService {
             return Eval.me("executionZone", executionZone, expression == null ? "" : expression)
 
         } catch (Exception e) {
-            this.log.error("executionZoneAccessExpression '$expression' from role '$role' threw an exception", e)
+            log.error("executionZoneAccessExpression '$expression' from role '$role' threw an exception", e)
             return false
         }
     }
 
     private boolean rolesHaveAccess(Set<Role> roles, ExecutionZone zone) {
-      roles.any() {
-        roleHasAccess(it, zone)
-      }
+        roles.any() {
+            roleHasAccess(it, zone)
+        }
     }
 
-    public boolean userHasAccess(ExecutionZone zone) {
-      SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
-        userHasAccess(springSecurityService.currentUser, zone)
+    boolean userHasAccess(ExecutionZone zone) {
+        SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
+                testIfUserHasAccess(springSecurityService.currentUser, zone)
     }
 
     // Might not be 100% Threadsafe but hopefully something above 99% ;-)
-    public synchronized boolean userHasAccess(Person user, ExecutionZone zone) {
-      if (accessCache == null) {
-        this.log.info("initializing accessCache")
-        accessCache = new ConcurrentHashMap<Long, HashMap>()
-      }
-      if (accessCache[user.id] == null) {
-        this.log.info("user ${user} not found in cache, creating")
+    private synchronized boolean testIfUserHasAccess(Person user, ExecutionZone zone) {
 
-        accessCache[user.id] = new ConcurrentHashMap<Long, Boolean>()
-      }
-      if (accessCache[user.id][zone.id] == null) {
-        def hasAccess = rolesHaveAccess(user.getAuthorities(), zone)
-        // concurrency is quite unlikely here until users use multiple browsers
-        // impact would be a clash with the invalidate-methods
-        // 1. invalidation-method removed a user
-        //    --> NullPointer
-        try {
-          accessCache[user.id][zone.id] = hasAccess
-        } catch (NullPointerException npe) {
-          log.error("userHasAccess threw NPE, returning false")
-          return false
+        if (user.getAuthorities().authority.contains(Role.ROLE_ADMIN)) {
+            //no cache required for admin user
+            return true
         }
 
-      }
-      try {
-        def hasAccess = accessCache[user.id][zone.id]
-        hasAccess || false
-      } catch (NullPointerException npe) {
-        log.error("userHasAccess threw NPE, returning false")
-        return false
-      }
+        if (!accessCache) {
+            log.info("initializing accessCache")
+            accessCache = new ConcurrentHashMap<Long, HashMap>()
+        }
+
+        if (!accessCache[user.id]) {
+            log.info("user ${user} not found in cache, creating")
+            accessCache[user.id] = new ConcurrentHashMap<Long, Boolean>()
+        }
+
+        if (!accessCache[user.id][zone.id]) {
+            def hasAccess = rolesHaveAccess(user.getAuthorities(), zone)
+            // concurrency is quite unlikely here until users use multiple browsers
+            // impact would be a clash with the invalidate-methods
+            // 1. invalidation-method removed a user
+            //    --> NullPointer
+
+            if (hasAccess != null) {
+                accessCache[user.id][zone.id] = hasAccess
+            }
+            else {
+                log.error("hasAccess is null, returning false")
+                return false
+            }
+        }
+
+        def hasAccess = accessCache[user.id][zone.id] ?: false
+
+        return hasAccess
     }
 
     /* The cache invalidation methods are not implemented symetrically for
@@ -93,57 +98,93 @@ public class AccessService {
         * refresh for for Person/Role
         * invalidate only for a zone
     */
-    public invalidateAccessCacheByZone(ExecutionZone zone) {
-      if (zone && accessCache) {
-        this.log.info("invalidating ${zone} in accessCache")
-        accessCache.each() { key, user ->
-          user.remove(zone.id)
+    def invalidateAccessCacheByZone(ExecutionZone zone) {
+        if (zone && accessCache) {
+            log.info("invalidating ${zone} in accessCache")
+            accessCache.each() { key, user ->
+                user.remove(zone.id)
+            }
         }
-      }
     }
 
-    public refreshAccessCacheByUser(Person user) {
-      if (user && accessCache && accessCache[user.id]) {
-        this.log.info("Refreshing ${user} in accessCache")
-        this.log.info("user has roles "+user.getAuthorities())
-        accessCache.remove(user.id)
-        def execZones = ExecutionZone.findAll()
-        execZones.each() { zone ->
-          this.userHasAccess(user, zone)
+    def refreshAccessCacheByUser(Person user) {
+
+        if (user) {
+
+            if (user.getAuthorities().authority.contains(Role.ROLE_ADMIN)) {
+                //no cache required for admin user
+                return
+            }
+
+            //remove existing user from cache
+            accessCache?.remove(user.id)
+
+            log.info("Refreshing ${user} in accessCache")
+            log.info("user has roles " + user.getAuthorities())
+
+            ExecutionZone.findAll().each { zone -> testIfUserHasAccess(user, zone) }
+
+            log.info(accessCache[user.id].collect { it.value })
         }
-        this.log.info(accessCache[user.id].collect{it.value})
-      }
+        else {
+            log.info("Cannot refresh access cache for null user")
+        }
     }
 
-    public refreshAccessCacheByRole(Role role) {
-      this.log.info("Refreshing ${role} in accessCache")
-      if (accessCache) {
+    def removeUserFromCacheByUser(Person user) {
+        if (user) {
+            accessCache?.remove(user.id)
+            log.info("User ${user} removed from cache")
+        }
+    }
+
+    def refreshAccessCacheByRole(Role role) {
+
+        if (role.authority == Role.ROLE_ADMIN) {
+            //no cache required for admin user
+            return
+        }
+
+        log.info("Refreshing ${role} in accessCache")
         def users = PersonRole.findAllByRole(role).person
-        users.each() { user ->
-          refreshAccessCacheByUser(user)
-        }
-      }
+        users.each() { user -> refreshAccessCacheByUser(user) }
     }
+
+    def removeRoleFromChacheByRole(Role role) {
+        if (role) {
+            def users = PersonRole.findAllByRole(role).person
+
+            log.info("Removing role ${role} from cache. Updating affected users...")
+            users.each { user ->
+                //because the update in database will be done after this the role have to be removed by hand from the user object
+                if (user.getAuthorities().remove(role)) {
+                    log.info("Affected user: ${user}")
+                    refreshAccessCacheByUser(user)
+                }
+            }
+        }
+    }
+
 
     // synchronized as nervous finger protection (might be triggerable via UI)
-    public synchronized warmAccessCacheAsync() {
-      runAsync {
-        this.log.info("Warming the accessCache")
-        def execZones = ExecutionZone.findAll()
-        execZones.each() { zone ->
-          this.log.info("Warming accessCache for zone ${zone}")
-          Person.findAll().each() { user ->
-            this.log.debug("Warming accessCache for person ${user}")
-            this.userHasAccess(user, zone)
-            Thread.sleep(50)
-          }
+    def synchronized warmAccessCacheAsync() {
+        runAsync {
+            log.info("Warming the accessCache")
+            def execZones = ExecutionZone.findAll()
+            execZones.each() { zone ->
+                log.info("Warming accessCache for zone ${zone}")
+                Person.findAll().each() { user ->
+                    log.debug("Warming accessCache for person ${user}")
+                    testIfUserHasAccess(user, zone)
+                    Thread.sleep(50)
+                }
+            }
+            log.info("Finished Warming the accessCache")
         }
-        this.log.info("Finished Warming the accessCache")
-      }
     }
 
-    public clearAccessCache() {
-      this.log.info("clearing the accessCache")
-      accessCache = new ConcurrentHashMap<Long, HashMap>()
+    def clearAccessCache() {
+        log.info("clearing the accessCache")
+        accessCache = new ConcurrentHashMap<Long, HashMap>()
     }
 }

@@ -7,33 +7,13 @@ class PersonRole implements Serializable {
 	Person person
 	Role role
 
-	def accessService
-
-	// If someone adds a role to a user, you have to invalidate the user-entry
-	// in the cache
-	def afterInsert() {
-		this.log.debug("PersonRole.afterInsert triggered!!")
-		this.withNewSession {
-			accessService.refreshAccessCacheByUser(this.person)
-		}
-	}
-
-	// If someone removes a Role from a User, you have to invalidate the user-entry
-	// in the cache
-	def afterDelete() {
-		this.log.debug("PersonRole.afterDelete triggered!!")
-		this.withNewSession {
-			accessService.refreshAccessCacheByUser(this.person)
-		}
-	}
-
 	boolean equals(other) {
 		if (!(other instanceof PersonRole)) {
 			return false
 		}
 
 		other.person?.id == person?.id &&
-			other.role?.id == role?.id
+				other.role?.id == role?.id
 	}
 
 	int hashCode() {
@@ -45,7 +25,7 @@ class PersonRole implements Serializable {
 
 	static PersonRole get(long personId, long roleId) {
 		find 'from PersonRole where person.id=:personId and role.id=:roleId',
-			[personId: personId, roleId: roleId]
+				[personId: personId, roleId: roleId]
 	}
 
 	static PersonRole create(Person person, Role role, boolean flush = false) {
