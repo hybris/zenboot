@@ -4,7 +4,7 @@ class Role {
 
     static final String ROLE_ADMIN = "ROLE_ADMIN"
     static final String ROLE_USER = "ROLE_USER"
-	static final String ROLE_SANITYCHECK = "ROLE_SANITYCHECK"
+    static final String ROLE_SANITYCHECK = "ROLE_SANITYCHECK"
 
     String authority
 

@@ -26,7 +26,7 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
         }
 
         renderSearch results: results, totalCount: results.totalCount,
-            'accountExpired', 'accountLocked', 'enabled', 'passwordExpired', 'username', 'email', 'displayName'
+                'accountExpired', 'accountLocked', 'enabled', 'passwordExpired', 'username', 'email', 'displayName'
     }
 
     def edit() {

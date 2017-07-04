@@ -13,7 +13,7 @@ class PersonRole implements Serializable {
 		}
 
 		other.person?.id == person?.id &&
-			other.role?.id == role?.id
+				other.role?.id == role?.id
 	}
 
 	int hashCode() {
@@ -25,7 +25,7 @@ class PersonRole implements Serializable {
 
 	static PersonRole get(long personId, long roleId) {
 		find 'from PersonRole where person.id=:personId and role.id=:roleId',
-			[personId: personId, roleId: roleId]
+				[personId: personId, roleId: roleId]
 	}
 
 	static PersonRole create(Person person, Role role, boolean flush = false) {

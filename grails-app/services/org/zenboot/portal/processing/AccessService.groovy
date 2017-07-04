@@ -40,14 +40,14 @@ class AccessService {
     }
 
     private boolean rolesHaveAccess(Set<Role> roles, ExecutionZone zone) {
-      roles.any() {
-        roleHasAccess(it, zone)
-      }
+        roles.any() {
+            roleHasAccess(it, zone)
+        }
     }
 
     boolean userHasAccess(ExecutionZone zone) {
-      SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
-        testIfUserHasAccess(springSecurityService.currentUser, zone)
+        SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
+                testIfUserHasAccess(springSecurityService.currentUser, zone)
     }
 
     // Might not be 100% Threadsafe but hopefully something above 99% ;-)
@@ -75,14 +75,14 @@ class AccessService {
             // 1. invalidation-method removed a user
             //    --> NullPointer
 
-          if (hasAccess != null) {
-              accessCache[user.id][zone.id] = hasAccess
-          }
-          else {
-              log.error("hasAccess is null, returning false")
-              return false
-          }
-      }
+            if (hasAccess != null) {
+                accessCache[user.id][zone.id] = hasAccess
+            }
+            else {
+                log.error("hasAccess is null, returning false")
+                return false
+            }
+        }
 
         def hasAccess = accessCache[user.id][zone.id] ?: false
 
@@ -169,22 +169,22 @@ class AccessService {
     // synchronized as nervous finger protection (might be triggerable via UI)
     def synchronized warmAccessCacheAsync() {
         runAsync {
-          log.info("Warming the accessCache")
-          def execZones = ExecutionZone.findAll()
-          execZones.each() { zone ->
-            log.info("Warming accessCache for zone ${zone}")
-            Person.findAll().each() { user ->
-              log.debug("Warming accessCache for person ${user}")
-              testIfUserHasAccess(user, zone)
-              Thread.sleep(50)
-          }
+            log.info("Warming the accessCache")
+            def execZones = ExecutionZone.findAll()
+            execZones.each() { zone ->
+                log.info("Warming accessCache for zone ${zone}")
+                Person.findAll().each() { user ->
+                    log.debug("Warming accessCache for person ${user}")
+                    testIfUserHasAccess(user, zone)
+                    Thread.sleep(50)
+                }
+            }
+            log.info("Finished Warming the accessCache")
         }
-        log.info("Finished Warming the accessCache")
-      }
     }
 
     def clearAccessCache() {
-      log.info("clearing the accessCache")
-      accessCache = new ConcurrentHashMap<Long, HashMap>()
+        log.info("clearing the accessCache")
+        accessCache = new ConcurrentHashMap<Long, HashMap>()
     }
 }
