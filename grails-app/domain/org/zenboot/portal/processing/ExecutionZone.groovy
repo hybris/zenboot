@@ -24,6 +24,8 @@ class ExecutionZone implements Likeable {
 
     SortedSet templates
 
+    def accessService
+
     static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter, templates:Template, hosts:Host]
 
     static constraints = {
@@ -86,6 +88,9 @@ class ExecutionZone implements Likeable {
             existingParam.save()
         } else {
             this.processingParameters << param
+        }
+        this.withNewSession {
+          accessService.invalidateAccessCacheByZone(this)
         }
     }
 
