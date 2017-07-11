@@ -34,7 +34,7 @@ class AccessService {
             return Eval.me("executionZone", executionZone, expression == null ? "" : expression)
 
         } catch (Exception e) {
-            log.error("executionZoneAccessExpression '$expression' from role '$role' threw an exception", e)
+            log.error("executionZoneAccessExpression '$expression' from role '$role' threw an exception: " + e.message)
             return false
         }
     }
@@ -68,7 +68,7 @@ class AccessService {
             accessCache[user.id] = new ConcurrentHashMap<Long, Boolean>()
         }
 
-        if (!accessCache[user.id][zone.id]) {
+        if (accessCache[user.id][zone.id] == null) {
             def hasAccess = rolesHaveAccess(user.getAuthorities(), zone)
             // concurrency is quite unlikely here until users use multiple browsers
             // impact would be a clash with the invalidate-methods
@@ -164,7 +164,6 @@ class AccessService {
             }
         }
     }
-
 
     // synchronized as nervous finger protection (might be triggerable via UI)
     def synchronized warmAccessCacheAsync() {
