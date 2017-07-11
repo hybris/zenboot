@@ -122,6 +122,7 @@ environments {
         // TODO: grails.serverURL = "http://www.changeme.com"
         grails.mail.host = "localhost"
         grails.mail.port = 25
+        grails.assets.enableSourceMaps = false
     }
 }
 
