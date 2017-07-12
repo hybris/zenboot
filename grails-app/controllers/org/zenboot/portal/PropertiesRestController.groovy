@@ -1,7 +1,7 @@
 package org.zenboot.portal
 
 import groovy.text.SimpleTemplateEngine
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus
 
 import org.zenboot.portal.processing.ExecutionZone
 import org.zenboot.portal.processing.ProcessingParameter
@@ -38,7 +38,6 @@ class PropertiesRestController {
         }
         this.sendFile(templateInstance, binding)
         return
-        
     }
     
     def showFile = {
@@ -56,8 +55,6 @@ class PropertiesRestController {
         
         this.sendFile(templateInstance, binding)
         return
-
-        
     }
 
     

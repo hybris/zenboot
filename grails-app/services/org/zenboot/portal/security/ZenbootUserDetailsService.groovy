@@ -1,7 +1,6 @@
 package org.zenboot.portal.security
 
 import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
-import org.springframework.security.core.authority.GrantedAuthorityImpl
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException

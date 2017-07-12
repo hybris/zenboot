@@ -1,15 +1,7 @@
 package org.zenboot.portal.processing
 
-import org.springframework.context.ApplicationListener
 import org.zenboot.portal.processing.groovy.GroovyScriptUtil
 import org.zenboot.portal.ProcessHandler
-import org.zenboot.portal.processing.converter.ParameterConverter
-import org.zenboot.portal.processing.converter.ParameterConverterMap
-import org.zenboot.portal.processing.flow.ScriptletBatchFlow
-import org.zenboot.portal.processing.meta.ParameterMetadata
-import org.zenboot.portal.processing.meta.ParameterMetadataList
-import org.zenboot.portal.processing.meta.annotation.ParameterType
-import org.zenboot.portal.security.Person
 
 /** a serviceClass dealing with all Execution-near topics which don't need
     state. Shouldn't call higher-level-services.
@@ -19,7 +11,7 @@ class ExecutionService {
 
   def grailsApplication
 
-  public Closure createProcessClosure(File file, Scriptlet owner) {
+  Closure createProcessClosure(File file, Scriptlet owner) {
     if (file.getName().split(/\./)[-1] == "groovy") {
       return createGroovyfileBasedClosure(file,owner)
     } else {

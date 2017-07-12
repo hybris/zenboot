@@ -2,9 +2,9 @@ package org.zenboot.portal.processing
 
 class ScriptExecutionException extends ProcessingException {
 
-    def int returnCode
+    int returnCode
 
-    public ScriptExecutionException(String message, returnCode) {
+    ScriptExecutionException(String message, returnCode) {
         super(message)
         this.returnCode = returnCode
     }

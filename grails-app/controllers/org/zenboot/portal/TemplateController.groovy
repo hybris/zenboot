@@ -2,7 +2,7 @@ package org.zenboot.portal
 
 import groovy.text.SimpleTemplateEngine
 
-import java.nio.charset.Charset;
+import java.nio.charset.Charset
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -14,12 +14,8 @@ import org.zenboot.portal.processing.*
 
 class TemplateController {
     
-
-
     static allowedMethods = [save: "POST", update: "POST", delete: "POST", upload: "POST"]
 
-
-    
     def index() {
       def executionZoneInstance 
       if(params.execId) {
@@ -50,7 +46,6 @@ class TemplateController {
          }
       }
     }
-
 
     def save() {
         
@@ -108,9 +103,8 @@ class TemplateController {
                     message: flash.message,
                     warning: flash?.warning
         }
-        return
     }
-    
+
     def ajaxGetVersion() {
         def templateInstance = TemplateVersion.get(params.id)
         
@@ -126,8 +120,6 @@ class TemplateController {
               commentUrl:createLink( mapping:'template', action: 'ajaxGetComment', id:templateInstance.id)
           )
         }
-        
-        return
     }
     
     def ajaxGetTemplate() {
@@ -139,7 +131,6 @@ class TemplateController {
         }
         
         render(text: templateInstance.content)
-        return
     }
     
     def ajaxGetComment() {
@@ -151,7 +142,6 @@ class TemplateController {
         }
         
         render(text: templateInstance.comment)
-        return
     }
 
     def checkParameters(){
@@ -174,11 +164,7 @@ class TemplateController {
           }
         }
       }
-      return
-      
     }
-
-
 
     def update() {
         flash.action = 'template'
@@ -267,7 +253,6 @@ class TemplateController {
         
         flash.message = message(code: 'template.imported', default: "{1} of {0} templates imported!", args: [files, imported])
         redirect(controller: "executionZone", action: "show", id: executionZoneInstance.id)
-        return
     }
     
     def export() {
@@ -296,18 +281,14 @@ class TemplateController {
             executionZoneInstance.templates.each {
                 zipFile.putNextEntry(new ZipEntry(it.name))
                 zipFile.write(it.template.getBytes(Charset.forName("UTF-8")))
-                zipFile.closeEntry();
+                zipFile.closeEntry()
             }
         } else {
             flash.message = "There are no Templates in this zone"
             render(controller: "executionZone", action: "show", id: executionZoneInstance.id)
         }
-        
-        
-        
+
         zipFile.close()
-        
-        
         
         response.setContentType("application/octet-stream")
         response.setHeader("Content-disposition", "attachment;filename=${exportFile.getName()}")
@@ -315,7 +296,6 @@ class TemplateController {
         response.outputStream << exportFile.newInputStream() // Performing a binary stream copy
         
         new File(this.grailsApplication.config.zenboot.template.tempDir.toString()).deleteDir()
-        return
     }
 
     def delete() {
@@ -329,11 +309,9 @@ class TemplateController {
         try {
             templateInstance.delete(flush: true)
             this.sendError(HttpStatus.OK, "Template deleted.")
-            return
         }
         catch (DataIntegrityViolationException e) {
             this.sendError(HttpStatus.BAD_REQUEST, "Can't delete template.")
-            return
         }
     }
 

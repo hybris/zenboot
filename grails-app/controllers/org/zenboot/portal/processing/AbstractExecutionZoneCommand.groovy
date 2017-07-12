@@ -1,8 +1,5 @@
 package org.zenboot.portal.processing
 
-
-
-
 abstract class AbstractExecutionZoneCommand {
 
     def executionZoneService
@@ -34,7 +31,5 @@ abstract class AbstractExecutionZoneCommand {
         }
     }
 
-
-
-    abstract AbstractExecutionZoneAction getExecutionZoneAction();
+    abstract AbstractExecutionZoneAction getExecutionZoneAction()
 }

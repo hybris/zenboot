@@ -2,11 +2,11 @@ package org.zenboot.portal.processing
 
 class PluginExecutionException extends ProcessingException {
 
-    public PluginExecutionException(String message) {
+    PluginExecutionException(String message) {
         super(message)
     }
 
-    public PluginExecutionException(String message, Throwable cause) {
+    PluginExecutionException(String message, Throwable cause) {
         super(message, cause)
     }
 }

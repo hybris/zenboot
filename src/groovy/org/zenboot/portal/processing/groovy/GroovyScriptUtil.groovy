@@ -15,7 +15,7 @@ class GroovyScriptUtil {
      *
      * this assumes the current execution zone structure without substructure
      */
-    public static Class parseGroovyScript(File script) {
+    static Class parseGroovyScript(File script) {
         GroovyClassLoader gcl = new GroovyClassLoader(GroovyScriptUtil.classLoader)
         def libPath = Paths.get(script.getParent(), "../../lib").toAbsolutePath().normalize()
         gcl.addClasspath(libPath.toString() + "/")

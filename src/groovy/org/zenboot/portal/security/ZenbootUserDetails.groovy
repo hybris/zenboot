@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority
 
 import grails.plugin.springsecurity.userdetails.GrailsUser
 
-public class ZenbootUserDetails extends GrailsUser {
+class ZenbootUserDetails extends GrailsUser {
     String displayName
     String email
 
@@ -23,7 +23,7 @@ public class ZenbootUserDetails extends GrailsUser {
      * @param displayName a displayable name of the user
      * @param email email address of the user
      */
-    public ZenbootUserDetails(String username, String password, boolean enabled,
+    ZenbootUserDetails(String username, String password, boolean enabled,
                               boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
                               Collection<GrantedAuthority> authorities, Object id,
                               String displayName, email) {

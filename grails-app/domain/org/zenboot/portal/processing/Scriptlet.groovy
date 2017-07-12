@@ -4,7 +4,6 @@ import org.apache.log4j.Logger
 import org.apache.log4j.SimpleLayout
 import org.apache.log4j.WriterAppender
 import org.zenboot.portal.ProcessListener
-import org.zenboot.portal.processing.Processable.ProcessState
 
 /**  A Scriptlet is a Domain-class and represents one Run of a
   *  specific Script. It stores all all related stuff in the DB
@@ -62,27 +61,27 @@ class Scriptlet extends Processable implements ProcessListener {
     }
 
     @Override
-    public boolean isExecutable() {
+    boolean isExecutable() {
         return this.state == ProcessState.WAITING
     }
 
     @Override
-    public void onExecute(String command) {
+    void onExecute(String command) {
         //nothing to do
     }
 
     @Override
-    public void onFinish(int exitCode) {
+    void onFinish(int exitCode) {
         this.exitCode = exitCode
     }
 
     @Override
-    public void onOutput(String output) {
+    void onOutput(String output) {
         this.processOutput << output
     }
 
     @Override
-    public void onError(String error) {
+    void onError(String error) {
         this.processError << error
     }
 
@@ -96,12 +95,12 @@ class Scriptlet extends Processable implements ProcessListener {
     }
 
     @Override
-    public int countProcessables() {
+    int countProcessables() {
         return 1
     }
 
     @Override
-    public int countExecutedProcessables() {
+    int countExecutedProcessables() {
         (this.state == ProcessState.WAITING) ? 0 : 1
     }
 }

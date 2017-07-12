@@ -42,7 +42,6 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
 
 
     def execute(ExecuteExecutionZoneCommand cmd) {
-        def executionZone = ExecutionZone.get(cmd.execId)
         flash.action = 'execute'
         executionZoneService.setParameters(cmd, params.parameters)
         log.info("cmd setParameters:" + params.inspect())
@@ -208,9 +207,10 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             executionZoneCount = executionZones.size()
             executionZones = executionZoneService.getRange(executionZones, params)
         }
-        log.debug("model: executionZoneInstanceList(.size(): "+executionZones.size()+"), executionZoneInstanceTotal ("+executionZoneCount+"), executionZoneTypes")
+        log.debug("model: executionZoneInstanceList(.size(): "+ executionZones.size()+"), executionZoneInstanceTotal ("+executionZoneCount+"), executionZoneTypes")
 
         request.withFormat {
+            //different results for same rest endpoint - html throws NPE because of filter params null
             html {
                     [
                         executionZoneInstanceList: executionZones,
@@ -222,6 +222,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
                     ]
             }
             json { render executionZones as JSON }
+            xml { render executionZones as XML }
         }
     }
 
@@ -392,7 +393,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     }
 
     @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+    void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.applicationEventPublisher = eventPublisher
     }
 }

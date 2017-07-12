@@ -8,12 +8,12 @@ class DefaultParameterConverter implements ParameterConverter {
     }
 
     @Override
-    public boolean supports(def key) {
+    boolean supports(def key) {
         return true
     }
 
     @Override
-    public void addParameters(Map parameters, Object key, Object value) {
+    void addParameters(Map parameters, Object key, Object value) {
         if (value.respondsTo("toString")) {
             parameters[key] = value.toString()
         } else if (value.respondsTo("text")) {
@@ -24,7 +24,7 @@ class DefaultParameterConverter implements ParameterConverter {
     }
 
     @Override
-    public void removeParameters(Map parameters, Object key) {
+    void removeParameters(Map parameters, Object key) {
         parameters.remove(key)
     }
 }

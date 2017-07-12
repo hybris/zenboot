@@ -8,12 +8,12 @@ import org.springframework.security.core.Authentication
 
 class AdminRoleVoter extends RoleHierarchyVoter {
 
-    public AdminRoleVoter(RoleHierarchy roleHierarchy) {
+    AdminRoleVoter(RoleHierarchy roleHierarchy) {
         super(roleHierarchy)
     }
 
     @Override
-    public int vote(Authentication auth, Object obj, Collection<ConfigAttribute> config) {
+    int vote(Authentication auth, Object obj, Collection<ConfigAttribute> config) {
         if (auth.getAuthorities()*.authority.contains(Role.ROLE_ADMIN)) {
             return ACCESS_GRANTED
         } else if(!auth.getAuthorities()*.authority.intersect(config).empty) {

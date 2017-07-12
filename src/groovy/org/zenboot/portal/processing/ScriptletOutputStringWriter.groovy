@@ -12,43 +12,43 @@ class ScriptletOutputStringWriter extends StringWriter {
     int syncTimeout = 5
     boolean saveWithFlush = true
 
-    public ScriptletOutputStringWriter(Scriptlet scriptlet) {
+    ScriptletOutputStringWriter(Scriptlet scriptlet) {
         super()
         this.scriptlet = scriptlet
     }
 
 
-    public ScriptletOutputStringWriter(Scriptlet scriptlet, int initialSize) {
+    ScriptletOutputStringWriter(Scriptlet scriptlet, int initialSize) {
         super(initialSize)
         this.scriptlet = scriptlet
     }
 
     @Override
-    public void write(char[] cbuf) throws IOException {
+    void write(char[] cbuf) throws IOException {
         super.write(cbuf)
         this.updateScriptlet(new String(cbuf))
     }
 
     @Override
-    public void write(int c) {
+    void write(int c) {
         super.write(c)
         this.updateScriptlet(String.valueOf(c))
     }
 
     @Override
-    public void write(char[] cbuf, int off, int len) {
+    void write(char[] cbuf, int off, int len) {
         super.write(cbuf, off, len)
         this.updateScriptlet(new String(cbuf).substring(off, len))
     }
 
     @Override
-    public void write(String str) {
+    void write(String str) {
         super.write(str)
         this.updateScriptlet(str)
     }
 
     @Override
-    public void write(String str, int off, int len) {
+    void write(String str, int off, int len) {
         super.write(str, off, len)
         this.updateScriptlet(new String(str).substring(off, len))
     }

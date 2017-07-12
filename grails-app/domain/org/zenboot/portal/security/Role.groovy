@@ -14,8 +14,6 @@ class Role {
     // is allowed to edit that parameter
     String parameterEditExpression
 
-//    transient accessService
-
     static mapping = { cache true }
 
     static constraints = {

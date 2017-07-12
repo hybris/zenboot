@@ -1,5 +1,4 @@
 package org.zenboot.portal
-import java.lang.AbstractStringBuilder
 
 class ProcessHandler {
 
@@ -29,37 +28,37 @@ class ProcessHandler {
     }
 
     def addProcessListener(ProcessListener procListener) {
-        this.error.addProcessListener(procListener)
-        this.output.addProcessListener(procListener)
-        this.processListener.add(procListener)
+        error.addProcessListener(procListener)
+        output.addProcessListener(procListener)
+        processListener.add(procListener)
     }
 
     def removeProcessListener(ProcessListener procListener) {
-        this.processListener.remove(procListener)
-        this.error.removeProcessListener(procListener)
-        this.output.removeProcessListener(procListener)
+        processListener.remove(procListener)
+        error.removeProcessListener(procListener)
+        output.removeProcessListener(procListener)
     }
 
     def execute(def envParams=null) {
-        this.log.debug(this.command)
-        this.processListener.each {
-            it.onExecute(this.command)
+        log.debug(command)
+        processListener.each {
+            it.onExecute(command)
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder(this.command.split(' '))
-        if (this.workingDirectory) {
-            processBuilder.directory(this.workingDirectory)
+        if (workingDirectory) {
+            processBuilder.directory(workingDirectory)
         }
 
         if (envParams instanceof Map) {
-            if (this.log.debugEnabled) {
-                this.log.debug("Set environment parameters: ${envParams}")
+            if (log.debugEnabled) {
+                log.debug("Set environment parameters: ${envParams}")
             }
             processBuilder.environment().putAll(envParams)
         }
 
-        if (this.log.debugEnabled) {
-            this.log.debug("Execute command '${this.command}'")
+        if (log.debugEnabled) {
+            log.debug("Execute command '${command}'")
         }
 
         Process proc = processBuilder.start()
@@ -68,27 +67,27 @@ class ProcessHandler {
         proc.waitForOrKill(this.timeout)
         Thread.sleep(1000)
 
-        this.setExitValue(proc.exitValue())
+        setExitValue(proc.exitValue())
         proc.destroy()
     }
 
     private void setExitValue(int exitValue) {
         this.exitValue = exitValue
-        this.processListener.each {
+        processListener.each {
             it.onFinish(exitValue)
         }
     }
 
     def getOutput() {
-        this.output.toString()
+        output.toString()
     }
 
     def getError() {
-        this.error.toString()
+        error.toString()
     }
 
     def hasError() {
-        return (this.exitValue >= 2)
+        return (exitValue >= 2)
     }
 }
 
@@ -104,11 +103,11 @@ class ObservableStringBuilder implements Appendable {
   }
 
   def addProcessListener(ProcessListener procListener) {
-      this.processListener.add(procListener)
+      processListener.add(procListener)
   }
 
   def removeProcessListener(ProcessListener procListener) {
-      this.processListener.remove(procListener)
+      processListener.remove(procListener)
   }
 
   Appendable append(char c) {
