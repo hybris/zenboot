@@ -110,7 +110,6 @@ class AccessService {
     def refreshAccessCacheByUser(Person user) {
 
         if (user) {
-
             if (user.getAuthorities().authority.contains(Role.ROLE_ADMIN)) {
                 //no cache required for admin user
                 return
