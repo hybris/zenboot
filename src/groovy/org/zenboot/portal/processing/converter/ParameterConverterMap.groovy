@@ -8,36 +8,36 @@ class ParameterConverterMap implements Map {
     private Map objects = [:]
 
     @Override
-    public int size() {
+    int size() {
         return this.parameters.size()
     }
 
     @Override
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return this.parameters.isEmpty()
     }
 
     @Override
-    public boolean containsKey(Object key) {
+    boolean containsKey(Object key) {
         return this.parameters.containsKey(key)
     }
 
     @Override
-    public boolean containsValue(Object value) {
+    boolean containsValue(Object value) {
         return this.parameters.containsValue(value)
     }
 
     @Override
-    public Object get(Object key) {
+    Object get(Object key) {
         return this.parameters.get(key)
     }
 
-    public Object getObject(Object key) {
+    Object getObject(Object key) {
         return objects.get(key)
     }
 
     @Override
-    public Object put(Object key, Object value) {
+    Object put(Object key, Object value) {
         def result = this.parameters.put(key, value)
         this.objects.put(key, value)
 
@@ -47,7 +47,7 @@ class ParameterConverterMap implements Map {
     }
 
     @Override
-    public Object remove(Object key) {
+    Object remove(Object key) {
         def result = this.parameters.remove(key)
         this.objects.remove(key)
 
@@ -57,7 +57,7 @@ class ParameterConverterMap implements Map {
     }
 
     @Override
-    public void putAll(Map map) {
+    void putAll(Map map) {
         map.each { key, value ->
             this.addConvertedParameters(key, value)
         }
@@ -65,23 +65,23 @@ class ParameterConverterMap implements Map {
     }
 
     @Override
-    public void clear() {
+    void clear() {
         this.parameters.clear()
         this.objects.clear()
     }
 
     @Override
-    public Set keySet() {
+    Set keySet() {
         return this.parameters.keySet()
     }
 
     @Override
-    public Collection values() {
+    Collection values() {
         return this.parameters.values()
     }
 
     @Override
-    public Set entrySet() {
+    Set entrySet() {
         this.parameters.entrySet()
     }
 

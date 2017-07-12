@@ -10,7 +10,7 @@ class PluginFileComparator implements Comparator {
     }
 
     @Override
-    public int compare(def pluginFile1, def pluginFile2) {
+    int compare(def pluginFile1, def pluginFile2) {
         return pluginFile1.getRank(this.attributes).compareTo(pluginFile2.getRank(this.attributes)) 
     }
 

@@ -2,12 +2,10 @@ package org.zenboot.portal.processing
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Role
-import org.zenboot.portal.PathResolver
 import org.zenboot.portal.ZenbootException
 import org.zenboot.portal.processing.flow.ScriptletBatchFlow
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
-import org.ho.yaml.Yaml
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.zenboot.portal.ControllerUtils
@@ -75,7 +73,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 		}
 	}
 
-    public List filterByAccessPermission(executionZoneInstanceList) {
+    List filterByAccessPermission(executionZoneInstanceList) {
         executionZoneInstanceList.findAll() { executionZone ->
             accessService.userHasAccess(executionZone)
         }
@@ -182,6 +180,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         execAction.save(flush:true)
         return execAction
     }
+
+
     Set getExposedExecutionZoneActionParameters(ExposedExecutionZoneAction exposedAction) {
         ScriptletBatchFlow flow = scriptletBatchService.getScriptletBatchFlow(exposedAction.scriptDir, exposedAction.executionZone.type)
         ParameterMetadataList paramMetaList = flow.parameterMetadataList
@@ -334,7 +334,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
         return shell.evaluate(expression == null ? "" : expression)
 
       } catch (Exception e) {
-        this.log.error("parameterEditExpression for role '"+ role + " with " + expression +"' is throwing an exception", e)
+        log.error("parameterEditExpression for role '"+ role + " with " + expression +"' is throwing an exception", e)
         return false
       }
 
@@ -369,7 +369,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     }
 
     @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+    void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.applicationEventPublisher = eventPublisher
     }
 }

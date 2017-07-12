@@ -19,7 +19,7 @@ class Hostname {
     }
 
     @Override
-    public int hashCode() {
+    int hashCode() {
         final int prime = 31
         int result = 1
         result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode())
@@ -28,7 +28,7 @@ class Hostname {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    boolean equals(Object obj) {
         if (obj == null) {
             return false
         }

@@ -211,7 +211,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     }
 
     @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+    void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.applicationEventPublisher = eventPublisher
     }
 }

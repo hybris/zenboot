@@ -23,7 +23,7 @@ class ScriptletAnnotationReader {
     }
 
 
-    public Set getParameters(File script) {
+    Set getParameters(File script) {
       Class scriptletClass = this.getScriptletClass(script)
 
       def annotations = []
@@ -143,16 +143,16 @@ class ScriptletAnnotationReader {
 
 class AnnotationReaderException extends Exception {
 
-    public AnnotationReaderException(String message, Throwable cause,
+    AnnotationReaderException(String message, Throwable cause,
             boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public AnnotationReaderException(String message, Throwable cause) {
+    AnnotationReaderException(String message, Throwable cause) {
         super(message, cause)
     }
 
-    public AnnotationReaderException(String message) {
+    AnnotationReaderException(String message) {
         super(message)
     }
 

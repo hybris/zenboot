@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus
 
 class ScriptletBatchController {
 
-    def PageRenderer groovyPageRenderer
+    PageRenderer groovyPageRenderer
     def executionZoneService
     def accessService
     def springSecurityService
@@ -75,8 +75,8 @@ class ScriptletBatchController {
                 for (q in result) {
                     output.queue << [
                         creationDate : q.creationDate,
-                        description:q.description,
-                        state:q.state.name(),
+                        description: q.description,
+                        state: q.state.name(),
                         progress: q.getProgress()
                     ]
                 }
@@ -162,7 +162,6 @@ class ScriptletBatchController {
         } else {
           flash.message = message(code: 'default.not.allowed.message')
           redirect(action: "list")
-          return
         }
     }
 }

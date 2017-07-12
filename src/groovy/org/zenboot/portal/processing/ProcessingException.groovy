@@ -4,11 +4,11 @@ import org.zenboot.portal.ZenbootException
 
 class ProcessingException extends ZenbootException {
 
-    public ProcessingException(String message, Throwable cause) {
+    ProcessingException(String message, Throwable cause) {
         super(message, cause)
     }
 
-    public ProcessingException(String message) {
+    ProcessingException(String message) {
         super(message)
     }
 }

@@ -1,14 +1,14 @@
 package org.zenboot.portal.processing
 
 @SuppressWarnings("GroovyUnusedDeclaration")
-public class RunTimeAttributesService {
+class RunTimeAttributesService {
     def grailsApplication
 
-    public List getRuntimeAttributes() {
+    List getRuntimeAttributes() {
         return normalizeRuntimeAttributes(grailsApplication.config.zenboot.processing.attributes.toString().split(",").asType(List))
     }
 
-    static public List normalizeRuntimeAttributes(List attributes) {
+    static List normalizeRuntimeAttributes(List attributes) {
         return attributes*.trim()*.toLowerCase()
     }
 }

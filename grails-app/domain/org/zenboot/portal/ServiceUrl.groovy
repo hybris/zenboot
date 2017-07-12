@@ -11,7 +11,7 @@ class ServiceUrl implements Comparable<ServiceUrl> {
   }
 
   @Override
-  public String toString() {
+  String toString() {
     "ServiceUrl{url='$url'}"
   }
 }

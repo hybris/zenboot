@@ -8,7 +8,6 @@ import org.zenboot.portal.processing.meta.ParameterMetadata
 import org.zenboot.portal.processing.meta.ParameterMetadataList
 import org.zenboot.portal.processing.meta.annotation.ParameterType
 import org.zenboot.portal.security.Person
-import org.zenboot.portal.processing.ProcessingException
 
 class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
 
@@ -58,8 +57,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     }
 
     @Override
-    public void onApplicationEvent(ProcessingEvent event) {
-        this.log.info("Receive application event ${event}")
+    void onApplicationEvent(ProcessingEvent event) {
+        log.info("Receive application event ${event}")
 
         // ToDo Refactor, so that not the processingEvent is a param to the closure, but
         // user, executionZoneAction and comment
@@ -171,8 +170,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
       *
       */
     synchronized private ScriptletBatch buildScriptletBatch(ExecutionZoneAction action, Person user, String comment) {
-        if (this.log.debugEnabled) {
-            this.log.debug("Build scriptlet batch for action ${action}")
+        if (log.debugEnabled) {
+            log.debug("Build scriptlet batch for action ${action}")
         }
         def username = user?.displayName ?: user?.username ?: 'cron'
 
@@ -231,23 +230,21 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         }
 
         if (scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()] == null || type.devMode ) {
-          ScriptResolver scriptResolver = new ScriptResolver(scriptDir)
-          String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ScriptDirectoryService.PLUGINS_DIR}"
-          PluginResolver pluginResolver = new PluginResolver(new File(pathPluginDir))
+            ScriptResolver scriptResolver = new ScriptResolver(scriptDir)
+            String pathPluginDir = "${scriptDir.parent}${System.properties['file.separator']}..${System.properties['file.separator']}${ScriptDirectoryService.PLUGINS_DIR}"
+            PluginResolver pluginResolver = new PluginResolver(new File(pathPluginDir))
 
-          ScriptletBatchFlow flow = new ScriptletBatchFlow()
-          flow.batchPlugin = pluginResolver.resolveScriptletBatchPlugin(scriptDir, runtimeAttributes)
+            ScriptletBatchFlow flow = new ScriptletBatchFlow()
+            flow.batchPlugin = pluginResolver.resolveScriptletBatchPlugin(scriptDir, runtimeAttributes)
 
-          def scriptFiles = scriptResolver.resolve(runtimeAttributes)
-          scriptFiles.each { File script ->
-              File plugin = pluginResolver.resolveScriptletPlugin(script, runtimeAttributes)
-              flow.addFlowElement(script, plugin)
-          }
-          scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()] = flow.build()
-          return scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()]
-        } else {
-          return scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()]
+            def scriptFiles = scriptResolver.resolve(runtimeAttributes)
+            scriptFiles.each { File script ->
+                File plugin = pluginResolver.resolveScriptletPlugin(script, runtimeAttributes)
+                flow.addFlowElement(script, plugin)
+            }
+            scriptletFlowCache[scriptDir.toString() + runtimeAttributes.toString()] = flow.build()
         }
 
+        return scriptletFlowCache[scriptDir.toString()+runtimeAttributes.toString()]
     }
 }

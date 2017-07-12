@@ -3,7 +3,7 @@ package org.zenboot.portal.processing
 import org.ho.yaml.Yaml
 import org.zenboot.portal.PathResolver
 
-public class ScriptDirectoryService {
+class ScriptDirectoryService {
     def grailsApplication
     static final String SCRIPTS_DIR = 'scripts'
     static final String JOBS_DIR = 'jobs'

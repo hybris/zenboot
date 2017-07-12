@@ -2,7 +2,6 @@ package org.zenboot.portal.processing
 
 import org.zenboot.portal.Host
 import org.zenboot.portal.processing.converter.ParameterConverterMap
-import org.zenboot.portal.processing.ScriptletBatch
 import org.zenboot.portal.security.Person
 
 class ProcessContext {

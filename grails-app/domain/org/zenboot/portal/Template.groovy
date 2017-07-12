@@ -1,8 +1,6 @@
 package org.zenboot.portal
 
 import org.zenboot.portal.processing.ExecutionZone;
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 class Template implements Comparable {
     
@@ -78,7 +76,6 @@ class Template implements Comparable {
         }
         this.template = null
     }
-    
     
     def importFile(String file){
         template = new File(file).getText()

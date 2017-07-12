@@ -9,7 +9,7 @@ class ScriptletLogFilter extends Filter {
     def threadId
 
     @Override
-    public int decide(LoggingEvent event) {
+    int decide(LoggingEvent event) {
         if (Thread.currentThread().id == this.threadId && pattern.matcher(event.getLoggerName()).matches()) {
             return Filter.ACCEPT
         } else {

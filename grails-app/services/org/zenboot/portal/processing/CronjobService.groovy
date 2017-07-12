@@ -34,7 +34,6 @@ class CronjobService implements ApplicationEventPublisherAware {
         }
     }
 
-
 	private List getJobList(CronjobExpression cronExpression) {
         List jobs = []
 
@@ -76,7 +75,7 @@ class CronjobService implements ApplicationEventPublisherAware {
     }
 
     @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+    void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.applicationEventPublisher = eventPublisher
     }
 

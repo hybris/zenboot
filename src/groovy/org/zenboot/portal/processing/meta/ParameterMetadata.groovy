@@ -11,9 +11,9 @@ class ParameterMetadata extends ScriptMetadata {
 
     // Below constructor will cause the empty constructor to disappear
     // so i'll add it explicitely
-    public ParameterMetadata(){}
+    ParameterMetadata(){}
 
-    public ParameterMetadata(ParameterMetadata pm) {
+    ParameterMetadata(ParameterMetadata pm) {
       super(pm)
       this.name = pm.name
       this.defaultValue = pm.defaultValue
@@ -24,7 +24,7 @@ class ParameterMetadata extends ScriptMetadata {
 
 
     @Override
-    public int hashCode() {
+    int hashCode() {
         final int prime = 31
         int result = 1
         result = prime * result + ((name == null) ? 0 : name.hashCode())
@@ -33,7 +33,7 @@ class ParameterMetadata extends ScriptMetadata {
     }
 
     @Override
-    public boolean equals(def obj) {
+    boolean equals(def obj) {
         if (obj == null) {
             return false
         }

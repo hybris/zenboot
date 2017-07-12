@@ -1,6 +1,5 @@
 package org.zenboot.portal.processing
 
-import org.zenboot.portal.processing.Processable.ProcessState
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.Host
 
@@ -27,7 +26,7 @@ class ScriptletBatch extends Processable {
     }
 
     @Override
-    public void execute(ProcessContext ctx) {
+    void execute(ProcessContext ctx) {
         try {
             super.execute(ctx);
         } catch (Exception exc) {
@@ -50,12 +49,12 @@ class ScriptletBatch extends Processable {
     }
 
     @Override
-    public int countProcessables() {
+    int countProcessables() {
         return this.processables.size()
     }
 
     @Override
-    public int countExecutedProcessables() {
+    int countExecutedProcessables() {
         return this.processables.findAll { Processable processable ->
             return (processable.state != ProcessState.WAITING)
         }.size()
@@ -87,10 +86,10 @@ class ScriptletBatch extends Processable {
     }
 
     @Override
-    public boolean cancel() {
+    boolean cancel() {
         this.processables.each { Processable processable ->
             processable.cancel()
         }
-        return super.cancel();
+        return super.cancel()
     }
 }
