@@ -3,3 +3,4 @@
 !docker-provisioning/ansible.cfg
 !target/*.war
 !docker-provisioning/setenv.sh
+!conf/server.xml
