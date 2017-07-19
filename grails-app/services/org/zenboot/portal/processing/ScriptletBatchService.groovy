@@ -78,30 +78,41 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
                 map[param.name] = param.value
                 return map
             })
+
             processContext.execZone=action.executionZone
             processContext.parameters.put("EXECUTIONZONE_TYPE",action.executionZone.type.name)
-            ScriptletBatch batch = this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
-            processContext.parameters.put("SCRIPTDIR",batch.executionZoneAction.scriptDir)
-            processContext.scriptletBatch=batch
-            try {
-              batch.execute(processContext)
-            } catch (ProcessingException e) {
-              batch.exceptionMessage = e.getMessage()
-              batch.exceptionClass = e.getClass().toString()
-              batch.cancel()
-            } catch (Exception e) {
-              //log.error("Caught Exception: ",e)
-              batch.exceptionMessage = e.getMessage()
-              batch.exceptionClass = e.getClass().toString()
-              batch.cancel()
-            }
+            this.buildScriptletBatch(action, processingEvent.user, processingEvent.comment)
 
-            this.synchronizeExposedProcessingParameters(batch, processContext)
+            ScriptletBatch batch = ScriptletBatch.findByExecutionZoneAction(action)
+
+            if (action.scriptletBatches) {
+                processContext.parameters.put("SCRIPTDIR", batch.executionZoneAction.scriptDir)
+                processContext.scriptletBatch = batch
+                try {
+                    batch.execute(processContext)
+                } catch (ProcessingException e) {
+                    batch.exceptionMessage = e.getMessage()
+                    batch.exceptionClass = e.getClass().toString()
+                    batch.cancel()
+                } catch (Exception e) {
+                    //log.error("Caught Exception: ",e)
+                    batch.exceptionMessage = e.getMessage()
+                    batch.exceptionClass = e.getClass().toString()
+                    batch.cancel()
+                }
+
+                this.synchronizeExposedProcessingParameters(batch, processContext)
+            }
+            else {
+                log.error('An error occurs while trying to execute the event for user ' + processingEvent.user.username + ' and executionzone ' + action.executionZone.description)
+                return
+            }
         }
 
         if (event.processAsync && grailsApplication.config.zenboot.processing.asynchron.toBoolean()) {
             // This leverages the grails executor-plugin
             // https://github.com/basejump/grails-executor#examples
+
             runAsync {
               try {
                 execute(event)
@@ -186,12 +197,11 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         if (batch.hasErrors()) {
             throw new ProcessingException("Failure while building ${batch}: ${batch.errors}")
         }
-        batch.save(flush:true, failOnError: true)
-        action.scriptletBatches << batch
-        action.save(flush:true, failOnError: true)
 
         this.addScriptlets(batch, action.runtimeAttributes)
+        action.addToScriptletBatches(batch)
 
+        action.save(flush: true, failOnError: true)
         return batch
     }
 
@@ -210,10 +220,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
                 executionService.injectPlugins(pluginFile, scriptlet)
             }
 
-            batch.processables << scriptlet
             scriptlet.scriptletBatch = batch
-
-            scriptlet.save(flush:true)
+            batch.addToProcessables(scriptlet)
         }
     }
 
