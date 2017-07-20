@@ -27,6 +27,8 @@ class BootStrap {
         //setup the sanity check (used for CI)
         this.setupSanityCheckExposedExecutionZoneAction()
 
+        setupBootstrapExecutionZoneAction()
+
         // setting up JSON-Marshallers
         // otherwise you're rendering out half of the heap-space
         grails.converters.JSON.registerObjectMarshaller(ExecutionZone) {
@@ -121,6 +123,18 @@ class BootStrap {
             )
             exposedAction.save()
         }
+    }
+
+    private setupBootstrapExecutionZoneAction() {
+        ExecutionZoneType bootstrapType = ExecutionZoneType.findByName("initial")
+        ExecutionZone execZoneBootstrap = ExecutionZone.findByType(bootstrapType)
+        if (!execZoneBootstrap) {
+            execZoneBootstrap = new ExecutionZone(type:bootstrapType, description:"Populate server with default data")
+            execZoneBootstrap.save()
+        }
+
+        // Execute the action on startup - similar bug to RPI-2167
+        //grailsApplication.mainContext.getBean('executionZoneService').createAndPublishExecutionZoneAction(execZoneBootstrap, "bootstrap")
     }
 
     def destroy = {
