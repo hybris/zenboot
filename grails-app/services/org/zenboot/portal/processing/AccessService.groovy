@@ -140,7 +140,7 @@ class AccessService {
 
     def refreshAccessCacheByRole(Role role) {
 
-        if (role.authority == Role.ROLE_ADMIN) {
+        if (role?.authority == Role.ROLE_ADMIN) {
             //no cache required for admin user
             return
         }
@@ -170,9 +170,10 @@ class AccessService {
         runAsync {
             log.info("Warming the accessCache")
             def execZones = ExecutionZone.findAll()
+            def persons = Person.getAll().findAll{ !it.getAuthorities().contains(Role.findByAuthority(Role.ROLE_ADMIN)) }
             execZones.each() { zone ->
                 log.info("Warming accessCache for zone ${zone}")
-                Person.findAll().each() { user ->
+                persons.each() { user ->
                     log.debug("Warming accessCache for person ${user}")
                     testIfUserHasAccess(user, zone)
                     Thread.sleep(50)
