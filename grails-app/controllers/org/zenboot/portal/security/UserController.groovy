@@ -29,9 +29,9 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
                 'accountExpired', 'accountLocked', 'enabled', 'passwordExpired', 'username', 'email', 'displayName'
     }
 
-    def edit() {
+    def update() {
         accessService.refreshAccessCacheByUser(Person.findById(params.id))
-        doEdit()
+        super.update()
     }
 
     def delete() {
