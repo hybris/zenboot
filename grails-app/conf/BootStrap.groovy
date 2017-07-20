@@ -4,6 +4,8 @@ import org.zenboot.portal.Host
 import org.zenboot.portal.processing.ExecutionZone
 import org.zenboot.portal.processing.ExecutionZoneType
 import org.zenboot.portal.processing.ExposedExecutionZoneAction
+import org.zenboot.portal.processing.Processable
+import org.zenboot.portal.processing.ScriptletBatch
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.PersonRole
 import org.zenboot.portal.security.Role
@@ -51,6 +53,12 @@ class BootStrap {
             returnArray['hostname'] = it.hostname
             returnArray['serviceUrls'] = it.serviceUrls
             return returnArray
+        }
+
+        //clean up hung stuff after restart
+        ScriptletBatch.findAll { state == Processable.ProcessState.RUNNING || state == Processable.ProcessState.WAITING }.each {
+            it.state = Processable.ProcessState.CANCELED
+            it.save(flush:true)
         }
 
         accessService.warmAccessCacheAsync()
