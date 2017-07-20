@@ -140,7 +140,7 @@ class AccessService {
 
     def refreshAccessCacheByRole(Role role) {
 
-        if (role?.authority == Role.ROLE_ADMIN) {
+        if (!role && role.authority == Role.ROLE_ADMIN) {
             //no cache required for admin user
             return
         }
