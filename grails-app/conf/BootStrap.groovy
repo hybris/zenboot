@@ -9,6 +9,7 @@ import org.zenboot.portal.processing.ScriptletBatch
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.PersonRole
 import org.zenboot.portal.security.Role
+import java.util.concurrent.Callable
 
 class BootStrap {
 
@@ -16,6 +17,7 @@ class BootStrap {
     def accessService
     def grailsApplication
     def scriptDirectoryService
+    def executorService
 
     def init = { servletContext ->
         //create fundamental user groups
@@ -134,7 +136,9 @@ class BootStrap {
         }
 
         // Execute the action on startup - similar bug to RPI-2167
-        //grailsApplication.mainContext.getBean('executionZoneService').createAndPublishExecutionZoneAction(execZoneBootstrap, "bootstrap")
+	executorService.submit({
+	    this.executionZoneService.createAndPublishExecutionZoneAction(execZoneBootstrap, "bootstrap")
+	} as Callable)
     }
 
     def destroy = {
