@@ -133,12 +133,12 @@ class BootStrap {
         if (!execZoneBootstrap) {
             execZoneBootstrap = new ExecutionZone(type:bootstrapType, description:"Populate server with default data")
             execZoneBootstrap.save()
-        }
 
-        // Execute the action on startup - similar bug to RPI-2167
-	executorService.submit({
-	    this.executionZoneService.createAndPublishExecutionZoneAction(execZoneBootstrap, "bootstrap")
-	} as Callable)
+            // Execute the action on startup - similar bug to RPI-2167
+  	    executorService.submit({
+	        this.executionZoneService.createAndPublishExecutionZoneAction(execZoneBootstrap, "bootstrap")
+	    } as Callable)
+        }
     }
 
     def destroy = {
