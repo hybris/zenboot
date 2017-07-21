@@ -26,7 +26,7 @@ class RoleController extends grails.plugin.springsecurity.ui.RoleController {
     }
 
     def delete() {
-        accessService.removeRoleFromChacheByRole(Role.findById(params.id))
+        accessService.removeRoleFromCacheByRole(Role.findById(params.id))
         super.delete()
     }
 }

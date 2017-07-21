@@ -1,5 +1,6 @@
 package org.zenboot.portal.processing
 
+import grails.async.Promise
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
@@ -150,7 +151,7 @@ class AccessService {
         users.each() { user -> refreshAccessCacheByUser(user) }
     }
 
-    def removeRoleFromChacheByRole(Role role) {
+    def removeRoleFromCacheByRole(Role role) {
         if (role) {
             def users = PersonRole.findAllByRole(role).person
 
@@ -169,16 +170,65 @@ class AccessService {
     def synchronized warmAccessCacheAsync() {
         runAsync {
             log.info("Warming the accessCache")
-            def execZones = ExecutionZone.findAll()
-            def persons = Person.getAll().findAll{ !it.getAuthorities().contains(Role.findByAuthority(Role.ROLE_ADMIN)) }
-            execZones.each() { zone ->
-                log.info("Warming accessCache for zone ${zone}")
-                persons.each() { user ->
-                    log.debug("Warming accessCache for person ${user}")
-                    testIfUserHasAccess(user, zone)
-                    Thread.sleep(50)
+            //all roles with exepressions
+            def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
+            def execZones = ExecutionZone.getAll()
+
+            def rolesZoneAccess = new ConcurrentHashMap<Long, HashMap>()
+
+            int i= 1
+            cleanedRoles.each { role ->
+                rolesZoneAccess[role.id] = new ConcurrentHashMap<Long, Boolean>()
+
+                log.info('Testing role: ' + role.authority + ' | Progress role check: ' + i + ' / ' + cleanedRoles.size() )
+                execZones.each {
+                    if (roleHasAccess(role, it)) {
+                        rolesZoneAccess[role.id][it.id] = true
+                    }
+                }
+                i++
+            }
+
+            log.info('Role tests done.')
+
+            if (!accessCache) {
+                log.info("initializing accessCache")
+                accessCache = new ConcurrentHashMap<Long, HashMap>()
+            }
+
+            log.info('Fill cache with collected data.')
+            rolesZoneAccess.each { roleID, zoneMap ->
+                PersonRole.findAllByRole(Role.findById(roleID)).each { personRole ->
+
+                    if (!accessCache[personRole.person.id]) {
+                        log.info("user ${personRole.person} not found in cache, creating")
+                        accessCache[personRole.person.id] = new ConcurrentHashMap<Long, Boolean>()
+                    }
+
+                    zoneMap.each { zoneId, hasAccess ->
+                        accessCache[personRole.person.id][zoneId] = hasAccess
+                    }
                 }
             }
+
+            def persons = Person.getAll().findAll {
+                !it.getAuthorities().contains(Role.findByAuthority(Role.ROLE_ADMIN))
+            }
+
+            persons.each { person ->
+
+                if (!accessCache[person.id]) {
+                    log.info("user ${person} not found in cache, creating")
+                    accessCache[person.id] = new ConcurrentHashMap<Long, Boolean>()
+                }
+
+                execZones.each { zone ->
+                    if(accessCache[person.id][zone.id] == null) {
+                        accessCache[person.id][zone.id] = false
+                    }
+                }
+            }
+
             log.info("Finished Warming the accessCache")
         }
     }
