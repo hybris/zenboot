@@ -141,7 +141,12 @@ class AccessService {
 
     def refreshAccessCacheByRole(Role role) {
 
-        if (!role && role.authority == Role.ROLE_ADMIN) {
+        if (role == null) {
+            log.info("Cannot refresh access cache for null role")
+            return
+        }
+
+        if (Role.ROLE_ADMIN == role.authority) {
             //no cache required for admin user
             return
         }

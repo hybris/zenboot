@@ -21,12 +21,16 @@ class RoleController extends grails.plugin.springsecurity.ui.RoleController {
     }
 
     def update() {
-        accessService.refreshAccessCacheByUser(Person.findById(params.id))
+        accessService.refreshAccessCacheByRole(Role.findById(params.id))
         super.update()
     }
 
     def delete() {
         accessService.removeRoleFromCacheByRole(Role.findById(params.id))
         super.delete()
+    }
+
+    def save() {
+        doSave uiRoleStrategy.saveRole(params), {accessService.refreshAccessCacheByRole(Role.findByAuthority(params.authority))}
     }
 }

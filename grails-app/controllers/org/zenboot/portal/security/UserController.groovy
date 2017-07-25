@@ -39,4 +39,8 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
         super.delete()
     }
 
+    def save() {
+        doSave uiUserStrategy.saveUser(params, roleNamesFromParams(), params.password) ,{accessService.refreshAccessCacheByUser(Person.findByUsername(params.username))}
+    }
+
 }
