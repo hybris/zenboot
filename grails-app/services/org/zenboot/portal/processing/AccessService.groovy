@@ -175,6 +175,7 @@ class AccessService {
     def synchronized warmAccessCacheAsync() {
         runAsync {
             log.info("Warming the accessCache")
+            def preAccessCache
             //all roles with exepressions
             def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
             def execZones = ExecutionZone.getAll()
@@ -196,22 +197,22 @@ class AccessService {
 
             log.info('Role tests done.')
 
-            if (!accessCache) {
+            if (!preAccessCache) {
                 log.info("initializing accessCache")
-                accessCache = new ConcurrentHashMap<Long, HashMap>()
+                preAccessCache = new ConcurrentHashMap<Long, HashMap>()
             }
 
             log.info('Fill cache with collected data.')
             rolesZoneAccess.each { roleID, zoneMap ->
                 PersonRole.findAllByRole(Role.findById(roleID)).each { personRole ->
 
-                    if (!accessCache[personRole.person.id]) {
+                    if (!preAccessCache[personRole.person.id]) {
                         log.info("user ${personRole.person} not found in cache, creating")
-                        accessCache[personRole.person.id] = new ConcurrentHashMap<Long, Boolean>()
+                        preAccessCache[personRole.person.id] = new ConcurrentHashMap<Long, Boolean>()
                     }
 
                     zoneMap.each { zoneId, hasAccess ->
-                        accessCache[personRole.person.id][zoneId] = hasAccess
+                        preAccessCache[personRole.person.id][zoneId] = hasAccess
                     }
                 }
             }
@@ -222,17 +223,25 @@ class AccessService {
 
             persons.each { person ->
 
-                if (!accessCache[person.id]) {
+                if (!preAccessCache[person.id]) {
                     log.info("user ${person} not found in cache, creating")
-                    accessCache[person.id] = new ConcurrentHashMap<Long, Boolean>()
+                    preAccessCache[person.id] = new ConcurrentHashMap<Long, Boolean>()
                 }
 
                 execZones.each { zone ->
-                    if(accessCache[person.id][zone.id] == null) {
-                        accessCache[person.id][zone.id] = false
+                    if(preAccessCache[person.id][zone.id] == null) {
+                        preAccessCache[person.id][zone.id] = false
                     }
                 }
             }
+
+            accessCache?.keys().each { personId ->
+                accessCache[personId].keys().each { zoneId ->
+                    preAccessCache[personId][zoneId] = accessCache[personId][zoneId]
+                }
+            }
+
+            accessCache = preAccessCache
 
             log.info("Finished Warming the accessCache")
         }
