@@ -1,16 +1,19 @@
 package org.zenboot.portal.processing
 
-import grails.async.Promise
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.security.PersonRole
 
+import javax.script.ScriptEngine
+import javax.script.ScriptEngineManager
 import java.util.concurrent.ConcurrentHashMap
 
 @SuppressWarnings("GroovyUnusedDeclaration")
 class AccessService {
     def springSecurityService
+    private static ScriptEngine engine = new ScriptEngineManager().getEngineByName("groovy")
+    private Binding binding = new Binding()
 
     /* The accessCache is a dynamic datastructure looking like this:
        {1={1=false, 2=true, 3=false, 4=false}, 2={1=false, 2=false, 3=false, 4=false}}
@@ -32,7 +35,8 @@ class AccessService {
     private boolean roleHasAccess(Role role, ExecutionZone executionZone) {
         def expression = role.executionZoneAccessExpression
         try {
-            return Eval.me("executionZone", executionZone, expression == null ? "" : expression)
+            binding.setVariable('executionZone',executionZone)
+            return engine.eval(expression == null ? "" : expression, binding)
 
         } catch (Exception e) {
             log.error("executionZoneAccessExpression '$expression' from role '$role' threw an exception: " + e.message)
@@ -180,11 +184,10 @@ class AccessService {
             def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
             def execZones = ExecutionZone.getAll()
 
-            def rolesZoneAccess = new ConcurrentHashMap<Long, HashMap>()
-
+            def rolesZoneAccess = new HashMap<Long, HashMap>(cleanedRoles.size())
             int i= 1
             cleanedRoles.each { role ->
-                rolesZoneAccess[role.id] = new ConcurrentHashMap<Long, Boolean>()
+                rolesZoneAccess[role.id] = new HashMap<Long, Boolean>()
 
                 log.info('Testing role: ' + role.authority + ' | Progress role check: ' + i + ' / ' + cleanedRoles.size() )
                 execZones.each {
@@ -217,9 +220,7 @@ class AccessService {
                 }
             }
 
-            def persons = Person.getAll().findAll {
-                !it.getAuthorities().contains(Role.findByAuthority(Role.ROLE_ADMIN))
-            }
+            def persons = PersonRole.findAllByRoleNotEqual(Role.findByAuthority(Role.ROLE_ADMIN)).person.unique()
 
             persons.each { person ->
 
