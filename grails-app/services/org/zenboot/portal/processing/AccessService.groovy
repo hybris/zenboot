@@ -236,13 +236,12 @@ class AccessService {
                 }
             }
 
-            accessCache?.keys().each { personId ->
-                accessCache[personId].keys().each { zoneId ->
-                    preAccessCache[personId][zoneId] = accessCache[personId][zoneId]
-                }
+            if(accessCache == null) {
+                accessCache = new ConcurrentHashMap<Long, HashMap>()
             }
 
-            accessCache = preAccessCache
+            preAccessCache.putAll(accessCache)
+            accessCache.putAll(preAccessCache)
 
             log.info("Finished Warming the accessCache")
         }
