@@ -6,7 +6,9 @@ def isAdmin = { ->
 
 navigation = {
     base {
-        home()
+        home(controller: 'home', titleText: 'Home', action: 'index') {
+            overview titleText: 'Overview'
+        }
 
         executionZone(controller: 'executionZone', titleText: 'Processing', action: 'list') {
             list titleText: 'Execution Zone'

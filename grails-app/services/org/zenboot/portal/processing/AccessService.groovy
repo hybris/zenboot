@@ -128,8 +128,6 @@ class AccessService {
             log.info("user has roles " + user.getAuthorities())
 
             ExecutionZone.findAll().each { zone -> testIfUserHasAccess(user, zone) }
-
-            log.info(accessCache[user.id].collect { it.value })
         }
         else {
             log.info("Cannot refresh access cache for null user")

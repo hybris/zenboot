@@ -83,7 +83,7 @@ class ScriptletBatchController {
                 render output as JSON
             }
             html {
-                [scriptletBatchInstanceList:result, scriptletBatchInstanceTotal:ScriptletBatch.count()]
+                [scriptletBatchInstanceList:result]
             }
         }
     }
