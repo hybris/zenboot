@@ -31,6 +31,12 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
 
     def update() {
         accessService.refreshAccessCacheByUser(Person.findById(params.id))
+        //for some reason it creates different personrole objects. Because the update method creates his own object it is required to discard
+        //the previous one
+        def pr = PersonRole.findAllByPerson(Person.findById(params.id))
+        pr.each {
+            it.discard()
+        }
         super.update()
     }
 
