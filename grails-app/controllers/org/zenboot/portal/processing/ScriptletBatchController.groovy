@@ -11,9 +11,12 @@ import org.zenboot.portal.security.Role
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
+import static grails.async.Promises.task
+import static grails.async.Promises.waitAll
+
 class ScriptletBatchController {
 
-    def PageRenderer groovyPageRenderer
+    PageRenderer groovyPageRenderer
     def executionZoneService
     def accessService
     def springSecurityService
@@ -41,8 +44,10 @@ class ScriptletBatchController {
         def parameters = params.findAll { it.value instanceof String }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            def batchCountTask = task(taskCreator2(params, ScriptletBatch))
             batches = filterPaneService.filter(params, ScriptletBatch)
-            batchCount = filterPaneService.count(params, ScriptletBatch)
+            waitAll(batchCountTask)
+            batchCount = batchCountTask.internalPromise.value
         } else {
             // could be more elegant by first finding the execution zones that the user has access to,
             // and then adding/modifying a filter param for this
@@ -59,6 +64,14 @@ class ScriptletBatchController {
             filterParams: FilterPaneUtils.extractFilterParams(params),
             parameters: parameters
         ]
+    }
+
+    Closure taskCreator1(params, ScriptletBatch) {
+        return { filterPaneService.filter(params, ScriptletBatch) }
+    }
+
+    Closure taskCreator2(params, ScriptletBatch) {
+        return { filterPaneService.count(params, ScriptletBatch) }
     }
 
     def ajaxList() {
