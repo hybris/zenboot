@@ -44,7 +44,7 @@ class ScriptletBatchController {
         def parameters = params.findAll { it.value instanceof String }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-            def batchCountTask = task(taskCreator2(params, ScriptletBatch))
+            def batchCountTask = task(countTaskCreator(params, ScriptletBatch))
             batches = filterPaneService.filter(params, ScriptletBatch)
             waitAll(batchCountTask)
             batchCount = batchCountTask.internalPromise.value
@@ -66,11 +66,7 @@ class ScriptletBatchController {
         ]
     }
 
-    Closure taskCreator1(params, ScriptletBatch) {
-        return { filterPaneService.filter(params, ScriptletBatch) }
-    }
-
-    Closure taskCreator2(params, ScriptletBatch) {
+    private Closure countTaskCreator(params, ScriptletBatch) {
         return { filterPaneService.count(params, ScriptletBatch) }
     }
 
