@@ -4,20 +4,12 @@ class RoleController extends grails.plugin.springsecurity.ui.RoleController {
 
     def accessService
 
-    def search() {
-        if (!isSearch()) {
-            // show the form
-            return
+    // pagination is missing in s2ui plugin for user tab so this will show max 500 users on this tab
+    def edit() {
+        if (!params?.max) {
+            params.put('max', 500)
         }
-
-        params.sort = 'authority'
-        if (!param('authority')) params.authority = 'ROLE_'
-
-        def results = doSearch {
-            like 'authority', delegate
-        }
-
-        renderSearch([results: results, totalCount: results.totalCount], 'authority')
+        super.edit()
     }
 
     def update() {

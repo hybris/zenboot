@@ -35,11 +35,9 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             this.renderRestResult(HttpStatus.NOT_FOUND)
             return
         }
-        //log.info("execZone"+execZone.hosts)
         this.renderRestResult(HttpStatus.OK, execZone)
         return
     }
-
 
     def execute(ExecuteExecutionZoneCommand cmd) {
         def executionZone = ExecutionZone.get(cmd.execId)
@@ -237,8 +235,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             render(view: "create", model: [executionZoneInstance: executionZoneInstance, executionZoneTypes:ExecutionZoneType.list()])
             return
         }
-
-
+        accessService.invalidateAccessCacheByZone(executionZoneInstance)
         flash.message = message(code: 'default.created.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
     }
