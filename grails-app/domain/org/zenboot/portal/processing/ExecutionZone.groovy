@@ -89,9 +89,6 @@ class ExecutionZone implements Likeable {
         } else {
             this.processingParameters << param
         }
-        this.withNewSession {
-          accessService.invalidateAccessCacheByZone(this)
-        }
     }
 
     /* convenience-method for script-usage
