@@ -196,7 +196,20 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     }
 
     private List<Scriptlet> addScriptlets(ScriptletBatch batch, List runtimeAttributes) {
-        ScriptResolver scriptsResolver = new ScriptResolver(batch.executionZoneAction.scriptDir)
+        ScriptResolver scriptsResolver
+
+        try {
+            scriptsResolver = new ScriptResolver(batch.executionZoneAction.scriptDir)
+        }
+        catch (ProcessingException e) {
+            batch.state = Processable.ProcessState.FAILURE
+            batch.exceptionMessage = e.getMessage()
+            batch.exceptionStacktrace = e.getStackTrace()
+            batch.exceptionClass = e.class.getSimpleName()
+            batch.save(flush: true)
+            throw e
+        }
+
         PluginResolver pluginResolver = new PluginResolver(scriptDirectoryService.getPluginDir(batch.executionZoneAction.executionZone.type))
 
         scriptsResolver.resolve(runtimeAttributes).each { File file ->
