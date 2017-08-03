@@ -19,7 +19,7 @@ class Role {
     static mapping = { cache true }
 
     static constraints = {
-        authority blank: false, unique: true
+        authority blank: false, unique: true, validator: { if(!it.startsWith('ROLE_')) return ['The name of the role need the "ROLE_" prefix!']}
     }
 
     @Override

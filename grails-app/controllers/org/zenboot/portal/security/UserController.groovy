@@ -36,11 +36,7 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
         pr.each {
             it.discard()
         }
-        List<String> roles = params.keySet().findAll { (it.contains('ROLE_') && params[it] == 'on') || (params[it] == 'on' && Role.findByAuthority(it)) } as List
-
-        doUpdate { user ->
-            uiUserStrategy.updateUser params, user, roles
-        }
+        super.update()
         accessService.refreshAccessCacheByUser(Person.findById(params.id))
     }
 
