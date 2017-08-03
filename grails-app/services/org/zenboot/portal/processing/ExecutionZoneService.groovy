@@ -82,7 +82,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     List filterByAccessPermission(executionZones) {
         List execZones = new ArrayList<ExecutionZone>()
-        Map execZonesCacheMap = accessService.accessCache?[springSecurityService.getCurrentUserId()]
+        Map execZonesCacheMap = accessService.accessCache?[springSecurityService.getCurrentUserId()] : null
 
         // if an entry in the cache for the user exists check cache, else update cache
         if(execZonesCacheMap) {
