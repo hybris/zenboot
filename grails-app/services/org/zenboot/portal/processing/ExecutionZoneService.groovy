@@ -80,10 +80,26 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 		}
 	}
 
-    public List filterByAccessPermission(executionZoneInstanceList) {
-        executionZoneInstanceList.findAll() { executionZone ->
-            accessService.userHasAccess(executionZone)
+    List filterByAccessPermission(executionZones) {
+        List execZones = new ArrayList<ExecutionZone>()
+        Map execZonesCacheMap = accessService.accessCache[springSecurityService.getCurrentUserId()]
+
+        // if an entry in the cache for the user exists check cache, else update cache
+        if(execZonesCacheMap) {
+            executionZones.each {
+                if (execZonesCacheMap[it.id].value) {
+                    execZones.add(it)
+                }
+            }
         }
+        else {
+            executionZones.each { zone ->
+                if (accessService.userHasAccess(zone)) {
+                    execZones.add(zone)
+                }
+            }
+        }
+        return execZones
     }
 
     def getRange(filteredExecutionZoneInstanceList, params) {
