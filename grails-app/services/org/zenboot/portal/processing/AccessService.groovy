@@ -118,6 +118,13 @@ class AccessService {
                         }
                     }
                 }
+                else {
+                    PersonRole.findByRole(it).person.each {
+                        if (accessCache[it.id][zone.id]) {
+                            accessCache[it.id][zone.id] = false
+                        }
+                    }
+                }
             }
         }
     }
