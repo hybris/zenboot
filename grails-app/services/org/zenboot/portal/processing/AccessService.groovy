@@ -110,20 +110,43 @@ class AccessService {
     def refreshAccessCacheByZone(ExecutionZone zone) {
         if (zone) {
             def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
+            def userList = Person.getAll()
+            def adminList = PersonRole.findAllByRole(Role.findByAuthority(Role.ROLE_ADMIN))
+
+            Set<Person> persons_with_access = new HashSet<Person>()
+
             cleanedRoles.each {
                 if (roleHasAccess(it, zone)) {
-                    PersonRole.findByRole(it).person.each {
-                        if (!accessCache[it.id][zone.id]) {
-                            accessCache[it.id][zone.id] = true
-                        }
-                    }
+                    persons_with_access.addAll(PersonRole.findByRole(it).person)
                 }
-                else {
-                    PersonRole.findByRole(it).person.each {
-                        if (accessCache[it.id][zone.id]) {
-                            accessCache[it.id][zone.id] = false
-                        }
-                    }
+            }
+
+            userList = userList - adminList.person
+
+            persons_with_access = persons_with_access - adminList.person
+
+            def users_without_access = userList - persons_with_access
+
+            persons_with_access.each {
+
+                if (!accessCache[it.id]) {
+                    accessCache[it.id] = new ConcurrentHashMap<Long, HashMap>()
+                }
+
+
+                if (!accessCache[it.id][zone.id]) {
+                    accessCache[it.id][zone.id] = true
+                }
+            }
+
+            users_without_access.each {
+
+                if(!accessCache[it.id]) {
+                    accessCache[it.id] = new ConcurrentHashMap<Long, HashMap>()
+                }
+
+                if (accessCache[it.id][zone.id]) {
+                    accessCache[it.id][zone.id] = false
                 }
             }
         }
