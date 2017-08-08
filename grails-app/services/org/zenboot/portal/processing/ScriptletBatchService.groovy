@@ -27,17 +27,6 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
       scriptletFlowCache = null
     }
 
-    def filterByAccessPermission(scriptletBatches) {
-        def hasAccess = { zone ->
-            accessService.userHasAccess(zone)
-        }.memoize() // caching ftw
-
-        scriptletBatches.findAll  { ScriptletBatch batch ->
-            batch?.executionZoneAction?.executionZone &&
-                    hasAccess(batch.executionZoneAction.executionZone)
-        }
-    }
-
     def getRange(scriptletBatches, params) {
         if (scriptletBatches.empty) {
             return scriptletBatches
@@ -205,7 +194,7 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             batch.state = Processable.ProcessState.FAILURE
             batch.exceptionMessage = e.getMessage()
             batch.exceptionStacktrace = e.getStackTrace()
-            batch.exceptionClass = e.class.getSimpleName()
+
             batch.save(flush: true)
             throw e
         }

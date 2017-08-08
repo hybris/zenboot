@@ -30,7 +30,7 @@ class AccessService {
        ==> ((1000 * (128 + 20)) + (1000 * (20 + 16))) * 1.8
        ==> about 320kb for 1000 Users on 1000 Zones
     */
-    def accessCache
+    def accessCache = new ConcurrentHashMap<Long, HashMap>()
 
     private boolean roleHasAccess(Role role, ExecutionZone executionZone) {
         def expression = role.executionZoneAccessExpression
@@ -61,11 +61,6 @@ class AccessService {
         if (user.getAuthorities().authority.contains(Role.ROLE_ADMIN)) {
             //no cache required for admin user
             return true
-        }
-
-        if (!accessCache) {
-            log.info("initializing accessCache")
-            accessCache = new ConcurrentHashMap<Long, HashMap>()
         }
 
         if (!accessCache[user.id]) {
@@ -104,10 +99,25 @@ class AccessService {
         * invalidate only for a zone
     */
     def invalidateAccessCacheByZone(ExecutionZone zone) {
-        if (zone && accessCache) {
+        if (zone) {
             log.info("invalidating ${zone} in accessCache")
             accessCache.each() { key, user ->
                 user.remove(zone.id)
+            }
+        }
+    }
+
+    def refreshAccessCacheByZone(ExecutionZone zone) {
+        if (zone) {
+            def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
+            cleanedRoles.each {
+                if (roleHasAccess(it, zone)) {
+                    PersonRole.findByRole(it).person.each {
+                        if (!accessCache[it.id][zone.id]) {
+                            accessCache[it.id][zone.id] = true
+                        }
+                    }
+                }
             }
         }
     }
@@ -122,7 +132,7 @@ class AccessService {
             }
 
             //remove existing user from cache
-            accessCache?.remove(user.id)
+            accessCache.remove(user.id)
 
             log.info("Refreshing ${user} in accessCache")
             log.info("user has roles " + user.getAuthorities())
@@ -136,7 +146,7 @@ class AccessService {
 
     def removeUserFromCacheByUser(Person user) {
         if (user) {
-            accessCache?.remove(user.id)
+            accessCache.remove(user.id)
             log.info("User ${user} removed from cache")
         }
     }
@@ -232,10 +242,6 @@ class AccessService {
                         preAccessCache[person.id][zone.id] = false
                     }
                 }
-            }
-
-            if(accessCache == null) {
-                accessCache = new ConcurrentHashMap<Long, HashMap>()
             }
 
             preAccessCache.putAll(accessCache)

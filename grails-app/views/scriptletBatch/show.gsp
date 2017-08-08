@@ -170,7 +170,7 @@
 						<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 					</span>
 					<asset:script>
-                        $(document).ready(function() {
+						$(window).load(function() {
                             var update = function() {
                                 if (! $('#autorefresh').is(':checked')) {
                                     return;

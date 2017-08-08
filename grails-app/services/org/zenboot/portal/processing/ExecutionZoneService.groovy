@@ -82,12 +82,12 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     List filterByAccessPermission(executionZones) {
         List execZones = new ArrayList<ExecutionZone>()
-        Map execZonesCacheMap = accessService.accessCache?[springSecurityService.getCurrentUserId()] : null
+        Map execZonesCacheMap = accessService.accessCache[springSecurityService.getCurrentUserId()]
 
         // if an entry in the cache for the user exists check cache, else update cache
         if(execZonesCacheMap) {
             executionZones.each {
-                if (execZonesCacheMap[it.id].value) {
+                if (execZonesCacheMap[it.id]?.value) {
                     execZones.add(it)
                 }
             }
@@ -274,7 +274,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
             if (!actionParameterEditAllowed(processParam, originalParameter)) {
                 command.errors.reject('executionZone.failure.unallowedEdit',
                         [originalParameter.name] as Object[],
-                        'You are not allowed to edittt parameter {0}'
+                        'You are not allowed to edit parameter {0}'
                 )
             }
         }

@@ -5,6 +5,7 @@ import grails.gsp.PageRenderer
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.grails.plugin.filterpane.FilterPaneUtils
+import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 
 
@@ -49,13 +50,54 @@ class ScriptletBatchController {
             waitAll(batchCountTask)
             batchCount = batchCountTask.internalPromise.value
         } else {
-            // could be more elegant by first finding the execution zones that the user has access to,
-            // and then adding/modifying a filter param for this
-            batches = filterPaneService.filter(params - [max: params.max, offset: params.offset], ScriptletBatch)
-            batches = scriptletBatchService.filterByAccessPermission(batches)
 
+            // Filter deactivated because we have atm around 60000 entries in this db column
+            // Because for non admin user the page loads every time all entries which needs between 20 sec to 1 min
+            // we decided to disable the filter for users. Now we get the allowed scriptletbatches via the execution zones
+            // where the user has access. See RPI-2405
+
+            //Past:
+            // batches = filterPaneService.filter(params - [max: params.max, offset: params.offset], ScriptletBatch)
+            // batches = scriptletBatchService.filterByAccessPermission(batches)
+
+            //Now:
+            // If currently logged in user not exists in the cache, refresh cache for this person
+            if (!accessService.accessCache[springSecurityService.getCurrentUserId()]) {
+                accessService.refreshAccessCacheByUser(Person.findById(springSecurityService.getCurrentUserId()))
+            }
+
+            // Get all execution zones where this currently logged in user has access and collect scriptletbatches from executionzoneactions
+            def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true}
+            batches = new ArrayList<ScriptletBatch>()
+            execList.each { key, value ->
+                Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
+                actions.each {batches.addAll(it.scriptletBatches)}
+            }
+
+            // Get size for pagination and use a range do avoid displaying all at once
             batchCount = batches.size()
             batches = scriptletBatchService.getRange(batches, params)
+
+            // Sort result by sortablecolumn vom list.gsp
+            switch (params.sort) {
+                case 'user': params.order =='desc'? batches = batches.sort{it.user.displayName ?: it.user.username}.reverse() : batches.sort{it.user.displayName ?: it.user.username}
+                    break
+                case 'description': params.order =='desc'? batches = batches.sort{it.description}.reverse() : batches.sort{it.description}
+                    break
+                case 'creationDate': params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
+                    break
+                case 'endDate': params.order =='desc'? batches = batches.sort{it.endDate}.reverse() : batches.sort{it.endDate}
+                    break
+                case 'startDate': params.order =='desc'? batches = batches.sort{it.startDate}.reverse() : batches.sort{it.startDate}
+                    break
+                case 'state': params.order =='desc'? batches = batches.sort{it.state}.reverse() : batches.sort{it.state}
+                    break
+                case 'executionZoneAction.executionZone': params.order =='desc'? batches = batches.sort{it.executionZoneAction.executionZone}.reverse() : batches.sort{it.executionZoneAction.executionZone}
+                    break
+                default:
+                    params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
+                    break
+            }
         }
 
         [
