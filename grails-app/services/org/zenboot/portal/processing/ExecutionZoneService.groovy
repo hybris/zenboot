@@ -187,7 +187,9 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
 
         processParameters.each {
-          execAction.addProcessingParameter(it)
+            if(it?.value?.trim()) {
+                execAction.addProcessingParameter(it)
+            }
         }
 
         if (runtimeAttributes) {
