@@ -76,7 +76,7 @@ class ScriptletBatchController {
 
             // Get size for pagination and use a range do avoid displaying all at once
             batchCount = batches.size()
-            batches = scriptletBatchService.getRange(batches, params)
+
 
             // Sort result by sortablecolumn vom list.gsp
             switch (params.sort) {
@@ -98,6 +98,8 @@ class ScriptletBatchController {
                     params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
                     break
             }
+
+            batches = scriptletBatchService.getRange(batches, params)
         }
 
         [
