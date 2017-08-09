@@ -112,7 +112,6 @@ class AccessService {
             def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
             def userList = Person.getAll()
             def adminList = PersonRole.findAllByRole(Role.findByAuthority(Role.ROLE_ADMIN))
-
             Set<Person> persons_with_access = new HashSet<Person>()
 
             cleanedRoles.each {
@@ -122,9 +121,7 @@ class AccessService {
             }
 
             userList = userList - adminList.person
-
             persons_with_access = persons_with_access - adminList.person
-
             def users_without_access = userList - persons_with_access
 
             persons_with_access.each {
@@ -132,7 +129,6 @@ class AccessService {
                 if (!accessCache[it.id]) {
                     accessCache[it.id] = new ConcurrentHashMap<Long, HashMap>()
                 }
-
 
                 if (!accessCache[it.id][zone.id]) {
                     accessCache[it.id][zone.id] = true
