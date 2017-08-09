@@ -27,17 +27,6 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
       scriptletFlowCache = null
     }
 
-    def filterByAccessPermission(scriptletBatches) {
-        def hasAccess = { zone ->
-            accessService.userHasAccess(zone)
-        }.memoize() // caching ftw
-
-        scriptletBatches.findAll  { ScriptletBatch batch ->
-            batch?.executionZoneAction?.executionZone &&
-                    hasAccess(batch.executionZoneAction.executionZone)
-        }
-    }
-
     def getRange(scriptletBatches, params) {
         if (scriptletBatches.empty) {
             return scriptletBatches
@@ -196,7 +185,20 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
     }
 
     private List<Scriptlet> addScriptlets(ScriptletBatch batch, List runtimeAttributes) {
-        ScriptResolver scriptsResolver = new ScriptResolver(batch.executionZoneAction.scriptDir)
+        ScriptResolver scriptsResolver
+
+        try {
+            scriptsResolver = new ScriptResolver(batch.executionZoneAction.scriptDir)
+        }
+        catch (ProcessingException e) {
+            batch.state = Processable.ProcessState.FAILURE
+            batch.exceptionMessage = e.getMessage()
+            batch.exceptionStacktrace = e.getStackTrace()
+
+            batch.save(flush: true)
+            throw e
+        }
+
         PluginResolver pluginResolver = new PluginResolver(scriptDirectoryService.getPluginDir(batch.executionZoneAction.executionZone.type))
 
         scriptsResolver.resolve(runtimeAttributes).each { File file ->

@@ -235,7 +235,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             render(view: "create", model: [executionZoneInstance: executionZoneInstance, executionZoneTypes:ExecutionZoneType.list()])
             return
         }
-        accessService.invalidateAccessCacheByZone(executionZoneInstance)
+        accessService.refreshAccessCacheByZone(executionZoneInstance)
         flash.message = message(code: 'default.created.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)
     }
@@ -252,10 +252,12 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     }
 
     def showModel(executionZoneInstance) {
-        if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) &&
-              !accessService.userHasAccess(executionZoneInstance)) {
-          render(view: "/login/denied")
-          return
+        if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            def cacheAccessMap = accessService.accessCache[springSecurityService.getCurrentUserId()]
+            if (!cacheAccessMap?.get(executionZoneInstance.id) && !accessService.userHasAccess(executionZoneInstance)) {
+                render(view: "/login/denied")
+                return
+            }
         }
 
         if ( executionZoneInstance.type.devMode ) {
@@ -356,6 +358,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             return render(view: "show", model: showModel(executionZoneInstance))
         }
 
+        accessService.refreshAccessCacheByZone(executionZoneInstance)
         flash.action = 'update'
         flash.message = message(code: 'default.updated.message', args: [message(code: 'executionZone.label', default: 'ExecutionZone'), executionZoneInstance.id])
         redirect(action: "show", id: executionZoneInstance.id)

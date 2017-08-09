@@ -1,5 +1,7 @@
 package org.zenboot.portal.security
 
+import org.zenboot.portal.processing.ExposedExecutionZoneAction
+
 class RoleController extends grails.plugin.springsecurity.ui.RoleController {
 
     def accessService
@@ -13,12 +15,21 @@ class RoleController extends grails.plugin.springsecurity.ui.RoleController {
     }
 
     def update() {
-        accessService.refreshAccessCacheByRole(Role.findById(params.id))
         super.update()
+        accessService.refreshAccessCacheByRole(Role.findById(params.id))
     }
 
     def delete() {
-        accessService.removeRoleFromCacheByRole(Role.findById(params.id))
+        Role roleToDelete = Role.findById(params.id)
+        ExposedExecutionZoneAction.getAll().findAll { it.roles.contains(roleToDelete)}.each {
+            it.roles.remove(roleToDelete)
+
+            if ( it.roles.size() == 0 ) {
+                it.roles.add(Role.findByAuthority(Role.ROLE_ADMIN))
+            }
+            it.save(flush:true)
+        }
+        accessService.removeRoleFromCacheByRole(roleToDelete)
         super.delete()
     }
 
