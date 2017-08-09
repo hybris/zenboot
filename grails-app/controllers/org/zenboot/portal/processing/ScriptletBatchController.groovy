@@ -50,7 +50,6 @@ class ScriptletBatchController {
             waitAll(batchCountTask)
             batchCount = batchCountTask.internalPromise.value
         } else {
-
             // Filter deactivated because we have atm around 60000 entries in this db column
             // Because for non admin user the page loads every time all entries which needs between 20 sec to 1 min
             // we decided to disable the filter for users. Now we get the allowed scriptletbatches via the execution zones
@@ -74,9 +73,8 @@ class ScriptletBatchController {
                 actions.each {batches.addAll(it.scriptletBatches)}
             }
 
-            // Get size for pagination and use a range do avoid displaying all at once
+            // Get size for pagination
             batchCount = batches.size()
-
 
             // Sort result by sortablecolumn vom list.gsp
             switch (params.sort) {
@@ -98,7 +96,7 @@ class ScriptletBatchController {
                     params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
                     break
             }
-
+            //use a range do avoid displaying all at once
             batches = scriptletBatchService.getRange(batches, params)
         }
 
