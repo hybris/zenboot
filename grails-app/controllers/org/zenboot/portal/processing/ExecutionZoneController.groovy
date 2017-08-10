@@ -39,6 +39,24 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
         return
     }
 
+    def exec = {
+        ExecutionZone execZone = ExecutionZone.findById(params.id)
+        String stackName = params.stackName
+
+        File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
+                + "/" + execZone.type.name + "/scripts/" + stackName)
+
+        if (!execZone || !stackDir) {
+            this.renderRestResult(HttpStatus.NOT_FOUND)
+            return
+        }
+
+        ExecutionZoneAction action = executionZoneService.createExecutionZoneAction(execZone, stackDir)
+        this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, "REST-call run"))
+
+        this.renderRestResult(HttpStatus.OK, execZone)
+    }
+
     def execute(ExecuteExecutionZoneCommand cmd) {
         def executionZone = ExecutionZone.get(cmd.execId)
         flash.action = 'execute'

@@ -21,6 +21,7 @@ class UrlMappings {
         "/rest/templates/$action?/$id?" (controller:'template')
         "/rest/properties/$puppetEnvironment/$qualityStage?"(controller:'propertiesRest', action:'rest')
         "/rest/$url?"(controller:'exposedExecutionZoneAction', action:'rest')
+        "/rest/executionzones/$id/$stackName"(controller:'executionZone', action:'exec')
 
         // templates
         name template : "/template/$action?/$id?" { controller='template' }
