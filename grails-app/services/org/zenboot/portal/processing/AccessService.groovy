@@ -116,8 +116,8 @@ class AccessService {
 
             cleanedRoles.each {
                 if (roleHasAccess(it, zone)) {
-                    if(PersonRole.findByRole(it)?.person) {
-                        persons_with_access.addAll(PersonRole.findByRole(it).person)
+                    if(PersonRole.findAllByRole(it)?.person) {
+                        persons_with_access.addAll(PersonRole.findAllByRole(it).person)
                     }
                 }
             }
