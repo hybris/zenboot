@@ -3,10 +3,12 @@
 //**********************************************************************************************
 
 dataSource {
-    pooled = true
-    driverClassName = "org.h2.Driver"
-    username = "sa"
-    password = ""
+    pooled: true
+    jmxExport: true
+    driverClassName: "com.mysql.jdbc.Driver"
+    dialect: "org.hibernate.dialect.MySQL5InnoDBDialect"
+    username: root
+    password: root
 
     properties {
       //run the evictor every 30 minutes and evict any connections older than 30 minutes.
@@ -30,22 +32,26 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:h2:mem:devDb;MVCC=TRUE"
-            logSql = false
-            formatSql = false
+            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
+            url = "jdbc:mysql://localhost:3306/zenboot"
+            username: root
+            password: root
         }
     }
     test {
         dataSource {
             dbCreate = "create"
-            url = "jdbc:h2:mem:testDb;MVCC=TRUE"
+            url = "jdbc:mysql://localhost:3306/zenboot"
+            username: root
+            password: root
         }
     }
     production {
         dataSource {
             dbCreate = "create" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:h2:mem:devDb;MVCC=TRUE"
+            url = "jdbc:mysql://localhost:3306/zenboot"
+            username: root
+            password: root
         }
     }
 }
