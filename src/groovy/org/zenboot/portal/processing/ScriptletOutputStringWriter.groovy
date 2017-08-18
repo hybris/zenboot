@@ -10,7 +10,6 @@ class ScriptletOutputStringWriter extends StringWriter {
 
     int lineThreshold = 2
     int syncTimeout = 5
-    boolean saveWithFlush = true
 
     public ScriptletOutputStringWriter(Scriptlet scriptlet) {
         super()
@@ -58,7 +57,7 @@ class ScriptletOutputStringWriter extends StringWriter {
         Date now = new Date()
         if (this.uncommitedLines >= this.lineThreshold || ((this.lastUpdate.time - now.time) >= (this.syncTimeout * 1000) && this.uncommitedLines > 0)) {
             this.scriptlet.output = this.buffer.toString()
-            this.scriptlet.save(this.saveWithFlush)
+            this.scriptlet.save(flush:true)
             this.uncommitedLines = 0
             this.lastUpdate = now
         }

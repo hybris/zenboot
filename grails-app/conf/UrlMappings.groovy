@@ -22,6 +22,9 @@ class UrlMappings {
         "/rest/properties/$puppetEnvironment/$qualityStage?"(controller:'propertiesRest', action:'rest')
         "/rest/$url?"(controller:'exposedExecutionZoneAction', action:'rest')
         "/rest/executionzones/$id/$stackName"(controller:'executionZone', action:'exec')
+        "/executionZoneRest/list"(controller: 'executionZoneRest', action: 'list')
+        "/executionZoneRest/listactions"(controller: 'executionZoneRest', action: 'listactions')
+        "/executionZoneRest/listparams"(controller: 'executionZoneRest', action: 'listparams')
 
         // templates
         name template : "/template/$action?/$id?" { controller='template' }
