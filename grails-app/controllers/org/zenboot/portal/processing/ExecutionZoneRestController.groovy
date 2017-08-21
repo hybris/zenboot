@@ -1,5 +1,7 @@
 package org.zenboot.portal.processing
 
+import grails.converters.JSON
+import grails.converters.XML
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
@@ -81,29 +83,27 @@ class ExecutionZoneRestController extends AbstractRestController {
             }
         }
 
+        def executionZones = results.collect {[execId: it.id, execType: it.type.name, execDescription: it.description]}
+
         withFormat {
             xml {
-                render (contentType: "text/xml") {
+                render(contentType: "text/xml") {
                     executionzones {
-                        results.each { result ->
-                            execId result.id
-                            execType result.type.name
-                            execDescription result.description
+                        executionZones.each { execZone ->
+                            executionzone {
+                                execId execZone.execId
+                                execType execZone.execType
+                                execDescription execZone.execDescription
+                            }
                         }
                     }
                 }
             }
             json {
-                render (contentType:"text/json"){
+                def zones = [:]
+                zones.put('executionZones', executionZones)
 
-                    def executionZones = [ executionZones:array {
-                        results.each { result ->
-                            zone(execId: result.id, execType: result.type.name, execDescription: result.description)
-                        }
-                    }]
-
-                    executionzones executionZones
-                }
+                render(contentType: "text/json") { zones } as JSON
             }
         }
     }
@@ -178,12 +178,22 @@ class ExecutionZoneRestController extends AbstractRestController {
 
             withFormat {
                 xml {
-                    render(contentType: "text/xml") {
-
+                    render (contentType: "text/xml") {
+                        parameters {
+                            paramsSet.each { param ->
+                                parameter {
+                                    parameterName param.name
+                                    parameterValue param.value
+                                }
+                            }
+                        }
                     }
                 }
                 json {
-//                    render(contentType: "text/json") { paramsSet as JSON }
+                    def parameters = [:]
+                    parameters.put('parameters', paramsSet.collect {['parameterName': it.name, 'parameterValue': it.value]} )
+
+                    render (contentType: "text/json") { parameters } as JSON
                 }
             }
         }
@@ -222,31 +232,22 @@ class ExecutionZoneRestController extends AbstractRestController {
             return
         }
         File[] scriptDirFiles = scriptDir.listFiles()
-        List<String> dirContent = new ArrayList<String>(scriptDirFiles.size())
-
-        scriptDirFiles.each {dirContent.add(it.name)}
 
         withFormat {
             xml {
-                render(contentType: "text/xml") {
+                render (contentType: "text/xml") {
                     actions {
-                        dirContent.each {
-                            action it
+                        scriptDirFiles.each {
+                            action it.name
                         }
                     }
                 }
             }
             json {
-                render(contentType: "text/json") {
+                def dirContent = [:]
+                dirContent.put('actions', scriptDirFiles.collect {it.name})
 
-                    def actions = [actions: array {
-                        dirContent.each {
-                            action(action: it)
-                        }
-                    }]
-
-                    executionzoneactions actions
-                }
+                render (contentType: "text/json") { dirContent as JSON }
             }
         }
     }
