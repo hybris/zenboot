@@ -20,7 +20,110 @@ class ExecutionZoneRestController extends AbstractRestController {
 
     //The help method gives you an overview about the possible rest endpoints and which parameters could be set
     def help = {
+        withFormat {
+            xml {
+                render(contentType: "text/xml") {
+                    restendpoints {
+                        restendpoint {
+                            name 'execute'
+                            description 'The method execute the specific action of an execution zone based on the parameters.'
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                            }
+                            action {
+                                description 'The name of the action.'
+                                type 'String'
+                                mandatory 'Yes'
+                            }
+                        }
+                        restendpoint {
+                            name 'list'
+                            description 'The method returns the execution zones of the user.'
+                            execType {
+                                description 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.'
+                                type 'Long or String.'
+                                mandatory 'No'
+                            }
+                        }
+                        restendpoint {
+                            name 'listparams'
+                            description 'The method returns all required parameters on an specific execution zone action.'
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                            }
+                            action {
+                                description 'The name of the action.'
+                                type 'String'
+                                mandatory 'Yes'
+                            }
+                        }
+                        restendpoint {
+                            name 'listactions'
+                            description 'The method return all action names of the specific execution zone.'
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                                }
+                            }
+                        }
+                }
+            }
+            json {
 
+                def execId = [description: 'The id of the specific execution zone.', type: 'Long', mandatory: 'Yes']
+                def action = [description: 'The name of the action.', type: 'String', mandatory: 'Yes']
+                def execType = [description: 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.', type: 'Long or String.',
+                                mandatory: 'No']
+
+                def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters.', execId: execId, action: action]
+                def listEndPoint = [description: 'The method returns the execution zones of the user.', execType: execType]
+                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action.', execId: execId, action: action]
+                def listactionsEndPoint = [description: 'The method return all action names of the specific execution zone.', execId: execId]
+
+                render (contentType: "text/json") { restendpoints execute: executeEndPoint, list: listEndPoint, listparams: listparamsEndPoint, listactions: listactionsEndPoint }
+            }
+        }
+    }
+
+    def execute = {
+
+        ExecutionZone executionZone
+        String actionName
+
+        if (ExecutionZone.get(params.execId)) {
+            executionZone = ExecutionZone.get(params.execId)
+        }
+        else {
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
+            return
+        }
+
+        if (params.action) {
+            actionName = params.action
+        }
+        else {
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (action) not set.')
+            return
+        }
+
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
+
+            File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
+                    + "/" + executionZone.type.name + "/scripts/" + actionName)
+
+            ExecutionZoneAction action = executionZoneService.createExecutionZoneAction(executionZone, stackDir)
+            applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, "REST-call run"))
+
+            this.renderRestResult(HttpStatus.OK, executionZone)
+        }
+        else {
+            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to execute this execution Zone.')
+        }
     }
 
     //Return a list of enabled execution zones to which the user has access
@@ -66,7 +169,7 @@ class ExecutionZoneRestController extends AbstractRestController {
             }
 
             executionZonesIDs.each {
-               executionZones.add(ExecutionZone.get(it.key))
+                executionZones.add(ExecutionZone.get(it.key))
             }
 
             if (executionZoneType) {
@@ -112,43 +215,6 @@ class ExecutionZoneRestController extends AbstractRestController {
         }
     }
 
-    def execute = {
-
-        ExecutionZone executionZone
-        String actionName
-
-        if (ExecutionZone.get(params.execId)) {
-            executionZone = ExecutionZone.get(params.execId)
-        }
-        else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
-            return
-        }
-
-        if (params.action) {
-            actionName = params.action
-        }
-        else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (action) not set.')
-            return
-        }
-
-        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || accessService.accessCache[springSecurityService.getCurrentUserId()] ||
-                accessService.userHasAccess(executionZone)) {
-
-            File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
-                    + "/" + executionZone.type.name + "/scripts/" + actionName)
-
-            ExecutionZoneAction action = executionZoneService.createExecutionZoneAction(executionZone, stackDir)
-            applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, "REST-call run"))
-
-            this.renderRestResult(HttpStatus.OK, executionZone)
-        }
-        else {
-            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to execute this execution Zone.')
-        }
-    }
-
     // the method returns a list of all required parameters of an execution zone
     def listparams = {
 
@@ -171,9 +237,7 @@ class ExecutionZoneRestController extends AbstractRestController {
             return
         }
 
-        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || accessService.accessCache[springSecurityService.getCurrentUserId()] != null ?
-                accessService.accessCache[springSecurityService.getCurrentUserId()][executionZone.id] :
-                accessService.userHasAccess(executionZone)) {
+        if (userHasAccess(executionZone)) {
 
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
@@ -224,9 +288,7 @@ class ExecutionZoneRestController extends AbstractRestController {
             scriptDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" )
         }
-        else if(accessService.accessCache[springSecurityService.getCurrentUserId()] != null ?
-                accessService.accessCache[springSecurityService.getCurrentUserId()][executionZone.id] :
-                accessService.userHasAccess(executionZone)) {
+        else if (userHasAccess(executionZone)) {
 
             scriptDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" )
@@ -255,4 +317,11 @@ class ExecutionZoneRestController extends AbstractRestController {
             }
         }
     }
+
+    private Boolean userHasAccess(ExecutionZone executionZone) {
+        return accessService.accessCache[springSecurityService.getCurrentUserId()] != null ?
+                accessService.accessCache[springSecurityService.getCurrentUserId()][executionZone.id] :
+                accessService.userHasAccess(executionZone)
+    }
+
 }
