@@ -18,7 +18,9 @@ class ExecutionZoneRestController extends AbstractRestController {
 
     static allowedMethods = [help: "GET", list: ["GET","POST"], execute: "POST", listparams: "POST", listactions: "POST"]
 
-    //The help method gives you an overview about the possible rest endpoints and which parameters could be set
+    /**
+     * The method gives you an overview about the possible rest endpoints and which parameters could be set.
+     */
     def help = {
         withFormat {
             xml {
@@ -90,6 +92,9 @@ class ExecutionZoneRestController extends AbstractRestController {
         }
     }
 
+    /**
+     * Execute a specific action (scriptstack) of a specific execution zone.
+     */
     def execute = {
 
         ExecutionZone executionZone
@@ -126,8 +131,10 @@ class ExecutionZoneRestController extends AbstractRestController {
         }
     }
 
-    //Return a list of enabled execution zones to which the user has access
-    // The list is be more specified if an execType param is set
+    /**
+     * Returns a list of enabled execution zones to which the user has access.
+     * The list is be more specified if an execType param is set.
+     */
     def list = {
 
         def results
@@ -215,7 +222,9 @@ class ExecutionZoneRestController extends AbstractRestController {
         }
     }
 
-    // the method returns a list of all required parameters of an execution zone
+    /**
+     * The method returns a list of all required parameters of an execution zone.
+     */
     def listparams = {
 
         ExecutionZone executionZone
@@ -270,7 +279,9 @@ class ExecutionZoneRestController extends AbstractRestController {
         }
     }
 
-    // this method creates a list of all possible actions for the executionzone
+    /**
+     * This method returns a list of all possible actions for the executionzone.
+     */
     def listactions = {
 
         ExecutionZone executionZone
@@ -318,6 +329,11 @@ class ExecutionZoneRestController extends AbstractRestController {
         }
     }
 
+    /**
+     * Check if the user is already in the cache and has access to the requested execution zone.
+     * @param executionZone - the execution zone which has to be checked for access.
+     * @return true if the user has access otherwise false.
+     */
     private Boolean userHasAccess(ExecutionZone executionZone) {
         return accessService.accessCache[springSecurityService.getCurrentUserId()] != null ?
                 accessService.accessCache[springSecurityService.getCurrentUserId()][executionZone.id] :
