@@ -36,6 +36,10 @@ class ExecutionZoneRestController extends AbstractRestController {
             } else if (params.execType instanceof String) {
                 executionZoneType = ExecutionZoneType.findByName(params.execType)
             }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The executionZoneType (execType) has to be a long or a string')
+                return
+            }
         }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
@@ -113,19 +117,19 @@ class ExecutionZoneRestController extends AbstractRestController {
         ExecutionZone executionZone
         String actionName
 
-        if (ExecutionZone.get(params.id)) {
-            executionZone = ExecutionZone.get(params.id)
+        if (ExecutionZone.get(params.execId)) {
+            executionZone = ExecutionZone.get(params.execId)
         }
         else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'executionZone id not set.')
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
             return
         }
 
-        if (params.actionName) {
-            actionName = params.actionName
+        if (params.action) {
+            actionName = params.action
         }
         else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name not set.')
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (action) not set.')
             return
         }
 
@@ -151,19 +155,19 @@ class ExecutionZoneRestController extends AbstractRestController {
         ExecutionZone executionZone
         String actionName
 
-        if (ExecutionZone.get(params.id)) {
-            executionZone = ExecutionZone.findById(params.id)
+        if (ExecutionZone.get(params.execId)) {
+            executionZone = ExecutionZone.findById(params.execId)
         }
         else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'executionZone id not set.')
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
             return
         }
 
-        if (params.actionName) {
-            actionName = params.actionName
+        if (params.action) {
+            actionName = params.action
         }
         else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name not set.')
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (action) not set.')
             return
         }
 
