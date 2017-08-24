@@ -177,16 +177,18 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
 
 
-            // check if it allowed to change the parameters
-            def origin_params = executionZoneService.getExecutionZoneParameters(executionZone, stackDir)
+            if(!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                // check if it allowed to change the parameters
+                def origin_params = executionZoneService.getExecutionZoneParameters(executionZone, stackDir)
 
-            origin_params.each {
-                ProcessingParameter org_parameter = new ProcessingParameter(name: it.name, value: it.value.toString())
-                ProcessingParameter new_parameter = new ProcessingParameter(name: it.name, value: parameters[it.name])
+                origin_params.each {
+                    ProcessingParameter org_parameter = new ProcessingParameter(name: it.name, value: it.value.toString())
+                    ProcessingParameter new_parameter = new ProcessingParameter(name: it.name, value: parameters[it.name])
 
-                if (org_parameter.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, org_parameter)) {
-                    //not allowed to change this param so change back
-                    parameters[org_parameter.name] = org_parameter.value
+                    if (org_parameter.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, org_parameter)) {
+                        //not allowed to change this param so change back
+                        parameters[org_parameter.name] = org_parameter.value
+                    }
                 }
             }
 
