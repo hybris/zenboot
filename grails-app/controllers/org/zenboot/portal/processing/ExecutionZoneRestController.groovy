@@ -1,14 +1,18 @@
 package org.zenboot.portal.processing
 
 import grails.converters.JSON
-import grails.converters.XML
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.util.slurpersupport.Node
+import groovy.util.slurpersupport.NodeChild
+import groovy.xml.StreamingMarkupBuilder
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 
-class ExecutionZoneRestController extends AbstractRestController {
+class ExecutionZoneRestController extends AbstractRestController implements ApplicationEventPublisherAware{
 
     def springSecurityService
     def accessService
@@ -17,6 +21,11 @@ class ExecutionZoneRestController extends AbstractRestController {
     def applicationEventPublisher
 
     static allowedMethods = [help: "GET", list: ["GET","POST"], execute: "POST", listparams: "POST", listactions: "POST"]
+
+    @Override
+    void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.applicationEventPublisher = eventPublisher
+    }
 
     /**
      * The method gives you an overview about the possible rest endpoints and which parameters could be set.
@@ -29,16 +38,7 @@ class ExecutionZoneRestController extends AbstractRestController {
                         restendpoint {
                             name 'execute'
                             description 'The method execute the specific action of an execution zone based on the parameters.'
-                            execId {
-                                description 'The id of the specific execution zone.'
-                                type 'Long'
-                                mandatory 'Yes'
-                            }
-                            action {
-                                description 'The name of the action.'
-                                type 'String'
-                                mandatory 'Yes'
-                            }
+                            parameters 'Requires json or xml where all the necessary parameters are stored. You can save the result of /listparams to get a working template.'
                         }
                         restendpoint {
                             name 'list'
@@ -57,7 +57,7 @@ class ExecutionZoneRestController extends AbstractRestController {
                                 type 'Long'
                                 mandatory 'Yes'
                             }
-                            action {
+                            execAction {
                                 description 'The name of the action.'
                                 type 'String'
                                 mandatory 'Yes'
@@ -78,13 +78,14 @@ class ExecutionZoneRestController extends AbstractRestController {
             json {
 
                 def execId = [description: 'The id of the specific execution zone.', type: 'Long', mandatory: 'Yes']
-                def action = [description: 'The name of the action.', type: 'String', mandatory: 'Yes']
+                def execAction = [description: 'The name of the action.', type: 'String', mandatory: 'Yes']
                 def execType = [description: 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.', type: 'Long or String.',
                                 mandatory: 'No']
 
-                def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters.', execId: execId, action: action]
+                def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters.',
+                                       parameters: 'Requires json or xml where all the necessary parameters are stored. You can save the result of /listparams to get a working template.']
                 def listEndPoint = [description: 'The method returns the execution zones of the user.', execType: execType]
-                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action.', execId: execId, action: action]
+                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action.', execId: execId, action: execAction]
                 def listactionsEndPoint = [description: 'The method return all action names of the specific execution zone.', execId: execId]
 
                 render (contentType: "text/json") { restendpoints execute: executeEndPoint, list: listEndPoint, listparams: listparamsEndPoint, listactions: listactionsEndPoint }
@@ -99,21 +100,75 @@ class ExecutionZoneRestController extends AbstractRestController {
 
         ExecutionZone executionZone
         String actionName
+        Map parameters =[:]
 
-        if (ExecutionZone.get(params.execId)) {
-            executionZone = ExecutionZone.get(params.execId)
-        }
-        else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
-            return
-        }
+        // get data from incomming json or xml
+        request.withFormat {
+            xml {
+                def xml =request.XML
 
-        if (params.action) {
-            actionName = params.action
-        }
-        else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (action) not set.')
-            return
+                Node execId = xml[0].children.find {it.name == 'execId'}
+                Node execAction = xml[0].children.find {it.name == 'execAction'}
+
+                if (ExecutionZone.get(execId.text())){
+                    executionZone = ExecutionZone.get(execId.text())
+                }
+                else {
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
+                    return
+                }
+
+                if (execAction.text()) {
+                    actionName = execAction.text()
+                }
+                else {
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (execAction) not set.')
+                    return
+                }
+
+                def xmlparameter = xml[0].children.findAll {it.name == 'parameter'}
+
+                xmlparameter.each{ node ->
+                    def name = ''
+                    def value = ''
+
+                    node.children.each{
+                        if (it.name == 'parameterName') {
+                            name = it.text()
+                        }
+                        else if (it.name == 'parameterValue') {
+                            value = it.text()
+                        }
+                    }
+
+                    parameters[name] = value
+                }
+            }
+            json {
+                def json = request.getJSON()
+
+                if (ExecutionZone.get(json.execId)) {
+                    executionZone = ExecutionZone.get(json.execId)
+                }
+                else {
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
+                    return
+                }
+
+                if (json.execAction) {
+                    actionName = json.execAction
+                }
+                else {
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (execAction) not set.')
+                    return
+                }
+
+                if(json.parameters) {
+                    json.parameters.each {
+                        parameters[it.parameterName] = it.parameterValue
+                    }
+                }
+            }
         }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
@@ -121,7 +176,23 @@ class ExecutionZoneRestController extends AbstractRestController {
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
 
-            ExecutionZoneAction action = executionZoneService.createExecutionZoneAction(executionZone, stackDir)
+
+            // check if it allowed to change the parameters
+            def origin_params = executionZoneService.getExecutionZoneParameters(executionZone, stackDir)
+
+            origin_params.each {
+                ProcessingParameter org_parameter = new ProcessingParameter(name: it.name, value: it.value.toString())
+                ProcessingParameter new_parameter = new ProcessingParameter(name: it.name, value: parameters[it.name])
+
+                if (org_parameter.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, org_parameter)) {
+                    //not allowed to change this param so change back
+                    parameters[org_parameter.name] = org_parameter.value
+                }
+            }
+
+            // create action with zone, stackdir and parameters
+            ExecutionZoneAction action = executionZoneService.createExecutionZoneAction(executionZone, stackDir, parameters)
+            //publish event to start execution
             applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, "REST-call run"))
 
             this.renderRestResult(HttpStatus.OK, executionZone)
@@ -238,15 +309,15 @@ class ExecutionZoneRestController extends AbstractRestController {
             return
         }
 
-        if (params.action) {
-            actionName = params.action
+        if (params.execAction) {
+            actionName = params.execAction
         }
         else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (action) not set.')
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (execAction) not set.')
             return
         }
 
-        if (userHasAccess(executionZone)) {
+        if ( SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
 
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
@@ -257,6 +328,8 @@ class ExecutionZoneRestController extends AbstractRestController {
                 xml {
                     render (contentType: "text/xml") {
                         parameters {
+                            execId executionZone.id
+                            execAction actionName
                             paramsSet.each { param ->
                                 parameter {
                                     parameterName param.name
@@ -267,10 +340,12 @@ class ExecutionZoneRestController extends AbstractRestController {
                     }
                 }
                 json {
-                    def parameters = [:]
-                    parameters.put('parameters', paramsSet.collect {['parameterName': it.name, 'parameterValue': it.value]} )
+                    def responseParams = [:]
+                    responseParams.put('execId', executionZone.id)
+                    responseParams.put('execAction', actionName)
+                    responseParams.put('parameters', paramsSet.collect {['parameterName': it.name, 'parameterValue': it.value]} )
 
-                    render (contentType: "text/json") { parameters } as JSON
+                    render (contentType: "text/json") { responseParams } as JSON
                 }
             }
         }
@@ -287,8 +362,8 @@ class ExecutionZoneRestController extends AbstractRestController {
         ExecutionZone executionZone
         File scriptDir
 
-        if (ExecutionZone.get(params.id)) {
-            executionZone = ExecutionZone.get(params.id)
+        if (ExecutionZone.get(params.execId)) {
+            executionZone = ExecutionZone.get(params.execId)
         }
         else {
             this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'executionZone id not set.')
@@ -313,18 +388,18 @@ class ExecutionZoneRestController extends AbstractRestController {
         withFormat {
             xml {
                 render (contentType: "text/xml") {
-                    actions {
+                    execActions {
                         scriptDirFiles.each {
-                            action it.name
+                            execAction it.name
                         }
                     }
                 }
             }
             json {
                 def dirContent = [:]
-                dirContent.put('actions', scriptDirFiles.collect {it.name})
+                dirContent.put('execActions', scriptDirFiles.collect {it.name})
 
-                render (contentType: "text/json") { dirContent as JSON }
+                render (contentType: "text/json") { dirContent } as JSON
             }
         }
     }
