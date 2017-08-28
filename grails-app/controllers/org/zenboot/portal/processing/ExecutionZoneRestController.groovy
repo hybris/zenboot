@@ -3,8 +3,6 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.util.slurpersupport.Node
-import groovy.util.slurpersupport.NodeChild
-import groovy.xml.StreamingMarkupBuilder
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
@@ -18,6 +16,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def accessService
     def scriptDirectoryService
     def executionZoneService
+    def grailsLinkGenerator
     def applicationEventPublisher
 
     static allowedMethods = [help: "GET", list: ["GET","POST"], execute: "POST", listparams: "POST", listactions: "POST"]
@@ -197,7 +196,9 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             //publish event to start execution
             applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, "REST-call run"))
 
-            this.renderRestResult(HttpStatus.OK, executionZone)
+            URI referral = new URI(grailsLinkGenerator.link(absolute:true, controller:'executionZoneAction', action:'rest', params:[id:action.id]))
+
+            this.renderRestResult(HttpStatus.CREATED, null, referral)
         }
         else {
             this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to execute this execution Zone.')
