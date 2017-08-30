@@ -198,7 +198,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
             URI referral = new URI(grailsLinkGenerator.link(absolute:true, controller:'executionZoneAction', action:'rest', params:[id:action.id]))
 
-            this.renderRestResult(HttpStatus.CREATED, null, referral)
+            this.renderRestResult(HttpStatus.CREATED, null, referral, actionName + ' sucessfully created.')
         }
         else {
             this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to execute this execution Zone.')
