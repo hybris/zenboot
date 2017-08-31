@@ -3,23 +3,21 @@
 //**********************************************************************************************
 
 dataSource {
-    pooled: true
-    jmxExport: true
-    driverClassName: "com.mysql.jdbc.Driver"
-    dialect: "org.hibernate.dialect.MySQL5InnoDBDialect"
-    username: root
-    password: root
+    pooled = true
+    driverClassName = "org.h2.Driver"
+    username = "sa"
+    password = ""
 
     properties {
-      //run the evictor every 30 minutes and evict any connections older than 30 minutes.
-      minEvictableIdleTimeMillis=1800000
-      timeBetweenEvictionRunsMillis=1800000
-      numTestsPerEvictionRun=3
-      //test the connection while its idle, before borrow and return it
-      testOnBorrow=true
-      testWhileIdle=true
-      testOnReturn=true
-      validationQuery="SELECT username FROM person WHERE id=1" // probably need a real query here should be "admin"
+        //run the evictor every 30 minutes and evict any connections older than 30 minutes.
+        minEvictableIdleTimeMillis=1800000
+        timeBetweenEvictionRunsMillis=1800000
+        numTestsPerEvictionRun=3
+        //test the connection while its idle, before borrow and return it
+        testOnBorrow=true
+        testWhileIdle=true
+        testOnReturn=true
+        validationQuery="SELECT username FROM person WHERE id=1" // probably need a real query here should be "admin"
     }
 }
 
@@ -32,26 +30,22 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost:3306/zenboot"
-            username: root
-            password: root
+            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+            url = "jdbc:h2:mem:devDb;MVCC=TRUE"
+            logSql = false
+            formatSql = false
         }
     }
     test {
         dataSource {
             dbCreate = "create"
-            url = "jdbc:mysql://localhost:3306/zenboot"
-            username: root
-            password: root
+            url = "jdbc:h2:mem:testDb;MVCC=TRUE"
         }
     }
     production {
         dataSource {
             dbCreate = "create" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost:3306/zenboot"
-            username: root
-            password: root
+            url = "jdbc:h2:mem:devDb;MVCC=TRUE"
         }
     }
 }
