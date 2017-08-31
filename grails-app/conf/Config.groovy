@@ -145,7 +145,6 @@ grails.plugin.springsecurity.secureChannel.insecureHeaderValue = 'https'
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.filterChain.chainMap = [
     '/rest/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
-    '/executionZoneRest/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
     '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
  ]
 
