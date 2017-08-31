@@ -2,7 +2,6 @@ package org.zenboot.portal.processing
 
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
-import groovy.util.slurpersupport.Node
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
@@ -19,13 +18,16 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def grailsLinkGenerator
     def applicationEventPublisher
 
-    static allowedMethods = [help: "GET", list: ["GET","POST"], execute: "POST", listparams: "POST", listactions: "POST"]
+    static allowedMethods = [index: 'GET' , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET"]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.applicationEventPublisher = eventPublisher
     }
 
+    def index() {
+        redirect(action: "help")
+    }
     /**
      * The method gives you an overview about the possible rest endpoints and which parameters could be set.
      */
@@ -37,20 +39,38 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         restendpoint {
                             name 'execute'
                             description 'The method execute the specific action of an execution zone based on the parameters.'
+                            url '/rest/v1/executionzones/{execId}/actions/{execAction}/execute'
+                            exampleurl '/rest/v1/executionzones/1/actions/internal/execute'
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                            }
+                            execAction {
+                                description 'The name of the action.'
+                                type 'String'
+                                mandatory 'Yes'
+                            }
                             parameters 'Requires json or xml where all the necessary parameters are stored. You can save the result of /listparams to get a working template.'
                         }
                         restendpoint {
                             name 'list'
                             description 'The method returns the execution zones of the user.'
+                            urls {
+                                all '/rest/v1/executionzones/list'
+                                specific '/rest/v1/executionzones/list/executionzonetype/{execType}'
+                                exampleurl '/rest/v1/executionzones/list/executionzonetype/internal'
+                            }
                             execType {
                                 description 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.'
-                                type 'Long or String.'
-                                mandatory 'No'
+                                type 'Long (id) or String (name).'
                             }
                         }
                         restendpoint {
                             name 'listparams'
                             description 'The method returns all required parameters on an specific execution zone action.'
+                            url '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams'
+                            exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
                             execId {
                                 description 'The id of the specific execution zone.'
                                 type 'Long'
@@ -65,6 +85,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         restendpoint {
                             name 'listactions'
                             description 'The method return all action names of the specific execution zone.'
+                            url '/rest/v1/executionzones/$execId/listactions'
+                            exampleurl '/rest/v1/executionzones/1/listactions'
                             execId {
                                 description 'The id of the specific execution zone.'
                                 type 'Long'
@@ -101,29 +123,32 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         String actionName
         Map parameters =[:]
 
+        if (params.execId) {
+            if(ExecutionZone.findById(params.execId)){
+                executionZone = ExecutionZone.findById(params.execId)
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
+                return
+            }
+        }
+        else {
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
+            return
+        }
+
+        if (params.execAction) {
+            actionName = params.execAction
+        }
+        else {
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (execAction) not set.')
+            return
+        }
+
         // get data from incomming json or xml
         request.withFormat {
             xml {
                 def xml =request.XML
-
-                Node execId = xml[0].children.find {it.name == 'execId'}
-                Node execAction = xml[0].children.find {it.name == 'execAction'}
-
-                if (ExecutionZone.get(execId.text())){
-                    executionZone = ExecutionZone.get(execId.text())
-                }
-                else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
-                    return
-                }
-
-                if (execAction.text()) {
-                    actionName = execAction.text()
-                }
-                else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (execAction) not set.')
-                    return
-                }
 
                 def xmlparameter = xml[0].children.findAll {it.name == 'parameter'}
 
@@ -145,22 +170,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
             json {
                 def json = request.getJSON()
-
-                if (ExecutionZone.get(json.execId)) {
-                    executionZone = ExecutionZone.get(json.execId)
-                }
-                else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
-                    return
-                }
-
-                if (json.execAction) {
-                    actionName = json.execAction
-                }
-                else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (execAction) not set.')
-                    return
-                }
 
                 if(json.parameters) {
                     json.parameters.each {
@@ -304,8 +313,14 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         ExecutionZone executionZone
         String actionName
 
-        if (ExecutionZone.get(params.execId)) {
-            executionZone = ExecutionZone.findById(params.execId)
+        if (params.execId) {
+            if(ExecutionZone.findById(params.execId)){
+                executionZone = ExecutionZone.findById(params.execId)
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
+                return
+            }
         }
         else {
             this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
@@ -365,11 +380,17 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         ExecutionZone executionZone
         File scriptDir
 
-        if (ExecutionZone.get(params.execId)) {
-            executionZone = ExecutionZone.get(params.execId)
+        if (params.execId) {
+            if(ExecutionZone.findById(params.execId)){
+                executionZone = ExecutionZone.findById(params.execId)
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
+                return
+            }
         }
         else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'executionZone id not set.')
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
             return
         }
 
