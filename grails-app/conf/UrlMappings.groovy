@@ -27,8 +27,7 @@ class UrlMappings {
         "/rest/v1"(controller: 'executionZoneRest', action: 'index')
         "/rest/v1/help"(controller: 'executionZoneRest', action: 'help')
         "/rest/v1/executionzones/$execId/actions/$execAction/execute"(controller: 'executionZoneRest', action: 'execute')
-        "/rest/v1/executionzones/list"(controller: 'executionZoneRest', action: 'list')
-        "/rest/v1/executionzones/list/executionzonetype/$execType"(controller: 'executionZoneRest', action: 'list')
+        "/rest/v1/executionzones/list?"(controller: 'executionZoneRest', action: 'list')
         "/rest/v1/executionzones/$execId/listactions"(controller: 'executionZoneRest', action: 'listactions')
         "/rest/v1/executionzones/$execId/actions/$execAction/listparams"(controller: 'executionZoneRest', action: 'listparams')
 

@@ -58,8 +58,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             description 'The method returns the execution zones of the user.'
                             urls {
                                 all '/rest/v1/executionzones/list'
-                                specific '/rest/v1/executionzones/list/executionzonetype/{execType}'
-                                exampleurl '/rest/v1/executionzones/list/executionzonetype/internal'
+                                specific '/rest/v1/executionzones/list?execType={execType}'
+                                exampleurl '/rest/v1/executionzones/list?execType=internal'
                             }
                             execType {
                                 description 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.'
