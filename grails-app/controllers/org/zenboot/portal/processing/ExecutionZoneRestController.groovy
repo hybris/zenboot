@@ -206,9 +206,13 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
 
+            if (parameters.any { key, value -> value == '' || value == null}) {
+                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No empty parameter values allowed - please check your data.')
+                return
+            }
+
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
-
 
             if(!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
                 // check if it allowed to change the parameters
