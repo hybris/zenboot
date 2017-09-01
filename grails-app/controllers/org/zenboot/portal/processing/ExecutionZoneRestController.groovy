@@ -3,6 +3,8 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
+import org.codehaus.groovy.grails.web.json.JSONException
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
@@ -177,10 +179,16 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
             }
             json {
-                def json = request.getJSON()
 
-                if(json.isEmpty()) {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The JSON could not be parsed.')
+                String text = request.getReader().text
+
+                def json
+
+                try {
+                    json = new JSONObject(text)
+                }
+                catch (JSONException e) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
                     hasError = true
                     return
                 }
