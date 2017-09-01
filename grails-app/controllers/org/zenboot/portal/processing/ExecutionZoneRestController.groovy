@@ -2,6 +2,7 @@ package org.zenboot.portal.processing
 
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
@@ -122,6 +123,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         ExecutionZone executionZone
         String actionName
         Map parameters =[:]
+        Boolean hasError = false
 
         if (params.execId) {
             if(ExecutionZone.findById(params.execId)){
@@ -148,7 +150,16 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         // get data from incomming json or xml
         request.withFormat {
             xml {
-                def xml =request.XML
+
+                def xml
+                try {
+                    xml = request.XML
+                }
+                catch (ConverterException e) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The XML could not be parsed.')
+                    hasError = true
+                    return
+                }
 
                 def xmlparameter = xml[0].children.findAll {it.name == 'parameter'}
 
@@ -171,12 +182,22 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             json {
                 def json = request.getJSON()
 
+                if(json.isEmpty()) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The JSON could not be parsed.')
+                    hasError = true
+                    return
+                }
+
                 if(json.parameters) {
                     json.parameters.each {
                         parameters[it.parameterName] = it.parameterValue
                     }
                 }
             }
+        }
+
+        if (hasError) {
+            return
         }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
