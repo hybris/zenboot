@@ -24,7 +24,7 @@ class UrlMappings {
         "/rest/executionzones/$id/$stackName"(controller:'executionZone', action:'exec')
 
         //ExecutionZoneRest
-        "/rest/v1"(controller: 'executionZoneRest', action: 'index')
+        "/rest/v1"(controller: 'executionZoneRest', action: 'help')
         "/rest/v1/help"(controller: 'executionZoneRest', action: 'help')
         "/rest/v1/executionzones/$execId/actions/$execAction/execute"(controller: 'executionZoneRest', action: 'execute')
         "/rest/v1/executionzones/list?"(controller: 'executionZoneRest', action: 'list')

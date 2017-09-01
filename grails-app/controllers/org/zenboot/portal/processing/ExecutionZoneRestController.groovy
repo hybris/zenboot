@@ -26,9 +26,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         this.applicationEventPublisher = eventPublisher
     }
 
-    def index() {
-        redirect(action: "help")
-    }
     /**
      * The method gives you an overview about the possible rest endpoints and which parameters could be set.
      */
