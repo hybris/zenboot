@@ -156,7 +156,6 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/login/**':                            ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/logout/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/plugins/**':                          ['IS_AUTHENTICATED_ANONYMOUSLY'],
-    //'/**/rest/**':                          ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/**/rest/**':                          ['IS_AUTHENTICATED_REMEMBERED'],
     '/home/index':                          ['IS_AUTHENTICATED_REMEMBERED'],
     '/executionZone/list':                  ['IS_AUTHENTICATED_REMEMBERED'],
@@ -177,6 +176,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/serviceUrl/show':                     ['IS_AUTHENTICATED_REMEMBERED'],
     '/executionZone/ajaxGetReadme':         ['IS_AUTHENTICATED_REMEMBERED'],
     '/executionZoneRest/**':                ['IS_AUTHENTICATED_REMEMBERED'],
+  
     //default
     '/administration':                      [Role.ROLE_ADMIN],
     '/**':                                  [Role.ROLE_ADMIN],

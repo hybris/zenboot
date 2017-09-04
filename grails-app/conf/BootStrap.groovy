@@ -9,6 +9,7 @@ import org.zenboot.portal.processing.ScriptletBatch
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.PersonRole
 import org.zenboot.portal.security.Role
+import java.util.concurrent.Callable
 
 class BootStrap {
 
@@ -16,6 +17,7 @@ class BootStrap {
     def accessService
     def grailsApplication
     def scriptDirectoryService
+    def executorService
 
     def init = { servletContext ->
         //create fundamental user groups
@@ -26,6 +28,8 @@ class BootStrap {
 
         //setup the sanity check (used for CI)
         this.setupSanityCheckExposedExecutionZoneAction()
+
+        setupBootstrapExecutionZoneAction()
 
         // setting up JSON-Marshallers
         // otherwise you're rendering out half of the heap-space
@@ -120,6 +124,20 @@ class BootStrap {
                 url: "sanitycheck",
             )
             exposedAction.save()
+        }
+    }
+
+    private setupBootstrapExecutionZoneAction() {
+        ExecutionZoneType bootstrapType = ExecutionZoneType.findByName("initial")
+        ExecutionZone execZoneBootstrap = ExecutionZone.findByType(bootstrapType)
+        if (!execZoneBootstrap) {
+            execZoneBootstrap = new ExecutionZone(type:bootstrapType, description:"Populate server with default data")
+            execZoneBootstrap.save()
+
+            // Execute the action on startup - similar bug to RPI-2167
+  	    executorService.submit({
+	        this.executionZoneService.createAndPublishExecutionZoneAction(execZoneBootstrap, "bootstrap")
+	    } as Callable)
         }
     }
 
