@@ -221,7 +221,21 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                 origin_params.each {
                     ProcessingParameter org_parameter = new ProcessingParameter(name: it.name, value: it.value.toString())
-                    ProcessingParameter new_parameter = new ProcessingParameter(name: it.name, value: parameters[it.name])
+                    ProcessingParameter new_parameter
+
+                    if (parameters[it.name]) {
+                        new_parameter = new ProcessingParameter(name: it.name, value: parameters[it.name])
+                    }
+                    else {
+                        if (it.value.toString()) {
+                            new_parameter = new ProcessingParameter(name: it.name, value: it.value.toString())
+                        }
+                        else {
+                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No empty parameter values allowed - please check your data. Empty parameter: ' + it.name)
+                            return
+                        }
+
+                    }
 
                     if (org_parameter.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, org_parameter)) {
                         //not allowed to change this param so change back
