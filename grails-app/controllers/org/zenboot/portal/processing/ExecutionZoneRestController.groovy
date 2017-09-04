@@ -204,10 +204,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         if (hasError) {
             return
         }
-        else if (parameters.isEmpty()) {
-            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received for this request. Please check your Content-Type header or your sent data.')
-            return
-        }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
 
