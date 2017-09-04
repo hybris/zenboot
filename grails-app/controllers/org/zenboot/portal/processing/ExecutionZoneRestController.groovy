@@ -215,7 +215,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
 
-            if(!validateScriptDir(stackDir)) {
+            if(!isValidScriptDir(stackDir)) {
                 return
             }
 
@@ -388,7 +388,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
 
-            if(!validateScriptDir(stackDir)) {
+            if(!isValidScriptDir(stackDir)) {
                 return
             }
 
@@ -459,6 +459,11 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to request the actions for this zone.')
             return
         }
+
+        if(!isValidScriptDir(scriptDir)) {
+            return
+        }
+
         File[] scriptDirFiles = scriptDir.listFiles()
 
         withFormat {
@@ -496,7 +501,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
       * @param scriptDir the script File object.
      * @return true if exists otherwise false.
      */
-    private Boolean validateScriptDir(File scriptDir) {
+    private Boolean isValidScriptDir(File scriptDir) {
         if (scriptDir.exists()) {
             return Boolean.TRUE
         }
