@@ -215,6 +215,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
 
+            if(!validateScriptDir(stackDir)) {
+                return
+            }
+
             if(!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
                 // check if it allowed to change the parameters
                 def origin_params = executionZoneService.getExecutionZoneParameters(executionZone, stackDir)
@@ -384,6 +388,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
 
+            if(!validateScriptDir(stackDir)) {
+                return
+            }
+
             def paramsSet = executionZoneService.getExecutionZoneParameters(executionZone, stackDir)
 
             withFormat {
@@ -483,4 +491,18 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 accessService.userHasAccess(executionZone)
     }
 
+    /**
+     * Check if the script file exists. If not it renders NOT_FOUND with the error message that the script file does not exists.
+      * @param scriptDir the script File object.
+     * @return true if exists otherwise false.
+     */
+    private Boolean validateScriptDir(File scriptDir) {
+        if (scriptDir.exists()) {
+            return Boolean.TRUE
+        }
+        else {
+            renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The script with path ${scriptDir.getPath()} does not exists.')
+        }
+        return Boolean.FALSE
+    }
 }
