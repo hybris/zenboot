@@ -106,6 +106,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
 
                 def xml = XmlUtil.serialize(restendpoints).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
                 render contentType: "text/xml", xml
             }
             json {
@@ -357,6 +358,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
 
                 def xml = XmlUtil.serialize(zones).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
                 render contentType: "text/xml", xml
             }
             json {
@@ -428,6 +430,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     }
 
                     def xml = XmlUtil.serialize(parameters).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                    xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
                     render contentType: "text/xml", xml
                 }
                 json {
@@ -500,6 +503,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     }
                 }
                 def xml = XmlUtil.serialize(execActions).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
                 render contentType: "text/xml", xml
             }
             json {
@@ -529,6 +533,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
 
                 def xml = XmlUtil.serialize(executionZoneTypes).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
                 render contentType: "text/xml", xml
             }
             json {
@@ -553,7 +558,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                 def executionZone = builder.bind {
                     executionZone {
-                        executionZoneType ''
                         executionZoneProperties {
                             properties.each { property ->
                                 if (!nonrelevant_Properties.contains(property.name)) {
@@ -577,11 +581,11 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
 
                 def xml = XmlUtil.serialize(executionZone).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
                 render contentType: "text/xml", xml
             }
             json {
                 def executionzonetemplate = [:]
-                executionzonetemplate.put('executionZoneType', '')
 
                 def executionZoneProperties = properties.findAll{!nonrelevant_Properties.contains(it.name)}
                 executionzonetemplate.put('executionZoneProperties', executionZoneProperties.collect {[propertyName: it.name, propertyValue: '']})
@@ -786,7 +790,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
      */
     def cloneexecutionzone = {
     }
-
 
     /**
      * Check if the user is already in the cache and has access to the requested execution zone.
