@@ -1,7 +1,12 @@
 package org.zenboot.portal.processing
 
 import grails.converters.JSON
+import grails.converters.XML
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.xml.StreamingMarkupBuilder
+import groovy.xml.XmlUtil
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 import org.codehaus.groovy.grails.web.json.JSONException
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -9,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
+import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 
@@ -21,7 +27,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def grailsLinkGenerator
     def applicationEventPublisher
 
-    static allowedMethods = [index: 'GET' , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET"]
+    static allowedMethods = [index: 'GET' , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", exectypes: "GET", execzonetemplate: "GET"]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -34,7 +40,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def help = {
         withFormat {
             xml {
-                render(contentType: "text/xml") {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                def restendpoints = builder.bind {
                     restendpoints {
                         restendpoint {
                             name 'execute'
@@ -95,6 +104,9 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             }
                         }
                 }
+
+                def xml = XmlUtil.serialize(restendpoints).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                render contentType: "text/xml", xml
             }
             json {
 
@@ -122,7 +134,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         ExecutionZone executionZone
         String actionName
         Map parameters =[:]
-        Boolean hasError = false
+        Boolean hasError = Boolean.FALSE
 
         if (params.execId) {
             if(ExecutionZone.findById(params.execId)){
@@ -149,14 +161,13 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         // get data from incomming json or xml
         request.withFormat {
             xml {
-
                 def xml
                 try {
                     xml = request.XML
                 }
                 catch (ConverterException e) {
                     this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The XML could not be parsed.')
-                    hasError = true
+                    hasError = Boolean.TRUE
                     return
                 }
 
@@ -179,9 +190,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
             }
             json {
-
                 String text = request.getReader().text
-
                 def json
 
                 try {
@@ -189,7 +198,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
                 catch (JSONException e) {
                     this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                    hasError = true
+                    hasError = Boolean.TRUE
                     return
                 }
 
@@ -255,10 +264,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
             URI referral = new URI(grailsLinkGenerator.link(absolute:true, controller:'executionZoneAction', action:'rest', params:[id:action.id]))
 
-            this.renderRestResult(HttpStatus.CREATED, null, referral, actionName + ' sucessfully created.')
+            renderRestResult(HttpStatus.CREATED, null, referral, actionName + ' sucessfully created.')
         }
         else {
-            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to execute this execution Zone.')
+            renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to execute this execution Zone.')
         }
     }
 
@@ -332,7 +341,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
         withFormat {
             xml {
-                render(contentType: "text/xml") {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                def zones = builder.bind {
                     executionzones {
                         executionZones.each { execZone ->
                             executionzone {
@@ -343,6 +355,9 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         }
                     }
                 }
+
+                def xml = XmlUtil.serialize(zones).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                render contentType: "text/xml", xml
             }
             json {
                 def zones = [:]
@@ -396,7 +411,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
             withFormat {
                 xml {
-                    render (contentType: "text/xml") {
+                    def builder = new StreamingMarkupBuilder()
+                    builder.encoding = 'UTF-8'
+
+                    def parameters = builder.bind {
                         parameters {
                             execId executionZone.id
                             execAction actionName
@@ -408,6 +426,9 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             }
                         }
                     }
+
+                    def xml = XmlUtil.serialize(parameters).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                    render contentType: "text/xml", xml
                 }
                 json {
                     def responseParams = [:]
@@ -468,13 +489,18 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
         withFormat {
             xml {
-                render (contentType: "text/xml") {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                def execActions = builder.bind {
                     execActions {
                         scriptDirFiles.each {
                             execAction it.name
                         }
                     }
                 }
+                def xml = XmlUtil.serialize(execActions).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                render contentType: "text/xml", xml
             }
             json {
                 def dirContent = [:]
@@ -484,6 +510,283 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
         }
     }
+
+    /**
+     * execTypes returns a list of all existing executionZoneTypes.
+     */
+    def exectypes = {
+        withFormat {
+            xml {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                def executionZoneTypes = builder.bind {
+                    executionZoneTypes {
+                        ExecutionZoneType.list().sort().each {
+                            executionZoneType it
+                        }
+                    }
+                }
+
+                def xml = XmlUtil.serialize(executionZoneTypes).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                render contentType: "text/xml", xml
+            }
+            json {
+                render (contentType: "text/json") { ExecutionZoneType.list().sort() } as JSON
+            }
+        }
+    }
+
+    /**
+     * This method returns a xml or json template to create an execution zone.
+     */
+    def execzonetemplate = {
+
+        String[] nonrelevant_Properties = ['actions', 'creationDate', 'hosts', 'templates', 'processingParameters']
+        DefaultGrailsDomainClass d = new DefaultGrailsDomainClass(ExecutionZone.class)
+        GrailsDomainClassProperty[] properties = d.getPersistentProperties()
+
+        withFormat {
+            xml {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                def executionZone = builder.bind {
+                    executionZone {
+                        executionZoneType ''
+                        executionZoneProperties {
+                            properties.each { property ->
+                                if (!nonrelevant_Properties.contains(property.name)) {
+                                    executionZoneProperty {
+                                        propertyName property.name
+                                        propertyValue ''
+                                    }
+                                }
+                            }
+                        }
+                        processingParameters {
+                            parameter {
+                                parameterName ''
+                                parameterValue ''
+                                parameterDescription ''
+                                parameterExposed ''
+                                parameterPublished ''
+                            }
+                        }
+                    }
+                }
+
+                def xml = XmlUtil.serialize(executionZone).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                render contentType: "text/xml", xml
+            }
+            json {
+                def executionzonetemplate = [:]
+                executionzonetemplate.put('executionZoneType', '')
+
+                def executionZoneProperties = properties.findAll{!nonrelevant_Properties.contains(it.name)}
+                executionzonetemplate.put('executionZoneProperties', executionZoneProperties.collect {[propertyName: it.name, propertyValue: '']})
+                executionzonetemplate.put('processingParameters',[[parameterName: '', parameterValue: '', parameterDescription: '', parameterExposed: '', parameterPublished: '']])
+
+                render (contentType: 'text/json') { executionzonetemplate } as JSON
+            }
+        }
+    }
+
+    /**
+     * This method creates a new execution zone.
+     */
+    def createzone = {
+
+        Boolean hasError = Boolean.FALSE
+        HashMap parameters = new HashMap()
+        Map processingParams = [:]
+
+        request.withFormat {
+            xml {
+                def xml
+                try {
+                    xml = request.XML
+                }
+                catch (ConverterException e) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The XML could not be parsed.')
+                    hasError = Boolean.TRUE
+                    return
+                }
+
+                def xmlExecutionZoneProperties = xml[0].children.findAll {it.name == 'executionZoneProperties'}
+
+                xmlExecutionZoneProperties.each{ node ->
+                    node.children.each{ innerNode ->
+                        def name = ''
+                        def value = ''
+                        innerNode.children.each {
+                            if (it.name == 'propertyName') {
+                                name = it.text()
+                            } else if (it.name == 'propertyValue') {
+                                value = it.text()
+                            }
+                        }
+                        parameters[name] = value
+                    }
+                }
+
+                def xmlExecutionZoneParameters = xml[0].children.findAll {it.name == 'processingParameters'}
+
+                String[] keys = new String[xmlExecutionZoneParameters.size()]
+                String[] values = new String[xmlExecutionZoneParameters.size()]
+                String[] descriptions = new String[xmlExecutionZoneParameters.size()]
+                String[] exposed = new String[xmlExecutionZoneParameters.size()]
+                String[] published = new String[xmlExecutionZoneParameters.size()]
+
+                xmlExecutionZoneParameters.eachWithIndex { processingParameters, index ->
+                    processingParameters.children.each { parameter ->
+                        parameter.children.each {
+                            if ('parameterName' == it.name) {
+                                keys[index] = it.text()
+                            } else if ('parameterValue' == it.name) {
+                                values[index] = it.text()
+                            } else if ('parameterDescription' == it.name) {
+                                descriptions[index] = it.text()
+                            } else if ('parameterExposed' == it.name) {
+                                String exposedText = it.text()
+
+                                if ('true' == exposedText.toLowerCase() || 'false' == exposedText.toLowerCase()) {
+                                    exposed[index] = exposedText.toLowerCase()
+                                } else if (exposedText.isEmpty()) {
+                                    exposed[index] = 'false'
+                                } else {
+                                    renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterExposed has to be true or false.')
+                                    hasError = Boolean.TRUE
+                                    return
+                                }
+                            } else if ('parameterPublished' == it.name) {
+                                String publishedText = it.text()
+
+                                if ('true' == publishedText.toLowerCase() || 'false' == publishedText.toLowerCase()) {
+                                    published[index] = publishedText.toLowerCase()
+                                } else if (publishedText.isEmpty()) {
+                                    published[index] = 'false'
+                                } else {
+                                    renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterPublished has to be true or false.')
+                                    hasError = Boolean.TRUE
+                                    return
+                                }
+                            }
+                        }
+                    }
+                }
+
+                processingParams.put('parameters.key', keys)
+                processingParams.put('parameters.value', values)
+                processingParams.put('parameters.exposed', exposed)
+                processingParams.put('parameters.published', published)
+                processingParams.put('parameters.description', descriptions)
+            }
+            json {
+                String text = request.getReader().text
+                def json
+
+                try {
+                    json = new JSONObject(text)
+                }
+                catch (JSONException e) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
+                    hasError = Boolean.TRUE
+                    return
+                }
+
+                if (json.executionZoneProperties) {
+                    json.executionZoneProperties.each {
+                        parameters[it.propertyName] = it.propertyValue
+                    }
+                }
+
+                if(json.processingParameters) {
+
+                    String[] keys = new String[json.processingParameters.size()]
+                    String[] values = new String[json.processingParameters.size()]
+                    String[] descriptions = new String[json.processingParameters.size()]
+                    String[] exposed = new String[json.processingParameters.size()]
+                    String[] published = new String[json.processingParameters.size()]
+
+                    json.processingParameters.eachWithIndex { parameter, index ->
+                        parameter.each {
+                            if ('parameterName' == it.key) {
+                                keys[index] = it.value
+                            } else if ('parameterValue' == it.key) {
+                                values[index] = it.value
+                            } else if ('parameterDescription' == it.key) {
+                                descriptions[index] = it.value
+                            } else if ('parameterExposed' == it.key) {
+                                String exposedText = it.value
+
+                                if ('true' == exposedText.toLowerCase() || 'false' == exposedText.toLowerCase()) {
+                                    exposed[index] = exposedText.toLowerCase()
+                                } else if (exposedText.isEmpty()) {
+                                    exposed[index] = 'false'
+                                } else {
+                                    renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterExposed has to be true or false.')
+                                    hasError = Boolean.TRUE
+                                    return
+                                }
+                            } else if ('parameterPublished' == it.key) {
+                                String publishedText = it.value
+
+                                if ('true' == publishedText.toLowerCase() || 'false' == publishedText.toLowerCase()) {
+                                    published[index] = publishedText.toLowerCase()
+                                } else if (publishedText.isEmpty()) {
+                                    published[index] = 'false'
+                                } else {
+                                    renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterPublished has to be true or false.')
+                                    hasError = Boolean.TRUE
+                                    return
+                                }
+                            }
+                        }
+                    }
+
+                    processingParams.put('parameters.key', keys)
+                    processingParams.put('parameters.value', values)
+                    processingParams.put('parameters.exposed', exposed)
+                    processingParams.put('parameters.published', published)
+                    processingParams.put('parameters.description', descriptions)
+                }
+            }
+        }
+
+        if (hasError) {
+            return
+        }
+
+        if (parameters['type'] instanceof String) {
+            parameters['type'] = ExecutionZoneType.findByName(parameters['type']).id
+        }
+
+        ExecutionZone newExecutionZone = new ExecutionZone(parameters)
+        ControllerUtils.synchronizeProcessingParameters(ControllerUtils.getProcessingParameters(processingParams), newExecutionZone)
+
+        if (!newExecutionZone.save(flush: true)) {
+            renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'ERROR. ExecutionZone could not be saved. '
+                    + newExecutionZone.errors.allErrors.join(' \n'))
+        }
+
+        withFormat {
+            xml {
+                render newExecutionZone as XML
+            }
+            json {
+                JSON.use('deep')
+                render newExecutionZone as JSON
+            }
+        }
+    }
+
+    /**
+     * This method clones an exiting execution zone.
+     */
+    def cloneexecutionzone = {
+    }
+
 
     /**
      * Check if the user is already in the cache and has access to the requested execution zone.
@@ -510,4 +813,5 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         }
         return Boolean.FALSE
     }
+
 }
