@@ -206,7 +206,7 @@
 				 			<g:if test="${cmd}">
 								<g:set value="${cmd.scriptDir}" var="selectedScriptDir" />
 							</g:if>
-							<g:elseif test="${!scriptDirs.empty}">
+							<g:elseif test="${scriptDirs}">
 								<g:set value="${scriptDirs.iterator().next()}" var="selectedScriptDir" />
 							</g:elseif>
 
