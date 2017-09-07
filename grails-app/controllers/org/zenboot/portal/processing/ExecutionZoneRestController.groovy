@@ -17,6 +17,7 @@ import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
+import org.zenboot.portal.Template
 
 class ExecutionZoneRestController extends AbstractRestController implements ApplicationEventPublisherAware{
 
@@ -789,6 +790,60 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
      * This method clones an exiting execution zone.
      */
     def cloneexecutionzone = {
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+
+            ExecutionZone executionZone
+            ExecutionZone clonedExecutionZone
+
+            if (params.execId) {
+                executionZone = ExecutionZone.findById(params.execId)
+            }
+            else {
+                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The parameter execId to find the execution zone by id is missing.')
+                return
+            }
+
+            if (executionZone) {
+                clonedExecutionZone = new ExecutionZone(executionZone.properties)
+                clonedExecutionZone.actions = []
+                clonedExecutionZone.hosts = []
+                clonedExecutionZone.processingParameters = [] as SortedSet
+                clonedExecutionZone.templates = [] as SortedSet
+
+                executionZone.processingParameters.each {
+                    ProcessingParameter clonedParameter = new ProcessingParameter(it.properties)
+                    clonedExecutionZone.processingParameters.add(clonedParameter)
+                }
+
+                executionZone.templates.each {
+                    Template template = new Template(it.properties)
+                    clonedExecutionZone.templates.add(template)
+                }
+
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The execution zone for id ' + params.execId + ' could not be found.')
+                return
+            }
+
+            if (!clonedExecutionZone.save(flush: true)) {
+                renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'ERROR. ExecutionZone could not be saved. '
+                        + clonedExecutionZone.errors.allErrors.join(' \n'))
+            }
+
+            withFormat {
+                xml {
+                    render clonedExecutionZone as XML
+                }
+                json {
+                    JSON.use('deep')
+                    render clonedExecutionZone as JSON
+                }
+            }
+        }
+        else {
+            this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You have no permissions to clone execution zones.')
+        }
     }
 
     /**
