@@ -175,7 +175,6 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
         if (batch.hasErrors()) {
             throw new ProcessingException("Failure while building ${batch}: ${batch.errors}")
         }
-        batch.save(flush:true, failOnError: true)
         action.scriptletBatches << batch
         action.save(flush:true, failOnError: true)
 

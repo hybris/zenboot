@@ -40,7 +40,6 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
     }
 
     def execute(ExecuteExecutionZoneCommand cmd) {
-        def executionZone = ExecutionZone.get(cmd.execId)
         flash.action = 'execute'
         executionZoneService.setParameters(cmd, params.parameters)
         log.info("cmd setParameters:" + params.inspect())
@@ -48,7 +47,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             chain(action:"show", id:cmd.execId, model:[cmd:cmd])
             return
         } else {
-            ExecutionZoneAction action = cmd.getExecutionZoneAction()
+            ExecutionZoneAction action = cmd.createExecutionZoneAction()
             this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser, params.comment))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
@@ -403,7 +402,7 @@ class ExecuteExecutionZoneCommand extends AbstractExecutionZoneCommand {
     }
 
     @Override
-    ExecutionZoneAction getExecutionZoneAction() {
+    ExecutionZoneAction createExecutionZoneAction() {
         return executionZoneService.createExecutionZoneAction(ExecutionZone.get(this.execId), this.scriptDir, this.execZoneParameters)
     }
 
@@ -415,7 +414,7 @@ class ExposeExecutionZoneCommand extends AbstractExecutionZoneCommand {
     }
 
     @Override
-    ExposedExecutionZoneAction getExecutionZoneAction() {
+    ExposedExecutionZoneAction createExecutionZoneAction() {
         ExposedExecutionZoneAction expAction = new ExposedExecutionZoneAction(executionZone: ExecutionZone.get(this.execId), scriptDir: this.scriptDir)
         ControllerUtils.synchronizeProcessingParameterValues(this.execZoneParameters, expAction)
         return expAction
