@@ -23,7 +23,11 @@ class AdministrationController {
     def accessCacheCleared = {}
 
     // because of an error in execution zone controller many actions where created without any sense. This will clean all ExecutionzoneActions without scriptletBatches
-    def database_cleanup = {}
+    def database_cleanup = {
+        if (params.totalSize) {
+           [totalItems: params.totalSize]
+        }
+    }
 
     def database_cleaned = {
         log.info('Starting cleanup....')
@@ -57,7 +61,7 @@ class AdministrationController {
         sessionFactory.currentSession.flush()
         def totalSize = emptyActionList.size() + nonemptyActionList.size() + processingParameterCounter
         log.info('Cleanup finished... total removed items from the database: ' + totalSize)
-        redirect(action: 'database_cleanup')
+        redirect(action: 'database_cleanup', params: [totalSize: totalSize])
     }
 
 }
