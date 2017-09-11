@@ -128,7 +128,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         restendpoint {
                             name 'cloneexecutionzone'
                             description 'The method clones an existing execution zone.'
-                            url '/rest/v1/executionzones/$execId/clone'
+                            url '/rest/v1/executionzones/{execId}/clone'
                             exampleurl '/rest/v1/executionzones/1/clone'
                             restriction 'admin only'
                             execId {
