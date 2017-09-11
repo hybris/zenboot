@@ -50,6 +50,9 @@ class AdministrationController {
             }
         }
 
+        // first flush the removed ProcessingParameters
+        sessionFactory.currentSession.flush()
+
         // delete all in one query
         log.info('Removing ' + emptyActionList.size() + ' ExecutionZoneAction entries from the database.')
         dmgEmptyActions.deleteAll()
