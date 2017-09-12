@@ -49,6 +49,8 @@ COPY conf/server.xml /home/user/tomcat/conf
 
 ADD zenboot.properties /etc/zenboot/zenboot.properties
 USER root
+RUN echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
 RUN sudo apt-get update && sudo apt-get install -y curl ansible openssh-client sshpass socat dnsutils jq less vim netcat-openbsd git \
     && apt-get -y autoremove \
     && apt-get -y clean \
