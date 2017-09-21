@@ -52,9 +52,15 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     restendpoints {
                         restendpoint {
                             name 'execute'
-                            description 'The method execute the specific action of an execution zone based on the parameters.'
-                            url '/rest/v1/executionzones/{execId}/actions/{execAction}/execute'
-                            exampleurl '/rest/v1/executionzones/1/actions/internal/execute'
+                            description 'The method execute the specific action of an execution zone based on the parameters one or multiple times. The "quantity" parameter ensure that the user knows the number ' +
+                                    'of executions and will be used to compare with the calculated executions. The "runs" parameter could be used to execute scripts multiple times. To do this ' +
+                                    'the value of "quantity" has to be the same as "runs". This redundant set of the number of executions prevents the user from unwanted actions. ' +
+                                    'For more information look at the documentation in the wiki.'
+                            urls {
+                                all '/rest/v1/executionzones/{execId}/actions/{execAction}/{quantity}/execute'
+                                specific '/rest/v1/executionzones/{execId}/actions/{execAction}/{quantity}/execute?runs={the number of your executions}'
+                                exampleurl '/rest/v1/executionzones/1/actions/internal/5/execute?runs=5'
+                            }
                             execId {
                                 description 'The id of the specific execution zone.'
                                 type 'Long'
@@ -64,6 +70,16 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                 description 'The name of the action.'
                                 type 'String'
                                 mandatory 'Yes'
+                            }
+                            quantity {
+                                description 'The numbers of wanted executions'
+                                type 'Int'
+                                mandatory 'Yes'
+                            }
+                            runs {
+                                description 'The numbers of executions'
+                                type 'Int'
+                                mandatory 'No'
                             }
                             parameters 'Requires json or xml where all the necessary parameters are stored. You can save the result of /listparams to get a working template.'
                         }
@@ -540,55 +556,70 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                     def xmlExecutionZoneParameters = xml[0].children.findAll { it.name == 'processingParameters' }
 
-                    String[] keys = new String[xmlExecutionZoneParameters.size()]
-                    String[] values = new String[xmlExecutionZoneParameters.size()]
-                    String[] descriptions = new String[xmlExecutionZoneParameters.size()]
-                    String[] exposed = new String[xmlExecutionZoneParameters.size()]
-                    String[] published = new String[xmlExecutionZoneParameters.size()]
+                    if (xmlExecutionZoneParameters.size() != 0) {
 
-                    xmlExecutionZoneParameters.eachWithIndex { processingParameters, index ->
-                        processingParameters.children.each { parameter ->
-                            parameter.children.each {
-                                if ('parameterName' == it.name) {
-                                    keys[index] = it.text()
-                                } else if ('parameterValue' == it.name) {
-                                    values[index] = it.text()
-                                } else if ('parameterDescription' == it.name) {
-                                    descriptions[index] = it.text()
-                                } else if ('parameterExposed' == it.name) {
-                                    String exposedText = it.text()
+                        String[] keys = new String[xmlExecutionZoneParameters.size()]
+                        String[] values = new String[xmlExecutionZoneParameters.size()]
+                        String[] descriptions = new String[xmlExecutionZoneParameters.size()]
+                        String[] exposed = new String[xmlExecutionZoneParameters.size()]
+                        String[] published = new String[xmlExecutionZoneParameters.size()]
 
-                                    if ('true' == exposedText.toLowerCase() || 'false' == exposedText.toLowerCase()) {
-                                        exposed[index] = exposedText.toLowerCase()
-                                    } else if (exposedText.isEmpty()) {
-                                        exposed[index] = 'false'
-                                    } else {
-                                        renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterExposed has to be true or false.')
+                        xmlExecutionZoneParameters.eachWithIndex { processingParameters, index ->
+
+                            if (processingParameters.children.size() == 0) {
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Processing parameters are empty')
+                                hasError = Boolean.TRUE
+                            }
+
+                            processingParameters.children.each { parameter ->
+                                parameter.children.each {
+
+                                    if (it.text() == '') {
+                                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The value of a processing parameter cannot be empty')
                                         hasError = Boolean.TRUE
-                                        return
                                     }
-                                } else if ('parameterPublished' == it.name) {
-                                    String publishedText = it.text()
 
-                                    if ('true' == publishedText.toLowerCase() || 'false' == publishedText.toLowerCase()) {
-                                        published[index] = publishedText.toLowerCase()
-                                    } else if (publishedText.isEmpty()) {
-                                        published[index] = 'false'
-                                    } else {
-                                        renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterPublished has to be true or false.')
-                                        hasError = Boolean.TRUE
-                                        return
+                                    if ('parameterName' == it.name) {
+                                        keys[index] = it.text()
+                                    } else if ('parameterValue' == it.name) {
+                                        values[index] = it.text()
+                                    } else if ('parameterDescription' == it.name) {
+                                        descriptions[index] = it.text()
+                                    } else if ('parameterExposed' == it.name) {
+                                        String exposedText = it.text()
+
+                                        if ('true' == exposedText.toLowerCase() || 'false' == exposedText.toLowerCase()) {
+                                            exposed[index] = exposedText.toLowerCase()
+                                        } else if (exposedText.isEmpty()) {
+                                            exposed[index] = 'false'
+                                        } else {
+                                            renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterExposed has to be true or false.')
+                                            hasError = Boolean.TRUE
+                                            return
+                                        }
+                                    } else if ('parameterPublished' == it.name) {
+                                        String publishedText = it.text()
+
+                                        if ('true' == publishedText.toLowerCase() || 'false' == publishedText.toLowerCase()) {
+                                            published[index] = publishedText.toLowerCase()
+                                        } else if (publishedText.isEmpty()) {
+                                            published[index] = 'false'
+                                        } else {
+                                            renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterPublished has to be true or false.')
+                                            hasError = Boolean.TRUE
+                                            return
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    processingParams.put('parameters.key', keys)
-                    processingParams.put('parameters.value', values)
-                    processingParams.put('parameters.exposed', exposed)
-                    processingParams.put('parameters.published', published)
-                    processingParams.put('parameters.description', descriptions)
+                        processingParams.put('parameters.key', keys)
+                        processingParams.put('parameters.value', values)
+                        processingParams.put('parameters.exposed', exposed)
+                        processingParams.put('parameters.published', published)
+                        processingParams.put('parameters.description', descriptions)
+                    }
                 }
                 json {
                     String text = request.getReader().text
@@ -609,7 +640,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         }
                     }
 
-                    if (json.processingParameters) {
+                    if (json.processingParameters && json.processingParameters.size() != 0) {
 
                         String[] keys = new String[json.processingParameters.size()]
                         String[] values = new String[json.processingParameters.size()]
@@ -619,6 +650,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                         json.processingParameters.eachWithIndex { parameter, int index ->
                             parameter.each {
+                                if(it.value == ''){
+                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The value of a processing parameter cannot be empty')
+                                    hasError = Boolean.TRUE
+                                }
                                 if ('parameterName' == it.key) {
                                     keys[index] = it.value
                                 } else if ('parameterValue' == it.key) {
@@ -671,7 +706,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
 
             ExecutionZone newExecutionZone = new ExecutionZone(parameters)
-            ControllerUtils.synchronizeProcessingParameters(ControllerUtils.getProcessingParameters(processingParams), newExecutionZone)
+
+            if(processingParams) {
+                ControllerUtils.synchronizeProcessingParameters(ControllerUtils.getProcessingParameters(processingParams), newExecutionZone)
+            }
 
             if (!newExecutionZone.save(flush: true)) {
                 renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'ERROR. ExecutionZone could not be saved. '
