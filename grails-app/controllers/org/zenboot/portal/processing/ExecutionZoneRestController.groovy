@@ -99,8 +99,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         restendpoint {
                             name 'listparams'
                             description 'The method returns all required parameters on an specific execution zone action.'
-                            url '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams'
-                            exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
+                            urls {
+                                url '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams'
+                                exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
+                            }
                             execId {
                                 description 'The id of the specific execution zone.'
                                 type 'Long'
@@ -115,8 +117,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         restendpoint {
                             name 'listactions'
                             description 'The method return all action names of the specific execution zone.'
-                            url '/rest/v1/executionzones/$execId/listactions'
-                            exampleurl '/rest/v1/executionzones/1/listactions'
+                            urls {
+                                url '/rest/v1/executionzones/$execId/listactions'
+                                exampleurl '/rest/v1/executionzones/1/listactions'
+                            }
                             execId {
                                 description 'The id of the specific execution zone.'
                                 type 'Long'
@@ -126,34 +130,64 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         restendpoint {
                             name 'exectypes'
                             description 'The method return all available execution zone types.'
-                            url '/rest/v1/executionzones/exectypes'
-                            exampleurl '/rest/v1/executionzones/exectypes'
+                            urls {
+                                url '/rest/v1/executionzones/exectypes'
+                                exampleurl '/rest/v1/executionzones/exectypes'
+                            }
                         }
                         restendpoint {
                             name 'execzonetemplate'
                             description 'The method return a template of an execution zone which could be used to create a new one.'
-                            url '/rest/v1/executionzones/execzonetemplate'
-                            exampleurl '/rest/v1/executionzones/execzonetemplate'
+                            urls {
+                                url '/rest/v1/executionzones/execzonetemplate'
+                                exampleurl '/rest/v1/executionzones/execzonetemplate'
+                            }
                             restriction 'admin only'
                         }
                         restendpoint {
                             name 'createzone'
                             description 'The method return a template of an execution zone which could be used to create a new one.'
-                            url '/rest/v1/executionzones/create'
-                            exampleurl '/rest/v1/executionzones/create'
+                            urls {
+                                url '/rest/v1/executionzones/create'
+                                exampleurl '/rest/v1/executionzones/create'
+                            }
                             restriction 'admin only'
                             parameters 'Requires json or xml where all the necessary parameters are stored. You can save the result of /execzonetemplate to get a working template.'
                         }
                         restendpoint {
                             name 'cloneexecutionzone'
                             description 'The method clones an existing execution zone.'
-                            url '/rest/v1/executionzones/{execId}/clone'
-                            exampleurl '/rest/v1/executionzones/1/clone'
+                            urls {
+                                url '/rest/v1/executionzones/{execId}/clone'
+                                exampleurl '/rest/v1/executionzones/1/clone'
+                            }
                             restriction 'admin only'
                             execId {
                                 description 'The id of the specific execution zone.'
                                 type 'Long'
                                 mandatory 'Yes'
+                            }
+                        }
+                        restendpoint {
+                            name 'listhosts'
+                            description 'The method returns a list of all hosts for a specific execution zone. Could be specified by host state.'
+                            urls {
+                                all '/rest/v1/executionzones/{execId}/hosts'
+                                specific '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState}'
+                                exampleurl '/rest/v1/executionzones/1/hosts'
+                                exampleurlmulti '/rest/v1/executionzones/1/hosts?hostState=completed,running'
+                            }
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                            }
+                        }
+                        restendpoint {
+                            name 'hoststates'
+                            description 'The method returns a list of all possible host states'
+                            urls {
+                                url '/rest/v1/hoststates'
                             }
                         }
                     }
@@ -170,18 +204,96 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 def execType = [description: 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.', type: 'Long or String.',
                                 mandatory: 'No']
 
-                def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters.',
-                                       parameters: 'Requires json or xml where all the necessary parameters are stored. You can save the result of /listparams to get a working template.']
-                def listEndPoint = [description: 'The method returns the execution zones of the user.', execType: execType]
-                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action.', execId: execId, action: execAction]
-                def listactionsEndPoint = [description: 'The method return all action names of the specific execution zone.', execId: execId]
-                def exectypes = [description: 'The method return all available execution zone types.']
-                def execzonetemplate = [description: 'The method return a template of an execution zone which could be used to create a new one.', restriction: 'admin only']
-                def createzone = [description: 'The method return a template of an execution zone which could be used to create a new one.', restriction: 'admin only']
-                def cloneexecutionzone = [description: 'The method clones an existing execution zone.', restriction: 'admins only', execId: execId]
+                def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters one or multiple times. The {quantity} parameter ensure that the user knows the number ' +
+                        'of executions and will be used to compare with the calculated executions. The {runs} parameter could be used to execute scripts multiple times. To do this ' +
+                        'the value of {quantity} has to be the same as {runs}. This redundant set of the number of executions prevents the user from unwanted actions. ' +
+                        'For more information look at the documentation in the wiki.',
+                                       parameters: 'Requires json or xml where all the necessary parameters are stored. You can save the result of /listparams to get a working template.',
+                                       urls: [all: '/rest/v1/executionzones/{execId}/actions/{execAction}/{quantity}/execute',
+                                              specific: '/rest/v1/executionzones/{execId}/actions/{execAction}/{quantity}/execute?runs={the number of your executions}',
+                                              exampleurl: '/rest/v1/executionzones/1/actions/internal/5/execute?runs=5'],
+                                       quantity: [
+                                               description: 'The numbers of wanted executions',
+                                               type: 'Int',
+                                               mandatory: 'Yes'
+                                       ],
+                                       runs: [
+                                               description: 'The numbers of executions',
+                                               type: 'Int',
+                                               mandatory: 'No'
+                                       ],
+                        execId: execId,
+                        execAction: execAction
+                ]
+
+                def listEndPoint = [description: 'The method returns the execution zones of the user.', execType: execType,
+                                    urls: [
+                                            all: '/rest/v1/executionzones/list',
+                                            specific: '/rest/v1/executionzones/list?execType={execType}',
+                                            exampleurl: '/rest/v1/executionzones/list?execType=internal'
+                                    ]
+                ]
+
+                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action.', execId: execId, action: execAction,
+                                          urls: [
+                                              url: '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams',
+                                              exampleurl: '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
+                                          ]
+                ]
+
+                def listactionsEndPoint = [description: 'The method return all action names of the specific execution zone.', execId: execId,
+                                           urls: [
+                                               url: '/rest/v1/executionzones/$execId/listactions',
+                                               exampleurl: '/rest/v1/executionzones/1/listactions'
+                                           ]
+                ]
+
+                def exectypes = [description: 'The method return all available execution zone types.',
+                                 urls: [
+                                         url: '/rest/v1/executionzones/exectypes',
+                                         exampleurl: '/rest/v1/executionzones/exectypes'
+                                 ]
+                ]
+
+                def execzonetemplate = [description: 'The method return a template of an execution zone which could be used to create a new one.', restriction: 'admin only',
+                                        urls: [
+                                                url: '/rest/v1/executionzones/execzonetemplate',
+                                                exampleurl: '/rest/v1/executionzones/execzonetemplate'
+                                                ]
+                ]
+
+                def createzone = [description: 'The method return a template of an execution zone which could be used to create a new one.', restriction: 'admin only',
+                                  urls: [
+                                      url: '/rest/v1/executionzones/create',
+                                      exampleurl: '/rest/v1/executionzones/create'
+                                  ]
+
+                ]
+
+                def cloneexecutionzone = [description: 'The method clones an existing execution zone.', restriction: 'admins only', execId: execId,
+                                          urls: [
+                                              url: '/rest/v1/executionzones/{execId}/clone',
+                                              exampleurl: '/rest/v1/executionzones/1/clone'
+                                          ]
+                ]
+
+                def listhosts = [description: 'The method returns a list of all hosts for a specific execution zone. Could be specified by host state.', execId: execId,
+                                 urls: [
+                                         all: '/rest/v1/executionzones/{execId}/hosts',
+                                         specific: '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState}',
+                                         exampleurl: '/rest/v1/executionzones/1/hosts',
+                                         exampleurlmulti: '/rest/v1/executionzones/1/hosts?hostState=completed,running'
+                                 ]
+                ]
+
+                def listhostsstates = [description: 'The method returns a list of all possible host states',
+                                       urls: [
+                                               url: '/rest/v1/hoststates'
+                                       ]
+                ]
 
                 render (contentType: "text/json") { restendpoints execute: executeEndPoint, list: listEndPoint, listparams: listparamsEndPoint, listactions: listactionsEndPoint,
-                        exectypes: exectypes, execzonetemplate: execzonetemplate, create: createzone, clone: cloneexecutionzone }
+                        exectypes: exectypes, execzonetemplate: execzonetemplate, create: createzone, clone: cloneexecutionzone, hosts: listhosts, hoststates: listhostsstates }
             }
         }
     }
@@ -332,8 +444,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                     String parameters = builder.bind {
                         parameters {
-                            execId executionZone.id
-                            execAction actionName
                             paramsSet.each { param ->
                                 parameter {
                                     parameterName param.name
@@ -349,8 +459,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
                 json {
                     def responseParams = [:]
-                    responseParams.put('execId', executionZone.id)
-                    responseParams.put('execAction', actionName)
                     responseParams.put('parameters', paramsSet.collect {['parameterName': it.name, 'parameterValue': it.value]} )
 
                     render (contentType: "text/json") { responseParams } as JSON
@@ -875,6 +983,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     parameters[zoneparam.name] = xml.childNodes().findAll { it.name == 'parameter' }.findAll {
                         it.childNodes().findAll { it.text() == zoneparam.name }
                     }.collect { it.children[1].text() }
+
+                    if (parameters[zoneparam.name].size() == 0 && zoneparam.value != '') {
+                        parameters[zoneparam.name].add(zoneparam.value)
+                    }
                 }
 
             }
@@ -893,6 +1005,11 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                 origin_params.each { zoneparam ->
                     parameters[zoneparam.name] = json.parameters.findAll{it.parameterName == zoneparam.name}.collect{it.parameterValue}
+
+                    if (parameters[zoneparam.name].size() == 0 && zoneparam.value != '') {
+                        parameters[zoneparam.name].add(zoneparam.value)
+                    }
+
                 }
             }
         }
@@ -903,7 +1020,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
 
-            if (parameters.any { key, value -> value.any {it == ''} || value == null}) {
+            if (parameters.any { key, value -> value.any {it == ''} || value == null || value.size() == 0}) {
                 this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No empty parameter values allowed - please check your data.')
                 return
             }
@@ -1000,8 +1117,9 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 parameters.each { param ->
                     if (param.value.size() > idx) {
                         singleParams[param.key] = param.value[idx]
-                    } else {
-                        singleParams[param.key] = param.value.last()
+                    }
+                    else {
+                         singleParams[param.key] = param.value.last()
                     }
                 }
 
