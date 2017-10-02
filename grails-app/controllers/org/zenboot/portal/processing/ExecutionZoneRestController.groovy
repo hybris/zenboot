@@ -169,13 +169,13 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             }
                         }
                         restendpoint {
-                            name 'listhosts'
+                            name 'hosts'
                             description 'The method returns a list of all hosts for a specific execution zone. Could be specified by host state.'
                             urls {
                                 all '/rest/v1/executionzones/{execId}/hosts'
-                                specific '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState}'
+                                specific '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState...}'
                                 exampleurl '/rest/v1/executionzones/1/hosts'
-                                exampleurlmulti '/rest/v1/executionzones/1/hosts?hostState=completed,running'
+                                exampleurlmulti '/rest/v1/executionzones/1/hosts?hostState=completed,created'
                             }
                             execId {
                                 description 'The id of the specific execution zone.'
@@ -280,9 +280,9 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 def listhosts = [description: 'The method returns a list of all hosts for a specific execution zone. Could be specified by host state.', execId: execId,
                                  urls: [
                                          all: '/rest/v1/executionzones/{execId}/hosts',
-                                         specific: '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState}',
+                                         specific: '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState...}',
                                          exampleurl: '/rest/v1/executionzones/1/hosts',
-                                         exampleurlmulti: '/rest/v1/executionzones/1/hosts?hostState=completed,running'
+                                         exampleurlmulti: '/rest/v1/executionzones/1/hosts?hostState=completed,created'
                                  ]
                 ]
 
