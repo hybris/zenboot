@@ -404,7 +404,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         ExecutionZone executionZone
         String actionName
 
-        if (params.execId) {
+        if (params.execId && params.execId.isInteger()) {
             if(ExecutionZone.findById(params.execId as Long)){
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
@@ -478,7 +478,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         ExecutionZone executionZone
         File scriptDir
 
-        if (params.execId) {
+        if (params.execId && params.execId.isInteger()) {
             if(ExecutionZone.findById(params.execId as Long)){
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
@@ -848,7 +848,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             ExecutionZone executionZone
             ExecutionZone clonedExecutionZone
 
-            if (params.execId) {
+            if (params.execId && params.execId.isInteger()) {
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
             else {
@@ -916,7 +916,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         int runs = 1
         int quantity
 
-        if (params.execId) {
+        if (params.execId && params.execId.isInteger()) {
             if(ExecutionZone.findById(params.execId as Long)){
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
@@ -1174,7 +1174,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def listhosts = {
         ExecutionZone executionZone
 
-        if (params.execId) {
+        if (params.execId && params.execId.isInteger()) {
             if(ExecutionZone.findById(params.execId as Long)){
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
