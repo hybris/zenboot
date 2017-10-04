@@ -254,7 +254,7 @@
 
 				 			<fieldset class="spacer buttons">
 
-				 				<g:actionSubmit class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Action')}" disabled="${!executionZoneInstance?.enabled}" />
+				 				<g:actionSubmit id="execute" class="btn btn-success" action="execute" value="${message(code: 'executionZone.button.executeExecutionZone.label', default: 'Execute Action')}" disabled="${!executionZoneInstance?.enabled}" />
 				 				<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
 									<g:actionSubmit class="btn btn-inverse" action="createExposedAction" value="${message(code: 'executionZone.button.createExposedAction.label', default: 'Expose Action')}" disabled="${!executionZoneInstance?.enabled}" />
 								</sec:ifAllGranted>
@@ -359,7 +359,7 @@
 		</div>
 	</div>
 
-	<asset:script>
+	<asset:script type="text/javascript">
     $('#scriptDirs input:radio').change(function(event) {
         $.ajax({
             url : '<g:createLink action="ajaxGetParameters" params="[execId:executionZoneInstance?.id]" />&scriptDir=' + encodeURI($(this).val()),
@@ -394,5 +394,20 @@
         zenboot.enableParameterList();
     });
 	</asset:script>
+
+    <asset:script type="text/javascript">
+	$(execute).click(function() {
+
+	    var active = $('#scriptDirs').find('.active').find('a').attr('href');
+
+	    if('#sd-delete' == active) {
+            return confirm('This cannot be undone - are you sure?');
+        }
+        else {
+            return true;
+		}
+	});
+    </asset:script>
+
 </body>
 </html>
