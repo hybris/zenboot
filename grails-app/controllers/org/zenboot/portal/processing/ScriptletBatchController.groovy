@@ -118,7 +118,13 @@ class ScriptletBatchController {
         params.order = 'desc'
         params.offset = 0
 
-        def result = ScriptletBatch.list(params)
+        def criteria = ScriptletBatch.createCriteria()
+        def result = criteria.list (max:params.max, offset: params.offset){
+            not {
+                ilike('description', 'cron%')
+            }
+            order(params.sort as String, params.order as String)
+        }
 
         request.withFormat {
             json {
@@ -173,7 +179,7 @@ class ScriptletBatchController {
 	}
 
     def show() {
-        def scriptletBatchInstance = ScriptletBatch.get(params.id)
+        def scriptletBatchInstance = ScriptletBatch.get(params.id as Long)
         if (!scriptletBatchInstance) {
 			    flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
           redirect(action: "list")
@@ -184,9 +190,7 @@ class ScriptletBatchController {
             redirect(action: "list")
             return
           }
-
         }
-
 
         [scriptletBatchInstance: scriptletBatchInstance]
     }
@@ -213,7 +217,6 @@ class ScriptletBatchController {
         } else {
           flash.message = message(code: 'default.not.allowed.message')
           redirect(action: "list")
-          return
         }
     }
 }
