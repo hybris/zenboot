@@ -5,6 +5,8 @@ import grails.gsp.PageRenderer
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.grails.plugin.filterpane.FilterPaneUtils
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.ApplicationEventPublisherAware
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 
@@ -15,7 +17,7 @@ import org.springframework.http.HttpStatus
 import static grails.async.Promises.task
 import static grails.async.Promises.waitAll
 
-class ScriptletBatchController {
+class ScriptletBatchController implements ApplicationEventPublisherAware{
 
     PageRenderer groovyPageRenderer
     def executionZoneService
@@ -23,12 +25,18 @@ class ScriptletBatchController {
     def springSecurityService
     def scriptletBatchService
     def filterPaneService
+    def applicationEventPublisher
 
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
+    }
+
+    @Override
+    void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.applicationEventPublisher = eventPublisher
     }
 
     def list() {
@@ -218,6 +226,19 @@ class ScriptletBatchController {
           flash.message = message(code: 'default.not.allowed.message')
           redirect(action: "list")
         }
+    }
+
+    def rerun() {
+        ScriptletBatch scriptletBatchInstance = ScriptletBatch.get(params.id)
+        ExecutionZoneAction reRunAction = scriptletBatchInstance.getExecutionZoneAction()
+        Map parameters = [:]
+        reRunAction.processingParameters.each {
+            parameters[it.name] = it.value
+        }
+
+        ExecutionZoneAction newAction = executionZoneService.createExecutionZoneAction(reRunAction.executionZone, reRunAction.scriptDir, parameters)
+        applicationEventPublisher.publishEvent(new ProcessingEvent(newAction, springSecurityService.currentUser, "REST-call run"))
+        redirect(action: "show")
     }
 }
 
