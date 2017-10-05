@@ -943,11 +943,11 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 quantity = params.int('quantity')
             }
             else {
-                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The quanitiy has to be an integer.')
+                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The quantity has to be an integer.')
             }
         }
         else {
-            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The quanitiy which ensure that the number of executions is like you expect is missing.')
+            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The quantity which ensure that the number of executions is like you expect is missing.')
             return
         }
 
