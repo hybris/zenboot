@@ -165,7 +165,7 @@
 						<g:render template="steps" model="[steps:scriptletBatchInstance.processables]" />
 					</ul>
 				</div>
-				<g:if test="${scriptletBatchInstance?.isRunning()}">
+				<g:if test="${scriptletBatchInstance?.isRunning() || scriptletBatchInstance?.isWaiting()}">
 					<span id="stepsSpinner" class="property-value">
 						<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 					</span>

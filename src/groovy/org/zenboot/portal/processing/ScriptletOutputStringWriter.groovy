@@ -8,7 +8,8 @@ class ScriptletOutputStringWriter extends StringWriter {
     private Date lastUpdate = new Date()
     private int uncommitedLines = 0
 
-    int lineThreshold = 2
+    //all 30 lines the process output will be writen to the database
+    int lineThreshold = 30
     int syncTimeout = 5
 
     public ScriptletOutputStringWriter(Scriptlet scriptlet) {

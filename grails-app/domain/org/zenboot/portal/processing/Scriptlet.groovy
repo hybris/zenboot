@@ -49,6 +49,10 @@ class Scriptlet extends Processable implements ProcessListener {
         this.logged = this.writer.toString()
         this.output = this.processOutput.toString()
         this.error = this.processError.toString()
+        this.writer = null
+        this.appender = null
+        this.processOutput = null
+        this.processError = null
     }
 
     private WriterAppender createWriterAppender(StringWriter stringWriter) {
