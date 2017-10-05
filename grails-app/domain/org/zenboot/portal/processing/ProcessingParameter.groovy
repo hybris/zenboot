@@ -73,12 +73,19 @@ class ProcessingParameter implements Comparable {
       this.comment=null
     }
 
+    def beforeInsert() {
+        name = name.trim()
+        value = value.trim()
+    }
+
     def beforeUpdate() {
         this.comment="UPDATE"
         // if nothing changes, do not log update
         if(!this.isDirty()) {
             this.comment = null
         }
+        name = name.trim()
+        value = value.trim()
     }
 
     def afterInsert(){
