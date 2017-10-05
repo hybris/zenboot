@@ -237,7 +237,7 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
         }
 
         ExecutionZoneAction newAction = executionZoneService.createExecutionZoneAction(reRunAction.executionZone, reRunAction.scriptDir, parameters)
-        applicationEventPublisher.publishEvent(new ProcessingEvent(newAction, springSecurityService.currentUser, "REST-call run"))
+        applicationEventPublisher.publishEvent(new ProcessingEvent(newAction, springSecurityService.currentUser, "Rerun of previous executed action."))
         redirect(action: "show")
     }
 }
