@@ -240,7 +240,6 @@
 					<g:link class="btn btn-primary" action="edit" id="${hostInstance?.id}">
 						<g:message code="default.button.edit.label" default="Edit" />
 					</g:link>
-					<g:actionSubmit id="deleteButton" class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'host.button.delete.confirm.message', default: 'Are you sure to delete host ${hostInstance}?', args:[hostInstance])}');" />
 				</sec:ifAllGranted>
 			</fieldset>
 		</g:form>
