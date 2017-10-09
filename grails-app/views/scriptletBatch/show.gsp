@@ -165,7 +165,7 @@
 						<g:render template="steps" model="[steps:scriptletBatchInstance.processables]" />
 					</ul>
 				</div>
-				<g:if test="${scriptletBatchInstance?.isRunning()}">
+				<g:if test="${scriptletBatchInstance?.isRunning() || scriptletBatchInstance?.isWaiting()}">
 					<span id="stepsSpinner" class="property-value">
 						<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 					</span>
@@ -211,6 +211,7 @@
 				<fieldset class="buttons">
 					<g:hiddenField name="id" value="${scriptletBatchInstance?.id}" />
 					<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+					<g:actionSubmit class="btn btn-primary" action="rerun" value="${message(code: 'default.button.rerun.label', default: 'Rerun')}" />
 				</fieldset>
 			</g:form>
 		</div>
