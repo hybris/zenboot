@@ -1070,7 +1070,26 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 }
             }
             else if (names.size() == 0) {
-                numberOfExecutions = runs
+                def parameters_sizes = parameters.collect {parameters[it.key].size()}.unique()
+
+                if (parameters_sizes.size() == 1) {
+                    if (parameters_sizes.first() == 1 && runs) {
+                        numberOfExecutions = runs
+                    }
+                    else {
+                        numberOfExecutions == parameters_sizes.first()
+                    }
+                }
+                else if (parameters_sizes.size() == 2) {
+                    if(parameters_sizes.any {it == 1}) {
+                        numberOfExecutions = parameters_sizes.find {it != 1}
+                    }
+                    else {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Number of parameters which have to be set by user are not equal and ' +
+                                'cannot be assigned. Possible is all have the same number or some parameters x times and the rest of the variables one.')
+                        return
+                    }
+                }
             }
             else {
                 // get the number of parameters which are not fix
