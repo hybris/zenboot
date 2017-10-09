@@ -26,7 +26,7 @@ class ExecuteExposedActionSpec extends ZenbootApiSpec {
                 assert false : "get returned ${e.response.status}"
             }
             assert res.status == 200
-            assert res.responseData.status.scriptletBatch.state == 'RUNNING'
+            assert (res.responseData.status.scriptletBatch.state == 'RUNNING' || res.responseData.status.scriptletBatch.state == 'SUCCESS')
         }
 
         when: 'we get the list of running executions'
@@ -34,7 +34,7 @@ class ExecuteExposedActionSpec extends ZenbootApiSpec {
 
         then: 'the first one is running'
         res.status == 200
-        res.responseData.queue.first().state == 'RUNNING'
+        res.responseData.queue.first().state == 'RUNNING' || res.responseData.queue.first().state == 'SUCCESS'
 
 
         when: 'the status is checked even more'
