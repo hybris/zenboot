@@ -1026,7 +1026,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                 def executions = json.executions
 
-                executions.parameters.each {exec ->
+                executions?.parameters?.each {exec ->
                     Map<String, List> parameters =[:]
                     origin_params.each { zoneparam ->
 
@@ -1183,7 +1183,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
             else {
-                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ' + params.execId + ' not found.')
                 return
             }
         }
