@@ -98,10 +98,11 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         }
                         restendpoint {
                             name 'listparams'
-                            description 'The method returns all required parameters on an specific execution zone action.'
+                            description 'The method returns all required parameters on an specific execution zone action. With an additional ?executions= you are able to generate a template for more executions.'
                             urls {
                                 url '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams'
-                                exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
+                                specific '/rest/v1/executionzones/listparams?executions={integer}'
+                                exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/listparams?executions=3'
                             }
                             execId {
                                 description 'The id of the specific execution zone.'
@@ -234,10 +235,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                     ]
                 ]
 
-                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action.', execId: execId, action: execAction,
+                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action. With an additional ?executions= you are able to ' +
+                        'generate a template for more executions.', execId: execId, action: execAction,
                                           urls: [
                                               url: '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams',
-                                              exampleurl: '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
+                                              specific: '/rest/v1/executionzones/listparams?executions={integer}',
+                                              exampleurl: '/rest/v1/executionzones/1/actions/sanitycheck/listparams?executions=3'
                                           ]
                 ]
 
@@ -397,80 +400,95 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     }
 
     /**
-     * The method returns a list of all required parameters of an execution zone.
+     * The method returns a list of all required parameters of an execution zone. It is possible to generate a template
+     * for multiple execution while adding ?executions={number of your planed executions} to the url
      */
     def listparams = {
-
         ExecutionZone executionZone
         String actionName
 
         if (params.execId && params.execId.isInteger()) {
-            if(ExecutionZone.findById(params.execId as Long)){
+            if (ExecutionZone.findById(params.execId as Long)) {
                 executionZone = ExecutionZone.findById(params.execId as Long)
-            }
-            else {
+            } else {
                 this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
                 return
             }
-        }
-        else {
+        } else {
             this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
             return
         }
 
         if (params.execAction) {
             actionName = params.execAction
-        }
-        else {
+        } else {
             this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Action name (execAction) not set.')
             return
         }
 
-        if ( SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
 
             File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                     + "/" + executionZone.type.name + "/scripts/" + actionName)
 
-            if(!isValidScriptDir(stackDir)) {
+            if (!isValidScriptDir(stackDir)) {
                 return
             }
 
             def paramsSet = executionZoneService.getExecutionZoneParameters(executionZone, stackDir)
+            int numberofExecutions = 1
+
+            if (params.executions && params.executions.isInteger()) {
+                numberofExecutions = params.int('executions')
+            }
 
             withFormat {
                 xml {
                     def builder = new StreamingMarkupBuilder()
                     builder.encoding = 'UTF-8'
 
-                    String parameters = builder.bind {
-                        parameters {
-                            paramsSet.each { param ->
-                                parameter {
-                                    parameterName param.name
-                                    parameterValue param.value
+                    String executions = builder.bind {
+                        executions {
+                            numberofExecutions.times {
+                                execution {
+                                    parameters {
+                                        paramsSet.each { param ->
+                                            parameter {
+                                                parameterName param.name
+                                                parameterValue param.value
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    def xml = XmlUtil.serialize(parameters).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                    def xml = XmlUtil.serialize(executions).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
                     xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
                     render contentType: "text/xml", xml
                 }
                 json {
                     def responseParams = [:]
-                    responseParams.put('parameters', paramsSet.collect {['parameterName': it.name, 'parameterValue': it.value]} )
-
-                    render (contentType: "text/json") { responseParams } as JSON
+                    responseParams.put('parameters', paramsSet.collect {
+                        ['parameterName': it.name, 'parameterValue': it.value]
+                    })
+                    def executions = [:]
+                    def executionList = []
+                    numberofExecutions.times {
+                        executionList.add(responseParams)
+                    }
+                    executions.put('executions', executionList)
+                    render(contentType: "text/json") { executions } as JSON
                 }
             }
-        }
-        else {
+        } else {
             this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to request the parameter for this zone.')
         }
     }
 
-    /**
+
+        /**
      * This method returns a list of all possible actions for the executionzone.
      */
     def listactions = {
@@ -900,18 +918,18 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     }
 
     /**
-     * This method execute actions in zenboot. The 'quantity' parameter ensure that the caller of this method is aware of the number of runs. The 'runs' parameter execute an action 'runs'
-     * times. If a required (empty in the original) parameter in the data is set multiple times, the number of executions is the count of this parameter. Are there multiple required
-     * parameters the number of them have to be equal or except one they have the count '1'. The 'runs' parameter will be ignored in this case but the number of required parameters have to
-     * be the same as the 'quantity' parameter in the url. The 'runs' parameter is usefull if you need the same execution multiple times. This means if all required parameters have the count
-     * '1', the number of executions is 'runs' times. Also in this case the count of 'runs' and the 'quantity' have to be the same. Per default 'runs' is set to 1. For more detailed
-     * information read the documentation in the wiki.
+     * This method execute actions in zenboot. The 'quantity' parameter ensure that the caller of this method is aware
+     * of the number of runs. The 'runs' parameter execute the same action 'runs' times. To execute an action multiple
+     * times without the 'runs' parameters add executions to the data you send (see listparams). If this is done, the
+     * action will be executed the number of 'executions' times.
+     *
+     * For more detailed information read the documentation in the wiki.
      */
     def execute = {
         ExecutionZone executionZone
         String executionZoneAction
-        Map<String, List> parameters =[:]
         def referralsCol = []
+        List<Map> execution = new ArrayList<Map>()
         Boolean hasError = Boolean.FALSE
         int runs = 1
         int quantity
@@ -921,7 +939,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
             else {
-                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ' + ${params.execId} + ' not found.')
                 return
             }
         }
@@ -979,14 +997,20 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     return
                 }
 
-                origin_params.each { zoneparam ->
-                    parameters[zoneparam.name] = xml.childNodes().findAll { it.name == 'parameter' }.findAll {
-                        it.childNodes().findAll { it.text() == zoneparam.name }
-                    }.collect { it.children[1].text() }
+                def executions = xml.childNodes().findAll { it.name == 'execution'}
 
-                    if (parameters[zoneparam.name].size() == 0 && zoneparam.value != '') {
-                        parameters[zoneparam.name].add(zoneparam.value)
+                executions.each { exec ->
+
+                    Map<String, List> parameters =[:]
+
+                    origin_params.each { zoneparam ->
+                        parameters[zoneparam.name] = exec.childNodes().find {it.name == 'parameters'}.childNodes().findAll {it.name == 'parameter'}.find{it.childNodes().find{it.text() == zoneparam.name}}.children[1].text()
+
+                        if (!parameters[zoneparam.name] && zoneparam.value != '') {
+                            parameters[zoneparam.name] = zoneparam.value
+                        }
                     }
+                    execution.add(parameters)
                 }
 
             }
@@ -1003,13 +1027,19 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     return
                 }
 
-                origin_params.each { zoneparam ->
-                    parameters[zoneparam.name] = json.parameters.findAll{it.parameterName == zoneparam.name}.collect{it.parameterValue}
+                def executions = json.executions
 
-                    if (parameters[zoneparam.name].size() == 0 && zoneparam.value != '') {
-                        parameters[zoneparam.name].add(zoneparam.value)
+                executions?.parameters?.each {exec ->
+                    Map<String, List> parameters =[:]
+                    origin_params.each { zoneparam ->
+
+                        parameters[zoneparam.name] = exec.find{it.parameterName == zoneparam.name}?.parameterValue
+
+                        if (!parameters[zoneparam.name] && zoneparam.value != '') {
+                            parameters[zoneparam.name] = zoneparam.value
+                        }
                     }
-
+                    execution.add(parameters)
                 }
             }
         }
@@ -1020,39 +1050,38 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
 
-            if (parameters.any { key, value -> value.any {it == ''} || value == null || value.size() == 0}) {
-                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No empty parameter values allowed - please check your data.')
-                return
+            execution.each {
+                if (it.any { key, value -> value == '' || value == null}) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No empty parameter values allowed - please check your data.')
+                    return
+                }
             }
 
             if(!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
                 // check if it allowed to change the parameters
 
-                origin_params.each {
-                    ProcessingParameter org_parameter = new ProcessingParameter(name: it.name, value: it.value.toString())
+                execution.each { exec ->
+                    origin_params.each {
+                        ProcessingParameter org_parameter = new ProcessingParameter(name: it.name, value: it.value.toString())
 
-                    List<ProcessingParameter> testParamsList = []
+                        List<ProcessingParameter> testParamsList = []
 
-                    if (parameters[it.name]) {
-                        parameters[it.name].each { param ->
-                            testParamsList.add(new ProcessingParameter(name: it.name, value: param))
-                        }
-                    }
-                    else {
-                        if (it.value.toString()) {
-                            testParamsList.add(new ProcessingParameter(name: it.name, value: it.value.toString()))
-                        }
-                        else {
-                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No empty parameter values allowed - please check your data. Empty parameter: ' + it.name)
-                            return
+                        if (exec[it.name]) {
+                            testParamsList.add(new ProcessingParameter(name: it.name, value: exec[it.name]))
+                        } else {
+                            if (it.value.toString()) {
+                                testParamsList.add(new ProcessingParameter(name: it.name, value: it.value.toString()))
+                            } else {
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No empty parameter values allowed - please check your data. Empty parameter: ' + it.name)
+                                return
+                            }
                         }
 
-                    }
-
-                    testParamsList.each { new_parameter ->
-                        if (org_parameter.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, org_parameter)) {
-                            //not allowed to change this param so change back
-                            parameters[org_parameter.name][new_parameter.value] = org_parameter.value
+                        testParamsList.each { new_parameter ->
+                            if (org_parameter.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, org_parameter)) {
+                                //not allowed to change this param so change back
+                                exec[org_parameter.name] = org_parameter.value
+                            }
                         }
                     }
                 }
@@ -1062,65 +1091,28 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             def names = origin_params.findAll {it.value == ''}.name
             int numberOfExecutions
 
-            if (names.size() == 1) {
-                numberOfExecutions = parameters[names[0]].size()
-
-                if (numberOfExecutions == 1 && runs) {
+            if (execution.size() == 0) {
+                if (names.size() == 0) {
                     numberOfExecutions = runs
+                    //prepare map and fill with fix values
+                    def origin_parameters = [:]
+                    origin_params.each {
+                        origin_parameters[it.name] = it.value
+                    }
+                    //add it to execution
+                    execution.add(origin_parameters)
                 }
             }
-            else if (names.size() == 0) {
-                def parameters_sizes = parameters.collect {parameters[it.key].size()}.unique()
-
-                if (parameters_sizes.size() == 1) {
-                    if (parameters_sizes.first() == 1 && runs) {
-                        numberOfExecutions = runs
-                    }
-                    else {
-                        numberOfExecutions == parameters_sizes.first()
-                    }
+            else if (execution.size() == 1) {
+                if (params.runs) {
+                    numberOfExecutions = runs
                 }
-                else if (parameters_sizes.size() == 2) {
-                    if(parameters_sizes.any {it == 1}) {
-                        numberOfExecutions = parameters_sizes.find {it != 1}
-                    }
-                    else {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Number of parameters which have to be set by user are not equal and ' +
-                                'cannot be assigned. Possible is all have the same number or some parameters x times and the rest of the variables one.')
-                        return
-                    }
+                else {
+                    numberOfExecutions = 1
                 }
             }
             else {
-                // get the number of parameters which are not fix
-                def sizes = names.collect{it.size()}.unique()
-
-                // only one exists - as a result the number of executions is the number of existing parameters or 'number' if the value is '1'
-                if (sizes.size() == 1) {
-                    if (sizes.first() == 1 && runs) {
-                        numberOfExecutions = runs
-                    }
-                    else {
-                        numberOfExecutions = sizes.first()
-                    }
-                }
-                else if (sizes.size() == 2) {
-                    //two different exists
-                    if (sizes.any{it == 1}) {
-                        // one or more parameter is 1 so it will be used as fix parameter for all executions, the number of existing other ones is the number of executions
-                        numberOfExecutions = sizes.find { it != 1}
-                    }
-                    else {
-                        //ERROR - cannot decide when to use the different parameters
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Number of parameters which have to be set by user are not equal.')
-                        return
-                    }
-                }
-                else {
-                    //more than two exists - also cannot decide when to use the different parameters
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Number of parameters which have to be set by user are not equal.')
-                    return
-                }
+                numberOfExecutions = execution.size()
             }
 
             if (numberOfExecutions != quantity) {
@@ -1130,16 +1122,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
 
             numberOfExecutions.times { int idx ->
-
-                Map singleParams = [:]
-
-                parameters.each { param ->
-                    if (param.value.size() > idx) {
-                        singleParams[param.key] = param.value[idx]
-                    }
-                    else {
-                         singleParams[param.key] = param.value.last()
-                    }
+                Map singleParams
+                if (execution.size() > idx) {
+                    singleParams = execution[idx]
+                }
+                else {
+                    singleParams = execution.last()
                 }
 
                 // create action with zone, stackdir and parameters
@@ -1198,7 +1186,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
             else {
-                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ' + params.execId + ' not found.')
                 return
             }
         }
