@@ -98,10 +98,11 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         }
                         restendpoint {
                             name 'listparams'
-                            description 'The method returns all required parameters on an specific execution zone action.'
+                            description 'The method returns all required parameters on an specific execution zone action. With an additional ?executions= you are able to generate a template for more executions.'
                             urls {
                                 url '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams'
-                                exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
+                                specific '/rest/v1/executionzones/listparams?executions={integer}'
+                                exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/listparams?executions=3'
                             }
                             execId {
                                 description 'The id of the specific execution zone.'
@@ -234,10 +235,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                     ]
                 ]
 
-                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action.', execId: execId, action: execAction,
+                def listparamsEndPoint = [description: 'The method returns all required parameters on an specific execution zone action. With an additional ?executions= you are able to ' +
+                        'generate a template for more executions.', execId: execId, action: execAction,
                                           urls: [
                                               url: '/rest/v1/executionzones/{execId}/actions/{execAction}/listparams',
-                                              exampleurl: '/rest/v1/executionzones/1/actions/sanitycheck/listparams'
+                                              specific: '/rest/v1/executionzones/listparams?executions={integer}',
+                                              exampleurl: '/rest/v1/executionzones/1/actions/sanitycheck/listparams?executions=3'
                                           ]
                 ]
 
