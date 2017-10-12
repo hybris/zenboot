@@ -936,7 +936,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 executionZone = ExecutionZone.findById(params.execId as Long)
             }
             else {
-                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ${params.execId} not found.')
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ' + ${params.execId} + ' not found.')
                 return
             }
         }
@@ -1030,7 +1030,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     Map<String, List> parameters =[:]
                     origin_params.each { zoneparam ->
 
-                        parameters[zoneparam.name] = exec.find{it.parameterName == zoneparam.name}.parameterValue
+                        parameters[zoneparam.name] = exec.find{it.parameterName == zoneparam.name}?.parameterValue
 
                         if (!parameters[zoneparam.name] && zoneparam.value != '') {
                             parameters[zoneparam.name] = zoneparam.value
