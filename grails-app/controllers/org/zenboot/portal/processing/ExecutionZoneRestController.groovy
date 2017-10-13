@@ -1175,8 +1175,9 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     }
 
     /**
-     * The method returns the hosts of an execution zone. The result could be more specific if 'hostState' parameter is added to the request url e.g. ?hostState=completed to return all
-     * hosts with the state completed. It is also possible to add multiple states. In this case call the url with ?hostState=completed,created .
+     * The method returns the hosts. The result could be more specific if 'hostState' parameter is added to the request url e.g. ?hostState=completed to return all
+     * hosts with the state completed. It is also possible to add multiple states. In this case call the url with ?hostState=completed,created . Furthermore it is possible
+     * to restrict the search for a single execution zone. In this case add e.g. ?execId=104 to the url. You also can use both e.g. ?execId=104&hostState=completed,created .
      */
     def listhosts = {
         ExecutionZone executionZone
@@ -1189,10 +1190,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ' + params.execId + ' not found.')
                 return
             }
-        }
-        else {
-            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone id (execId) not set.')
-            return
         }
 
         def hostsFromZone = []
@@ -1212,7 +1209,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 state = state.toUpperCase()
                 if (HostState.values().find { it.toString() == state }) {
                     HostState hostState = HostState.valueOf(state)
-                    hostsFromZone.addAll(Host.findAllByExecZoneAndState(executionZone, hostState))
+                    if (executionZone) {
+                        hostsFromZone.addAll(Host.findAllByExecZoneAndState(executionZone, hostState))
+                    }
+                    else {
+                        hostsFromZone.addAll(Host.findAllByState(hostState))
+                    }
                 } else {
                     this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No hoststate found for state: ' + params.hostState)
                     return
@@ -1220,7 +1222,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
         }
         else {
-            hostsFromZone = Host.findAllByExecZone(executionZone)
+            if (executionZone) {
+                hostsFromZone = Host.findAllByExecZone(executionZone)
+            }
+            else {
+                hostsFromZone = Host.list()
+            }
         }
 
         withFormat {
@@ -1230,7 +1237,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                 String foundHosts = builder.bind {
                     hosts {
-                        execId executionZone.id
                         hostsFromZone.each { hostElement ->
                             host {
                                 hostname hostElement.hostname.toString()
@@ -1253,13 +1259,13 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
             json {
                 Map hosts = [:]
-                hosts.put('execId', executionZone.id)
                 List host = hostsFromZone.collect{[hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect{it.url}]]}
                 hosts.put('hosts', host)
                 render hosts as JSON
             }
         }
     }
+
 
     /**
      * The method returns a list of all existing states of a host.
