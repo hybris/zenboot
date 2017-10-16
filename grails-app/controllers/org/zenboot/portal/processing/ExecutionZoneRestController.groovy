@@ -132,8 +132,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             name 'exectypes'
                             description 'The method return all available execution zone types.'
                             urls {
-                                url '/rest/v1/executionzones/exectypes'
-                                exampleurl '/rest/v1/executionzones/exectypes'
+                                url '/rest/v1/exectypes'
+                                exampleurl '/rest/v1/exectypes'
                             }
                         }
                         restendpoint {
@@ -171,17 +171,22 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         }
                         restendpoint {
                             name 'hosts'
-                            description 'The method returns a list of all hosts for a specific execution zone. Could be specified by host state.'
+                            description 'The method returns a list of all hosts. Could be specified by host state and executionzone.'
                             urls {
-                                all '/rest/v1/executionzones/{execId}/hosts'
-                                specific '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState...}'
-                                exampleurl '/rest/v1/executionzones/1/hosts'
-                                exampleurlmulti '/rest/v1/executionzones/1/hosts?hostState=completed,created'
+                                all '/rest/v1/executionzones/hosts'
+                                specific '/rest/v1/executionzones/hosts?hostState={hostState,hostState...}&execId={execId}'
+                                exampleurl '/rest/v1/executionzones/hosts'
+                                exampleurlmulti '/rest/v1/executionzones/hosts?hostState=completed,created&execiId=104'
                             }
                             execId {
                                 description 'The id of the specific execution zone.'
                                 type 'Long'
-                                mandatory 'Yes'
+                                mandatory 'No'
+                            }
+                            hostState {
+                                description 'The state(s) of the host'
+                                type 'String'
+                                mandatory 'No'
                             }
                         }
                         restendpoint {
@@ -204,6 +209,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 def execAction = [description: 'The name of the action.', type: 'String', mandatory: 'Yes']
                 def execType = [description: 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.', type: 'Long or String.',
                                 mandatory: 'No']
+                def hostState = [description: 'The state(s) of the host', type: 'String', mandatory: 'No']
 
                 def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters one or multiple times. The {quantity} parameter ensure that the user knows the number ' +
                         'of executions and will be used to compare with the calculated executions. The {runs} parameter could be used to execute scripts multiple times. To do this ' +
@@ -253,8 +259,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                 def exectypes = [description: 'The method return all available execution zone types.',
                                  urls: [
-                                         url: '/rest/v1/executionzones/exectypes',
-                                         exampleurl: '/rest/v1/executionzones/exectypes'
+                                         url: '/rest/v1/exectypes',
+                                         exampleurl: '/rest/v1/exectypes'
                                  ]
                 ]
 
@@ -280,12 +286,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                           ]
                 ]
 
-                def listhosts = [description: 'The method returns a list of all hosts for a specific execution zone. Could be specified by host state.', execId: execId,
+                def listhosts = [description: 'The method returns a list of all hosts. Could be specified by host state and executionzone.', execId: execId, hostState: hostState,
                                  urls: [
-                                         all: '/rest/v1/executionzones/{execId}/hosts',
-                                         specific: '/rest/v1/executionzones/$execId/hosts?hostState={hostState,hostState...}',
-                                         exampleurl: '/rest/v1/executionzones/1/hosts',
-                                         exampleurlmulti: '/rest/v1/executionzones/1/hosts?hostState=completed,created'
+                                         all: '/rest/v1/executionzones/hosts',
+                                         specific: '/rest/v1/executionzones/hosts?hostState={hostState,hostState...}&execId={execId}',
+                                         exampleurl: '/rest/v1/executionzones/hosts',
+                                         exampleurlmulti: '/rest/v1/executionzones/hosts?hostState=completed,created&execId=104'
                                  ]
                 ]
 
