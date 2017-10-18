@@ -54,11 +54,6 @@ class Scriptlet extends Processable implements ProcessListener {
     @Override
     protected void stop(ProcessContext ctx) {
         Logger.rootLogger.removeAppender(this.appender)
-//        List<String> finalLogOutput = this.writer.toString().tokenize('\n')
-//        if(finalLogOutput.size() > logslist.size()) {
-//            logslist.addAll(logslist.size(), finalLogOutput.getAt(logslist.size()..-1))
-//
-//        }
         this.logslist = this.writer.toString().tokenize('\n')
         this.logged = ''
         this.output = this.processOutput.toString()

@@ -72,7 +72,7 @@
 
 	<g:if test="${q?.state != ProcessState.WAITING}">
 		<g:if test="${q?.logOutput}">
-			<pre id="${itemId}_logOutput" aria-labelledby="processables-log" class="hide">${q?.logOutput}</pre>
+			<pre id="${itemId}_logOutput" aria-labelledby="processables-log" class="hide" <g:if test="${q?.state == ProcessState.RUNNING}">style="display: block;"</g:if>>${q?.logOutput}</pre>
 		</g:if>
 		<g:if test="${q?.output}">
 			<pre id="${itemId}_output" class="alert alert-info hide" aria-labelledby="processables-output" <g:if test="${q?.state == ProcessState.RUNNING}">style="display: block;"</g:if>>${q?.output}</pre>
