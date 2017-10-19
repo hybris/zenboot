@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"io/ioutil"
     "net"
+    "os"
     "time"
 )
 
-var BASE_URL = "https://zenboot.hybris.com/zenboot/rest/v1/"
+var ENDPOINT = "/zenboot/rest/v1/"
 
-func sendRequest(request_type string, endpoint string) string {
+func sendRequest(request_type string, rest_call string) (string, error) {
 
     var netTransport = &http.Transport {
         Dial: (&net.Dialer {
@@ -22,11 +23,15 @@ func sendRequest(request_type string, endpoint string) string {
         Timeout: time.Second * 10,
         Transport: netTransport,
 	}
-	req, err := http.NewRequest(request_type, BASE_URL+endpoint, nil)
-	req.SetBasicAuth("nobody", "nobody")
+	req, err := http.NewRequest(request_type, zenbootUrl+ENDPOINT+rest_call, nil)
+	req.SetBasicAuth(username, password)
     req.Header.Set("Accept", "application/json")
 
 	resp, err := client.Do(req)
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
 
 	defer resp.Body.Close()
 
@@ -35,5 +40,5 @@ func sendRequest(request_type string, endpoint string) string {
 		fmt.Println(err)
 	}
 
-    return string(content)
+    return string(content), nil
 }
