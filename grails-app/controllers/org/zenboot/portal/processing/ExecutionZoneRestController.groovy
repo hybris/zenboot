@@ -3,6 +3,7 @@ package org.zenboot.portal.processing
 import grails.converters.JSON
 import grails.converters.XML
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.slurpersupport.NodeChild
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
@@ -42,7 +43,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     /**
      * The method gives you an overview about the possible rest endpoints and which parameters could be set.
      */
-    def help = {
+    @Secured(['permitAll'])
+    def help() {
         withFormat {
             xml {
                 def builder = new StreamingMarkupBuilder()
@@ -173,10 +175,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             name 'hosts'
                             description 'The method returns a list of all hosts. Could be specified by host state and executionzone.'
                             urls {
-                                all '/rest/v1/executionzones/hosts'
-                                specific '/rest/v1/executionzones/hosts?hostState={hostState,hostState...}&execId={execId}'
-                                exampleurl '/rest/v1/executionzones/hosts'
-                                exampleurlmulti '/rest/v1/executionzones/hosts?hostState=completed,created&execiId=104'
+                                all '/rest/v1/hosts'
+                                specific '/rest/v1/hosts?hostState={hostState,hostState...}&execId={execId}'
+                                exampleurl '/rest/v1/hosts'
+                                exampleurlmulti '/rest/v1/hosts?hostState=completed,created&execiId=104'
                             }
                             execId {
                                 description 'The id of the specific execution zone.'
@@ -288,10 +290,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                 def listhosts = [description: 'The method returns a list of all hosts. Could be specified by host state and executionzone.', execId: execId, hostState: hostState,
                                  urls: [
-                                         all: '/rest/v1/executionzones/hosts',
-                                         specific: '/rest/v1/executionzones/hosts?hostState={hostState,hostState...}&execId={execId}',
-                                         exampleurl: '/rest/v1/executionzones/hosts',
-                                         exampleurlmulti: '/rest/v1/executionzones/hosts?hostState=completed,created&execId=104'
+                                         all: '/rest/v1/hosts',
+                                         specific: '/rest/v1/hosts?hostState={hostState,hostState...}&execId={execId}',
+                                         exampleurl: '/rest/v1/hosts',
+                                         exampleurlmulti: '/rest/v1/hosts?hostState=completed,created&execId=104'
                                  ]
                 ]
 
@@ -1186,90 +1188,122 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
      * to restrict the search for a single execution zone. In this case add e.g. ?execId=104 to the url. You also can use both e.g. ?execId=104&hostState=completed,created .
      */
     def listhosts = {
-        ExecutionZone executionZone
+            ExecutionZone executionZone
 
-        if (params.execId && params.execId.isInteger()) {
-            if(ExecutionZone.findById(params.execId as Long)){
-                executionZone = ExecutionZone.findById(params.execId as Long)
-            }
-            else {
-                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ' + params.execId + ' not found.')
-                return
-            }
-        }
-
-        def hostsFromZone = []
-
-        if (params.hostState) {
-            def hostStates = []
-
-            if (params.hostState.contains(',')){
-                hostStates = params.hostState.split(',')
-            }
-            else {
-                hostStates.add(params.hostState as String)
-            }
-
-            hostStates.each {
-                String state = it as String
-                state = state.toUpperCase()
-                if (HostState.values().find { it.toString() == state }) {
-                    HostState hostState = HostState.valueOf(state)
-                    if (executionZone) {
-                        hostsFromZone.addAll(Host.findAllByExecZoneAndState(executionZone, hostState))
-                    }
-                    else {
-                        hostsFromZone.addAll(Host.findAllByState(hostState))
-                    }
+            if (params.execId && params.execId.isInteger()) {
+                if (ExecutionZone.findById(params.execId as Long)) {
+                    executionZone = ExecutionZone.findById(params.execId as Long)
                 } else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No hoststate found for state: ' + params.hostState)
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'ExecutionZone with id ' + params.execId + ' not found.')
                     return
                 }
             }
-        }
-        else {
-            if (executionZone) {
-                hostsFromZone = Host.findAllByExecZone(executionZone)
-            }
-            else {
-                hostsFromZone = Host.list()
-            }
-        }
 
-        withFormat {
-            xml {
-                def builder = new StreamingMarkupBuilder()
-                builder.encoding = 'UTF-8'
+            List<Long> usersExecutionZones = []
+            if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                Map execZoneMap = accessService.accessCache[springSecurityService.getCurrentUserId()]
+                usersExecutionZones = execZoneMap.findAll{it.value == true}.collect{it.key}
+                if (usersExecutionZones.isEmpty()) {
+                    this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You do not have any access to any executionzone.')
+                }
+            }
 
-                String foundHosts = builder.bind {
-                    hosts {
-                        hostsFromZone.each { hostElement ->
-                            host {
-                                hostname hostElement.hostname.toString()
-                                cname hostElement.cname
-                                hoststate hostElement.state.toString()
-                                ipadress hostElement.ipAddress
-                                serviceUrls {
-                                    hostElement.serviceUrls.each { singleurl ->
-                                        serviceUrl singleurl.url
+            def hostsFromZone = []
+
+            if (params.hostState) {
+                def hostStates = []
+
+                if (params.hostState.contains(',')) {
+                    hostStates = params.hostState.split(',')
+                } else {
+                    hostStates.add(params.hostState as String)
+                }
+
+                hostStates.each {
+                    String state = it as String
+                    state = state.toUpperCase()
+                    if (HostState.values().find { it.toString() == state }) {
+                        HostState hostState = HostState.valueOf(state)
+                        if (executionZone) {
+                            if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
+                                hostsFromZone.addAll(Host.findAllByExecZoneAndState(executionZone, hostState))
+                            }
+                            else {
+                                this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You have no permissions to list the hosts of this execution zone.')
+                            }
+                        } else {
+                            if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                                hostsFromZone.addAll(Host.findAllByState(hostState))
+                            }
+                            else {
+                                usersExecutionZones.each {
+                                    hostsFromZone.addAll(Host.findAllByStateAndExecZone(hostState, ExecutionZone.findById(it)))
+                                }
+                            }
+                        }
+                    } else {
+                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No hoststate found for state: ' + params.hostState)
+                        return
+                    }
+                }
+            } else {
+                if (executionZone) {
+                    if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || userHasAccess(executionZone)) {
+                        hostsFromZone = Host.findAllByExecZone(executionZone)
+                    }
+                    else {
+                        this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You have no permissions to list the hosts of this execution zone.')
+                    }
+                } else {
+                    if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                        hostsFromZone = Host.list()
+                    }
+                    else {
+                        usersExecutionZones.each {
+                            hostsFromZone.addAll(Host.findAllByExecZone(ExecutionZone.findById(it)))
+                        }
+                    }
+                }
+            }
+
+            withFormat {
+                xml {
+                    def builder = new StreamingMarkupBuilder()
+                    builder.encoding = 'UTF-8'
+
+                    String foundHosts = builder.bind {
+                        hosts {
+                            hostsFromZone.each { hostElement ->
+                                host {
+                                    hostname hostElement.hostname.toString()
+                                    cname hostElement.cname
+                                    hoststate hostElement.state.toString()
+                                    ipadress hostElement.ipAddress
+                                    serviceUrls {
+                                        hostElement.serviceUrls.each { singleurl ->
+                                            serviceUrl singleurl.url
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                def xml = XmlUtil.serialize(foundHosts).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
-                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
-                render contentType: "text/xml", xml
+                    def xml = XmlUtil.serialize(foundHosts).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                    xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
+                    render contentType: "text/xml", xml
+                }
+                json {
+                    Map hosts = [:]
+                    List host = hostsFromZone.collect {
+                        [hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect {
+                            it.url
+                        }]]
+                    }
+                    hosts.put('hosts', host)
+                    render hosts as JSON
+                }
             }
-            json {
-                Map hosts = [:]
-                List host = hostsFromZone.collect{[hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect{it.url}]]}
-                hosts.put('hosts', host)
-                render hosts as JSON
-            }
-        }
     }
 
 

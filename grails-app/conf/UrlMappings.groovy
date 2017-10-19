@@ -34,7 +34,7 @@ class UrlMappings {
         "/rest/v1/executionzones/create"(controller: 'executionZoneRest', action: 'createzone')
         "/rest/v1/executionzones/$execId/clone"(controller: 'executionZoneRest', action: 'cloneexecutionzone')
         "/rest/v1/executionzones/$execId/actions/$execAction/$quantity/execute?"(controller: 'executionZoneRest', action: 'execute')
-        "/rest/v1/executionzones/hosts?"(controller: 'executionZoneRest', action: 'listhosts')
+        "/rest/v1/hosts?"(controller: 'executionZoneRest', action: 'listhosts')
         "/rest/v1/hoststates"(controller: 'executionZoneRest', action: 'listhoststates')
 
         // templates
