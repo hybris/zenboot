@@ -1,40 +1,19 @@
-package main
+package cmd
 
 import (
-	"fmt"
-	"net/http"
-	"io/ioutil"
-    "net"
-    "time"
+  "github.com/spf13/cobra"
+  "fmt"
 )
 
-var BASE_URL = "https://zenboot.hybris.com/zenboot/rest/v1/"
-//var BASE_URL = "https://zenboot.hybris.com/zenboot/rest/v1/"
+func init() {
+  RootCmd.AddCommand(resttestCmd)
+}
 
-func main() {
-
-    var netTransport = &http.Transport {
-        Dial: (&net.Dialer {
-            Timeout: 5 * time.Second,
-        }).Dial,
-        TLSHandshakeTimeout: 5 * time.Second,
-    }
-	var client = &http.Client{
-        Timeout: time.Second * 10,
-        Transport: netTransport,
-	}
-	req, err := http.NewRequest("GET", BASE_URL+"help", nil)
-	req.SetBasicAuth("nobody", "nobody")
-    req.Header.Set("Accept", "application/json")
-
-	resp, err := client.Do(req)
-
-	defer resp.Body.Close()
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Printf("%s\n", content)
+var resttestCmd = &cobra.Command {
+  Use:   "resttest",
+  Short: "Test a rest-command with zenboot-test",
+  Run: func(cmd *cobra.Command, args []string) {
+      var content = sendRequest("GET", "help")
+      fmt.Printf("%s\n", content)
+  },
 }
