@@ -11,7 +11,7 @@ import (
 
 var cfgFile string
 var username string
-var password string
+var secret string
 var zenbootUrl string
 var default_zenbootUrl string = "https://zenboot.hybris.com"
 
@@ -29,7 +29,7 @@ var RootCmd = &cobra.Command{
 func init() {
   RootCmd.PersistentFlags().StringVarP(&zenbootUrl, "zenbooturl", "z", "", "The zenboot instance to use (default is https://zenboot.hybris.com)")
   RootCmd.PersistentFlags().StringVarP(&username, "username", "u", "", "The username to connect to zenboot (default is empty)")
-  RootCmd.PersistentFlags().StringVarP(&password, "password", "p", "", "The password to connect (default is empty)")
+  RootCmd.PersistentFlags().StringVarP(&secret, "secret", "s", "", "The password to connect (default is empty)")
   RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.zenboot.json)")
   initConfig()
 
@@ -40,8 +40,8 @@ func init() {
   if username == "" {
       username = viper.GetString("username")
   }
-  if password == "" {
-      password = viper.GetString("password")
+  if secret == "" {
+      secret = viper.GetString("secret")
   }
   viper.SetDefault("author", "RPI <rpi@sap.com>")
   viper.SetDefault("license", "apache")

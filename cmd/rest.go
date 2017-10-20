@@ -47,7 +47,7 @@ func sendRequest(request_type string, rest_call string, data string) (string, er
 
 	req, err := http.NewRequest(request_type, zenbootUrl+ENDPOINT+rest_call, data_buffer)
     handleError(err)
-	req.SetBasicAuth(username, password)
+	req.SetBasicAuth(username, secret)
     req.Header.Set("Accept", "application/json")
 
 	resp, err := client.Do(req)

@@ -25,22 +25,22 @@ type Parameter struct {
 }
 
 func init() {
-  executeCmd.Flags().StringVarP(&action, "action", "a", "", "the action to run.")
   executeCmd.Flags().IntVarP(&id, "executionzone", "e", 0, "the id of the Execution Zone in which to execute.")
   RootCmd.AddCommand(executeCmd)
 }
 
 var executeCmd = &cobra.Command {
-  Use:   "execute [endpoint]",
-  Short: "Test a rest-command with zenboot",
+  Use:   "execute [action]",
+  Short: "Execute an action in an Execution Zone with zenboot.",
   Run: func(cmd *cobra.Command, args []string) {
       if id == 0 {
           fmt.Println("Please specify an id for the Execution Zone.")
           os.Exit(1)
-      } else if action == "" {
+      } else if len(args) < 1 {
           fmt.Println("Please specify an action to execute.")
           os.Exit(1)
       }
+      action := args[0]
 
       parameters, err := sendGet("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/listparams")
       handleError(err)
@@ -48,9 +48,9 @@ var executeCmd = &cobra.Command {
       jsonParameters := JsonResponse{}
       json.Unmarshal([]byte(parameters), &jsonParameters)
 
-      fmt.Println("First parameter: ", string(jsonParameters.Executions[0].Parameters[0].ParameterName))
+      //fmt.Println("First parameter: ", string(jsonParameters.Executions[0].Parameters[0].ParameterName))
 
-      jsonParameters.Executions[0].Parameters[0].ParameterName = "CHANGED USERNAME"
+      //jsonParameters.Executions[0].Parameters[0].ParameterName = "CHANGED USERNAME"
 
       for _, execution := range jsonParameters.Executions {
           for _, params := range execution.Parameters {
@@ -63,7 +63,7 @@ var executeCmd = &cobra.Command {
 
       fmt.Println(string(prettyJSON))
 
-      //callback, err := sendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", parameters)
+      //callback, err := sendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", prettyJSON)
       //handleError(err)
 
       //fmt.Printf("%s\n", callback)
