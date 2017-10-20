@@ -52,6 +52,12 @@ var executeCmd = &cobra.Command {
 
       jsonParameters.Executions[0].Parameters[0].ParameterName = "CHANGED USERNAME"
 
+      for _, execution := range jsonParameters.Executions {
+          for _, params := range execution.Parameters {
+            fmt.Println(params.ParameterName)
+          }
+      }
+
       prettyJSON, error := json.MarshalIndent(jsonParameters, "", "  ")
       handleError(error)
 
