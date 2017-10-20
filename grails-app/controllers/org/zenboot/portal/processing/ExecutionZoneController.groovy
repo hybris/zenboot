@@ -136,7 +136,7 @@ class ExecutionZoneController extends AbstractRestController implements Applicat
             chain(action:"show", id:cmd.execId, model:[cmd:cmd])
             return
         }
-        chain(controller:'exposedExecutionZoneAction', action:'create', model:['exposedExecutionZoneActionInstance':cmd.executionZoneAction])
+        chain(controller:'exposedExecutionZoneAction', action:'create', model:['exposedExecutionZoneActionInstance':cmd.createExecutionZoneAction()])
     }
 
     def index() {
