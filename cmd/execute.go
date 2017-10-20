@@ -26,6 +26,7 @@ type Parameter struct {
 
 func init() {
   executeCmd.Flags().IntVarP(&id, "executionzone", "e", 0, "the id of the Execution Zone in which to execute.")
+  executeCmd.Flags().StringSliceP("parameter", "p", nil, "a parameter to pass to the execution")
   RootCmd.AddCommand(executeCmd)
 }
 
@@ -40,6 +41,13 @@ var executeCmd = &cobra.Command {
           fmt.Println("Please specify an action to execute.")
           os.Exit(1)
       }
+      slicePFlag, _ := cmd.Flags().GetStringSlice("parameter")
+
+      for _, flag := range slicePFlag {
+          fmt.Println(flag)
+      }
+      fmt.Println(slicePFlag)
+
       action := args[0]
 
       parameters, err := sendGet("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/listparams")
