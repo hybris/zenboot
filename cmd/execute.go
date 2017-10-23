@@ -4,8 +4,10 @@ import (
   "github.com/spf13/cobra"
   "fmt"
   "os"
+  "bytes"
   "strconv"
   "encoding/json"
+  "strings"
 )
 
 var action string
@@ -46,7 +48,6 @@ var executeCmd = &cobra.Command {
       for _, flag := range slicePFlag {
           fmt.Println(flag)
       }
-      fmt.Println(slicePFlag)
 
       action := args[0]
 
@@ -56,24 +57,41 @@ var executeCmd = &cobra.Command {
       jsonParameters := JsonResponse{}
       json.Unmarshal([]byte(parameters), &jsonParameters)
 
+      prettyJson0, err := json.MarshalIndent(jsonParameters, "", "  ")
+      handleError(err)
+
+      fmt.Println(string(prettyJson0))
       //fmt.Println("First parameter: ", string(jsonParameters.Executions[0].Parameters[0].ParameterName))
 
       //jsonParameters.Executions[0].Parameters[0].ParameterName = "CHANGED USERNAME"
 
-      for _, execution := range jsonParameters.Executions {
-          for _, params := range execution.Parameters {
-            fmt.Println(params.ParameterName)
+      for execId, execution := range jsonParameters.Executions {
+          for paramId, params := range execution.Parameters {
+            if params.ParameterValue == "" {
+                for _, flag := range slicePFlag {
+                    paramMap := strings.SplitN(flag, "=", 2)
+                    if params.ParameterName == paramMap[0] {
+                        jsonParameters.Executions[execId].Parameters[paramId].ParameterValue = paramMap[1]
+                    }
+                }
+            }
           }
       }
 
-      prettyJSON, error := json.MarshalIndent(jsonParameters, "", "  ")
+      b := new(bytes.Buffer)
+      json.NewEncoder(b).Encode(jsonParameters)
+
+      setParameters, err := json.Marshal(jsonParameters)
+      handleError(err)
+
+      fmt.Println(string(setParameters))
+
+      callback, err := sendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", b)
+      handleError(err)
+
+      prettyJSON2, error := json.MarshalIndent(callback, "", "  ")
       handleError(error)
 
-      fmt.Println(string(prettyJSON))
-
-      //callback, err := sendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", prettyJSON)
-      //handleError(err)
-
-      //fmt.Printf("%s\n", callback)
+      fmt.Println(string(prettyJSON2))
   },
 }

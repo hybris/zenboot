@@ -30,7 +30,7 @@ func sendPost(rest_call string, data string) (string, error) {
     return result, err
 }
 
-func sendRequest(request_type string, rest_call string, data string) (string, error) {
+func sendRequest(request_type string, rest_call string, data []bytes.Buffer) (string, error) {
 
     var netTransport = &http.Transport {
         Dial: (&net.Dialer {
@@ -43,12 +43,16 @@ func sendRequest(request_type string, rest_call string, data string) (string, er
         Transport: netTransport,
 	}
 
-    data_buffer := bytes.NewBuffer([]byte(data))
+    data_buffer := bytes.NewBuffer(data)
 
 	req, err := http.NewRequest(request_type, zenbootUrl+ENDPOINT+rest_call, data_buffer)
     handleError(err)
 	req.SetBasicAuth(username, secret)
     req.Header.Set("Accept", "application/json")
+
+    if request_type == "POST" {
+        req.Header.Set("Content-Type", "application/json")
+    }
 
 	resp, err := client.Do(req)
     if err != nil {
