@@ -1,6 +1,12 @@
 <script>
     function resizeIframe(obj) {
-        obj.style.height = obj.contentWindow.document.body.scrollHeight + 21 +  'px';
+        var isChromium = window.chrome;
+        if(isChromium) {
+            obj.style.height = obj.contentDocument.documentElement.scrollHeight + 21 + 'px';
+        }
+        else {
+            obj.style.height = obj.contentWindow.document.body.scrollHeight + 21 + 'px';
+        }
     }
 </script>
 
