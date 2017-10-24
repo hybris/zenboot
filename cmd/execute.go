@@ -4,17 +4,17 @@ import (
   "github.com/spf13/cobra"
   "fmt"
   "os"
-  "bytes"
   "strconv"
   "encoding/json"
   "strings"
+  "github.com/hokaccha/go-prettyjson"
 )
 
 var action string
 var id int
 
 type JsonResponse struct {
-  Executions    []Execution
+  Executions    []Execution  `json:"executions"`
 }
 
 type Execution struct {
@@ -45,25 +45,13 @@ var executeCmd = &cobra.Command {
       }
       slicePFlag, _ := cmd.Flags().GetStringSlice("parameter")
 
-      for _, flag := range slicePFlag {
-          fmt.Println(flag)
-      }
-
       action := args[0]
 
       parameters, err := sendGet("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/listparams")
       handleError(err)
 
       jsonParameters := JsonResponse{}
-      json.Unmarshal([]byte(parameters), &jsonParameters)
-
-      prettyJson0, err := json.MarshalIndent(jsonParameters, "", "  ")
-      handleError(err)
-
-      fmt.Println(string(prettyJson0))
-      //fmt.Println("First parameter: ", string(jsonParameters.Executions[0].Parameters[0].ParameterName))
-
-      //jsonParameters.Executions[0].Parameters[0].ParameterName = "CHANGED USERNAME"
+      json.Unmarshal(parameters, &jsonParameters)
 
       for execId, execution := range jsonParameters.Executions {
           for paramId, params := range execution.Parameters {
@@ -78,20 +66,13 @@ var executeCmd = &cobra.Command {
           }
       }
 
-      b := new(bytes.Buffer)
-      json.NewEncoder(b).Encode(jsonParameters)
-
       setParameters, err := json.Marshal(jsonParameters)
       handleError(err)
 
-      fmt.Println(string(setParameters))
-
-      callback, err := sendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", b)
+      callback, err := sendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", []byte(setParameters))
       handleError(err)
 
-      prettyJSON2, error := json.MarshalIndent(callback, "", "  ")
-      handleError(error)
-
-      fmt.Println(string(prettyJSON2))
+      prettyjson, _ := prettyjson.Format(callback)
+      fmt.Println(string(prettyjson))
   },
 }

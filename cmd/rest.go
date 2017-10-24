@@ -7,8 +7,8 @@ import (
     "net"
     "os"
     "time"
-    "bytes"
     "strings"
+    "bytes"
 )
 
 var ENDPOINT = "/zenboot/rest/v1/"
@@ -20,17 +20,17 @@ func handleError(err error) {
   }
 }
 
-func sendGet(rest_call string) (string, error) {
-    result, err := sendRequest("GET", rest_call, "")
+func sendGet(rest_call string) ([]byte, error) {
+    result, err := sendRequest("GET", rest_call, nil)
     return result, err
 }
 
-func sendPost(rest_call string, data string) (string, error) {
+func sendPost(rest_call string, data []byte) ([]byte, error) {
     result, err := sendRequest("POST", rest_call, data)
     return result, err
 }
 
-func sendRequest(request_type string, rest_call string, data []bytes.Buffer) (string, error) {
+func sendRequest(request_type string, rest_call string, data []byte) ([]byte, error) {
 
     var netTransport = &http.Transport {
         Dial: (&net.Dialer {
@@ -56,14 +56,14 @@ func sendRequest(request_type string, rest_call string, data []bytes.Buffer) (st
 
 	resp, err := client.Do(req)
     if err != nil {
-        return "", err
+        return nil, err
     }
 
 	defer resp.Body.Close()
 
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-	    return "", err
+	    return nil, err
 	}
 
     var returnValue = string(content)
@@ -76,5 +76,5 @@ func sendRequest(request_type string, rest_call string, data []bytes.Buffer) (st
         os.Exit(1)
     }
 
-    return returnValue, nil
+    return content, nil
 }
