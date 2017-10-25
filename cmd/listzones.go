@@ -4,10 +4,21 @@ import (
   "github.com/spf13/cobra"
   "fmt"
   "os"
+  "encoding/json"
   "github.com/hokaccha/go-prettyjson"
 )
 
 var domain string
+
+type ExecutionZonesResponse struct {
+    ExecutionZones []ExecutionZone  `json:"executionzones"`
+}
+
+type ExecutionZone struct {
+    ExecId int  `json:"execId"`
+    ExecType string  `json:"execType"`
+    ExecDescription string  `json:"execDescription"`
+}
 
 func init() {
   RootCmd.AddCommand(listzonesCmd)
@@ -15,25 +26,27 @@ func init() {
 }
 
 var listzonesCmd = &cobra.Command {
-  Use: "listzones -d <ExecutionZone>",
-  Short: "list all matching execution zones",
+  Use: "list zones [-d <ExecutionZone>]",
+  Short: "list all Execution Zones [matching the given domain]",
   Run: func(cmd *cobra.Command, args []string){
-    if domain == "" {
-      fmt.Println("Error!")
-      os.Exit(1)
+
+    content, err := sendGet("executionzones/list")
+    if err != nil {
+      fmt.Println("Error: ", err)
+	  os.Exit(1)
     }
 
-	  content, err := sendGet("executionzones/list")
-	  if err != nil {
-		  fmt.Println(err)
-		  os.Exit(1)
-	  }
+    jsonZones := ExecutionZonesResponse{}
+    json.Unmarshal(content, &jsonZones)
 
+    if domain != "" {
 
+    }
 
+    zones, err := json.Marshal(jsonZones)
 
-	  prettyjson, _ := prettyjson.Format(content)
-	  fmt.Printf("%s\n", prettyjson)
+    prettyjson, _ := prettyjson.Format(zones)
+    fmt.Println(string(prettyjson))
   },
 }
 
