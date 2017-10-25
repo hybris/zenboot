@@ -4,7 +4,6 @@ import (
   "github.com/spf13/cobra"
   "fmt"
   "os"
-//  "encoding/json"
   "github.com/hokaccha/go-prettyjson"
 )
 
@@ -34,13 +33,6 @@ var listhostsCmd = &cobra.Command {
       fmt.Println("Error: ", err)
 	  os.Exit(1)
     }
-
-    //jsonHosts := HostsResponse{}
-    //json.Unmarshal(content, &jsonHosts)
-
-    //var filteredHosts = jsonHosts
-
-    //hosts, err := json.Marshal(filteredHosts)
 
     prettyjson, _ := prettyjson.Format(content)
     fmt.Println(string(prettyjson))
