@@ -3,7 +3,6 @@ package org.zenboot.portal.processing
 
 class ScriptletOutputStringWriter extends StringWriter {
 
-    Scriptlet scriptlet
     File tempFile
 
     private Date lastUpdate = new Date()
