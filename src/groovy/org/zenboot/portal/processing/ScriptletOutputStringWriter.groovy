@@ -3,24 +3,18 @@ package org.zenboot.portal.processing
 
 class ScriptletOutputStringWriter extends StringWriter {
 
-    Scriptlet scriptlet
+    File tempFile
 
     private Date lastUpdate = new Date()
     private int uncommitedLines = 0
 
     //all 30 lines the process output will be writen to the database
-    int lineThreshold = 30
+    int lineThreshold = 2
     int syncTimeout = 5
 
-    public ScriptletOutputStringWriter(Scriptlet scriptlet) {
+    ScriptletOutputStringWriter(File tempFile) {
         super()
-        this.scriptlet = scriptlet
-    }
-
-
-    public ScriptletOutputStringWriter(Scriptlet scriptlet, int initialSize) {
-        super(initialSize)
-        this.scriptlet = scriptlet
+        this.tempFile = tempFile
     }
 
     @Override
@@ -57,8 +51,13 @@ class ScriptletOutputStringWriter extends StringWriter {
         this.uncommitedLines += data.count("\n")
         Date now = new Date()
         if (this.uncommitedLines >= this.lineThreshold || ((this.lastUpdate.time - now.time) >= (this.syncTimeout * 1000) && this.uncommitedLines > 0)) {
-            this.scriptlet.output = this.buffer.toString()
-            this.scriptlet.save(flush:true)
+            String content = this.buffer.toString()
+            List logOutput =  content.tokenize('\n')
+            if (logOutput.size() > tempFile.readLines().size()) {
+                logOutput[tempFile.readLines().size()..-1].each {
+                    tempFile << it + '\n'
+                }
+            }
             this.uncommitedLines = 0
             this.lastUpdate = now
         }

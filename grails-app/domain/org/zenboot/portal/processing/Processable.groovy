@@ -88,6 +88,7 @@ abstract class Processable {
         }
         this.startDate = new Date()
         this.state = ProcessState.RUNNING
+        this.save(flush:true)
         this.onStart(ctx)
     }
 

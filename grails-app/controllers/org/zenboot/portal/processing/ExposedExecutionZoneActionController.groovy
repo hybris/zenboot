@@ -111,10 +111,10 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     def save = { SaveExposedExecutionZoneActionCommand cmd ->
         executionZoneService.setParameters(cmd, params.parameters)
         if (cmd.hasErrors()) {
-            render(view:"create", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.executionZoneAction])
+            render(view:"create", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.createExecutionZoneAction()])
             return
         }
-        def exposedExecutionZoneActionInstance = cmd.executionZoneAction
+        def exposedExecutionZoneActionInstance = cmd.createExecutionZoneAction()
         if (!exposedExecutionZoneActionInstance.save(flush: true)) {
             render(view: "create", model: [exposedExecutionZoneActionInstance: exposedExecutionZoneActionInstance])
             return

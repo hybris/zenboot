@@ -143,7 +143,7 @@ class ScriptletTests {
         def log = LogFactory.getLog("org.zenboot.portal.processing.ScriptletTests")
         processUnit.process = { log.debug(logMessage) }
         processUnit.execute()
-        assertTrue("Log entry not found", processUnit.logged.contains(logMessage))
+        assertTrue("Log entry not found", processUnit.getLogOutput().contains(logMessage))
     }
 
     private createProcessUnit(Closure onFailure, Closure onSuccess, Closure onStart, Closure onStop, Closure process) {

@@ -176,10 +176,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             throw new ProcessingException("Failure while building ${batch}: ${batch.errors}")
         }
         action.scriptletBatches << batch
-        action.save(flush:true, failOnError: true)
-
         this.addScriptlets(batch, action.runtimeAttributes)
-
+        action.save(flush:true, failOnError: true)
         return batch
     }
 
@@ -193,7 +191,6 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             batch.state = Processable.ProcessState.FAILURE
             batch.exceptionMessage = e.getMessage()
             batch.exceptionStacktrace = e.getStackTrace()
-
             batch.save(flush: true)
             throw e
         }
@@ -210,11 +207,8 @@ class ScriptletBatchService implements ApplicationListener<ProcessingEvent> {
             if (pluginFile) {
                 executionService.injectPlugins(pluginFile, scriptlet)
             }
-
             batch.processables << scriptlet
             scriptlet.scriptletBatch = batch
-
-            scriptlet.save(flush:true)
         }
     }
 
