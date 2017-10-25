@@ -22,12 +22,12 @@ type ExecutionZone struct {
 }
 
 func init() {
-  RootCmd.AddCommand(listzonesCmd)
   listzonesCmd.Flags().StringVarP(&domain, "domain", "d","", "Domain to match zones to")
+  RootCmd.AddCommand(listzonesCmd)
 }
 
 var listzonesCmd = &cobra.Command {
-  Use: "list zones [-d <ExecutionZone>]",
+  Use: "list zones [flags]",
   Short: "list all Execution Zones [matching the given domain]",
   Run: func(cmd *cobra.Command, args []string){
 
