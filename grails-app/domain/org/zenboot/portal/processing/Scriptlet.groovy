@@ -42,7 +42,7 @@ class Scriptlet extends Processable implements ProcessListener {
 
     @Override
     protected void start(ProcessContext ctx) {
-        tempfile = File.createTempFile(String.valueOf(this.id),'.tmp')
+        tempfile = File.createTempFile('temp_' + String.valueOf(this.id),'.tmp')
         tempFilePath = tempfile.getAbsolutePath()
         logslist = []
         this.writer = new ScriptletOutputStringWriter(tempfile)
