@@ -6,6 +6,7 @@ import (
   "os"
   "encoding/json"
   "github.com/hokaccha/go-prettyjson"
+  "strings"
 )
 
 var domain string
@@ -39,11 +40,18 @@ var listzonesCmd = &cobra.Command {
     jsonZones := ExecutionZonesResponse{}
     json.Unmarshal(content, &jsonZones)
 
+    filteredZones := ExecutionZonesResponse{}
     if domain != "" {
-
+        for _, executionZone := range jsonZones.ExecutionZones {
+            if strings.Contains(executionZone.ExecDescription, domain) {
+                filteredZones.ExecutionZones = append(filteredZones.ExecutionZones, executionZone)
+            }
+        }
+    } else {
+        filteredZones = jsonZones
     }
 
-    zones, err := json.Marshal(jsonZones)
+    zones, err := json.Marshal(filteredZones)
 
     prettyjson, _ := prettyjson.Format(zones)
     fmt.Println(string(prettyjson))
