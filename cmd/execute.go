@@ -59,12 +59,12 @@ var executeCmd = &cobra.Command{
 			for paramId, params := range execution.Parameters {
 				if params.ParameterValue == "" {
 					emptyParams[params.ParameterName] = true
-					for _, flag := range slicePFlag {
-						paramMap := strings.SplitN(flag, "=", 2)
-						if params.ParameterName == paramMap[0] {
-							jsonParameters.Executions[execId].Parameters[paramId].ParameterValue = paramMap[1]
-							delete(emptyParams, params.ParameterName)
-						}
+				}
+				for _, flag := range slicePFlag {
+					paramMap := strings.SplitN(flag, "=", 2)
+					if params.ParameterName == paramMap[0] {
+						jsonParameters.Executions[execId].Parameters[paramId].ParameterValue = paramMap[1]
+						delete(emptyParams, params.ParameterName)
 					}
 				}
 			}
