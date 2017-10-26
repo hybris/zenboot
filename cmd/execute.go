@@ -3,7 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"log"
 	"strconv"
 	"strings"
 
@@ -37,11 +37,9 @@ var executeCmd = &cobra.Command{
 	Short: "Execute an action in an Execution Zone with zenboot.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if id == 0 {
-			fmt.Println("Please specify an id for the Execution Zone.")
-			os.Exit(1)
+			log.Fatalln("Please specify an id for the Execution Zone.")
 		} else if len(args) < 1 {
-			fmt.Println("Please specify an action to execute.")
-			os.Exit(1)
+			log.Fatalln("Please specify an action to execute.")
 		}
 		slicePFlag, _ := cmd.Flags().GetStringSlice("parameter")
 
@@ -77,8 +75,7 @@ var executeCmd = &cobra.Command{
 			for key, _ := range emptyParams {
 				fmt.Println(" - ParameterName [", key, "] has no value")
 			}
-			fmt.Println("")
-			os.Exit(1)
+			log.Fatalln("")
 		}
 
 		setParameters, err := json.Marshal(jsonParameters)

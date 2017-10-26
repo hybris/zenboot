@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"os"
+	"log"
 	"strconv"
 
 	"../lib"
@@ -23,8 +23,7 @@ var listActionsCmd = &cobra.Command{
 
 		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/listactions")
 		if err != nil {
-			fmt.Println("Error: ", err)
-			os.Exit(1)
+			log.Fatalln("Error: ", err)
 		}
 
 		prettyjson, _ := prettyjson.Format(content)

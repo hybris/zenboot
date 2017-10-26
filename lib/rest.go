@@ -2,11 +2,10 @@ package lib
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
@@ -21,8 +20,7 @@ type Zenboot struct {
 
 func HandleError(err error) {
 	if err != nil {
-		fmt.Println("There was an error: ", err)
-		os.Exit(1)
+		log.Fatalln("There was an error: ", err)
 	}
 }
 
@@ -87,10 +85,8 @@ func handlePermissionError(content []byte) {
 	var returnValue = string(content)
 
 	if strings.Contains(returnValue, "Status 401") {
-		fmt.Println("Wrong or missing credentials. Please set correct credentials.")
-		os.Exit(1)
+		log.Fatalln("Wrong or missing credentials. Please set correct credentials.")
 	} else if strings.Contains(returnValue, "Status 403") {
-		fmt.Println("Insufficient permissions to access resource.")
-		os.Exit(1)
+		log.Fatalln("Insufficient permissions to access resource.")
 	}
 }

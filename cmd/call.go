@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"../lib"
 	"github.com/spf13/cobra"
@@ -17,8 +17,7 @@ var callCmd = &cobra.Command{
 	Short: "Test a rest-command with zenboot",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			fmt.Println("This command needs at least a rest-command to be passed.")
-			os.Exit(1)
+			log.Fatalln("This command needs at least a rest-command to be passed.")
 		}
 		rest_call := args[0]
 
