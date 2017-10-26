@@ -15,8 +15,8 @@ func init() {
 }
 
 var listActionsCmd = &cobra.Command{
-	Use:   "actions [ExecutionZoneID]",
-	Short: "list all action names of the specific execution zone",
+	Use:   "actions [flags]",
+	Short: "list all action names of the specific Execution Zone",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
