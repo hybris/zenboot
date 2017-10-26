@@ -3,27 +3,25 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strconv"
 
+	"../lib"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	RootCmd.AddCommand(listactionsCmd)
+	listCmd.AddCommand(listActionsCmd)
 }
 
-var listactionsCmd = &cobra.Command{
-	Use:   "listactions [ExecutionZoneID]",
+var listActionsCmd = &cobra.Command{
+	Use:   "actions [ExecutionZoneID]",
 	Short: "list all action names of the specific execution zone",
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) != 1 {
-			fmt.Println("Please specify an id for the Execution Zone.")
-			os.Exit(1)
-		}
 
-		id := args[0]
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
 
-		content, err := sendGet("executionzones/" + id + "/listactions")
+		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/listactions")
 		if err != nil {
 			fmt.Println("Error: ", err)
 			os.Exit(1)
