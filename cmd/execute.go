@@ -8,6 +8,7 @@ import (
   "encoding/json"
   "strings"
   "github.com/hokaccha/go-prettyjson"
+  "../lib"
 )
 
 var action string
@@ -47,30 +48,45 @@ var executeCmd = &cobra.Command {
 
       action := args[0]
 
-      parameters, err := sendGet("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/listparams")
-      handleError(err)
+      var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+
+      parameters, err := rest.SendGet("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/listparams")
+      lib.HandleError(err)
 
       jsonParameters := JsonResponse{}
       json.Unmarshal(parameters, &jsonParameters)
 
+      var emptyParams map[string]bool = make(map[string]bool)
+
       for execId, execution := range jsonParameters.Executions {
           for paramId, params := range execution.Parameters {
             if params.ParameterValue == "" {
+                emptyParams[params.ParameterName] = true
                 for _, flag := range slicePFlag {
                     paramMap := strings.SplitN(flag, "=", 2)
                     if params.ParameterName == paramMap[0] {
                         jsonParameters.Executions[execId].Parameters[paramId].ParameterValue = paramMap[1]
+                        delete(emptyParams, params.ParameterName)
                     }
                 }
             }
           }
       }
 
-      setParameters, err := json.Marshal(jsonParameters)
-      handleError(err)
+      if len(emptyParams) > 0 {
+        fmt.Println("\x1b[31mThe action cannot be executed. There are empty parameters:\n\x1b[0m")
+        for key, _ := range emptyParams {
+          fmt.Println(" - ParameterName [", key, "] has no value")
+        }
+        fmt.Println("")
+        os.Exit(1)
+      }
 
-      callback, err := sendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", []byte(setParameters))
-      handleError(err)
+      setParameters, err := json.Marshal(jsonParameters)
+      lib.HandleError(err)
+
+      callback, err := rest.SendPost("executionzones/"+strconv.Itoa(id)+"/actions/"+action+"/1/execute", []byte(setParameters))
+      lib.HandleError(err)
 
       prettyjson, _ := prettyjson.Format(callback)
       fmt.Println(string(prettyjson))

@@ -3,8 +3,8 @@ package cmd
 import (
   "github.com/spf13/cobra"
   "fmt"
-  "os"
   "github.com/hokaccha/go-prettyjson"
+  "../lib"
 )
 
 type HostsResponse struct {
@@ -28,11 +28,10 @@ var listhostsCmd = &cobra.Command {
   Short: "list all CREATED and COMPLETED hosts [matching the given domain]",
   Run: func(cmd *cobra.Command, args []string){
 
-    content, err := sendGet("hosts?hostState=CREATED,COMPLETED")
-    if err != nil {
-      fmt.Println("Error: ", err)
-	  os.Exit(1)
-    }
+    var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+
+    content, err := rest.SendGet("hosts?hostState=CREATED,COMPLETED")
+    lib.HandleError(err)
 
     prettyjson, _ := prettyjson.Format(content)
     fmt.Println(string(prettyjson))

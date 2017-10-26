@@ -3,10 +3,10 @@ package cmd
 import (
   "github.com/spf13/cobra"
   "fmt"
-  "os"
   "encoding/json"
   "github.com/hokaccha/go-prettyjson"
   "strings"
+  "../lib"
 )
 
 var domain string
@@ -31,11 +31,10 @@ var listzonesCmd = &cobra.Command {
   Short: "list all Execution Zones [matching the given domain]",
   Run: func(cmd *cobra.Command, args []string){
 
-    content, err := sendGet("executionzones/list")
-    if err != nil {
-      fmt.Println("Error: ", err)
-	  os.Exit(1)
-    }
+    var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+
+    content, err := rest.SendGet("executionzones/list")
+    lib.HandleError(err)
 
     jsonZones := ExecutionZonesResponse{}
     json.Unmarshal(content, &jsonZones)

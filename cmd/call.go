@@ -4,6 +4,7 @@ import (
   "github.com/spf13/cobra"
   "fmt"
   "os"
+  "../lib"
 )
 
 func init() {
@@ -20,11 +21,11 @@ var callCmd = &cobra.Command {
       }
       rest_call := args[0]
 
-      content, err := sendGet(rest_call)
-      if err != nil {
-          fmt.Println(err)
-          os.Exit(1)
-      }
+      var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+
+      content, err := rest.SendGet(rest_call)
+      lib.HandleError(err)
+
       fmt.Printf("%s\n", content)
   },
 }
