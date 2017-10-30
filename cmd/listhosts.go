@@ -6,6 +6,7 @@ import (
 	"../lib"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 type HostsResponse struct {
@@ -31,7 +32,13 @@ var listhostsCmd = &cobra.Command{
 
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
 
-		content, err := rest.SendGet("hosts?hostState=CREATED,COMPLETED")
+		var filter string
+
+		if id != 0 {
+			filter = "&execId=" + strconv.Itoa(id)
+		}
+
+		content, err := rest.SendGet("hosts?hostState=CREATED,COMPLETED" + filter)
 		lib.HandleError(err)
 
 		prettyjson, _ := prettyjson.Format(content)
