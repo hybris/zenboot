@@ -11,6 +11,7 @@ import (
 )
 
 var domain string
+var zoneType string
 
 type ExecutionZonesResponse struct {
 	ExecutionZones []ExecutionZone `json:"executionzones"`
@@ -24,12 +25,13 @@ type ExecutionZone struct {
 
 func init() {
 	listzonesCmd.Flags().StringVarP(&domain, "domain", "d", "", "Domain to match zones to")
+	listzonesCmd.Flags().StringVarP(&zoneType, "type", "t", "", "Type to match zones to")
 	listCmd.AddCommand(listzonesCmd)
 }
 
 var listzonesCmd = &cobra.Command{
 	Use:   "zones [flags]",
-	Short: "list all Execution Zones [matching the given domain]",
+	Short: "list all Execution Zones [matching the given arguments]",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
@@ -41,10 +43,10 @@ var listzonesCmd = &cobra.Command{
 		json.Unmarshal(content, &jsonZones)
 
 		filteredZones := ExecutionZonesResponse{}
-		if domain != "" {
+		if domain != "" || zoneType != "" {
 			for _, executionZone := range jsonZones.ExecutionZones {
-				if strings.Contains(executionZone.ExecDescription, domain) {
-					filteredZones.ExecutionZones = append(filteredZones.ExecutionZones, executionZone)
+				if strings.Contains(executionZone.ExecDescription, domain) && strings.Contains(executionZone.ExecType, zoneType){
+						filteredZones.ExecutionZones = append(filteredZones.ExecutionZones, executionZone)
 				}
 			}
 		} else {
