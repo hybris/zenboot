@@ -30,27 +30,11 @@ class ExecutionService {
   private Closure createGroovyfileBasedClosure(File file, Scriptlet owner) {
     return { ProcessContext ctx ->
       def groovyScript = createObjectFromGroovy(file, owner)
-      def oldStdOut
-      def oldStdErr
-      def outBufStr = new ByteArrayOutputStream()
-      def errBufStr = new ByteArrayOutputStream()
       try {
-        oldStdOut = System.out
-        oldStdErr = System.err
-        def newStdOut = new PrintStream(outBufStr)
-        def newStdErr = new PrintStream(errBufStr)
-        System.out = newStdOut
-        System.err = newStdErr
-        groovyScript.execute(ctx)
-        System.out = oldStdOut
-        System.err = oldStdErr
-        owner.onOutput(outBufStr.toString())
-        owner.onError(errBufStr.toString())
+          groovyScript.metaClass.println = {Object processOutput -> groovyScript.addOutput(processOutput)}
+          groovyScript.metaClass.print = {Object processOutput -> groovyScript.addOutput(processOutput)}
+          groovyScript.execute(ctx)
       } catch (Exception exc) {
-        System.out = oldStdOut
-        System.err = oldStdErr
-        owner.onOutput(outBufStr.toString())
-        owner.onError(errBufStr.toString())
         throw new PluginExecutionException("Execution of groovyScript '${file.getName()}' failed ': ${exc.getMessage()}", exc)
       }
     }
