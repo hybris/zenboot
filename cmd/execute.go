@@ -45,7 +45,6 @@ var executeCmd = &cobra.Command{
 		} else if len(args) < 1 {
 			log.Fatalln("Please specify an action to execute.")
 		}
-		sliceParams, _ := cmd.Flags().GetStringSlice("parameter")
 
 		action := args[0]
 
@@ -59,6 +58,7 @@ var executeCmd = &cobra.Command{
 
 		var emptyParams map[string]bool = make(map[string]bool)
 
+		var sliceParams []string
 		if paramFile != "" {
 			paramByte, err := ioutil.ReadFile(paramFile)
 			if err != nil {
@@ -70,6 +70,9 @@ var executeCmd = &cobra.Command{
 			for k, v := range f {
 				sliceParams = append(sliceParams, string(k)+"="+v.(string))
 			}
+		}
+		if slicePFlags, _ := cmd.Flags().GetStringSlice("parameter"); len(slicePFlags) > 0 {
+			sliceParams = append(sliceParams, slicePFlags...)
 		}
 
 		for execId, execution := range jsonParameters.Executions {
