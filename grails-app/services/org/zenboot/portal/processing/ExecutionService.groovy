@@ -25,7 +25,7 @@ class ExecutionService {
       try {
           groovyScript.metaClass.println = { processOutput -> groovyScript.scriptlet.processOutput.append(processOutput + '\n') }
           groovyScript.metaClass.print = { processOutput -> groovyScript.scriptlet.processOutput.append(processOutput + '\n')}
-          groovyScript.metaClass.executeCommand = { Object data ->
+          groovyScript.metaClass.executeCommand = { data ->
               def process = data.execute()
               process.errorStream.eachLine { groovyScript.scriptlet.processError.append(it + '\n')}
               process.inputStream.eachLine { groovyScript.scriptlet.processOutput.append(it + '\n') }
