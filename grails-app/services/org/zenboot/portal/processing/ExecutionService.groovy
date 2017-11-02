@@ -1,15 +1,7 @@
 package org.zenboot.portal.processing
 
-import org.springframework.context.ApplicationListener
 import org.zenboot.portal.processing.groovy.GroovyScriptUtil
 import org.zenboot.portal.ProcessHandler
-import org.zenboot.portal.processing.converter.ParameterConverter
-import org.zenboot.portal.processing.converter.ParameterConverterMap
-import org.zenboot.portal.processing.flow.ScriptletBatchFlow
-import org.zenboot.portal.processing.meta.ParameterMetadata
-import org.zenboot.portal.processing.meta.ParameterMetadataList
-import org.zenboot.portal.processing.meta.annotation.ParameterType
-import org.zenboot.portal.security.Person
 
 /** a serviceClass dealing with all Execution-near topics which don't need
     state. Shouldn't call higher-level-services.
@@ -19,7 +11,7 @@ class ExecutionService {
 
   def grailsApplication
 
-  public Closure createProcessClosure(File file, Scriptlet owner) {
+  Closure createProcessClosure(File file, Scriptlet owner) {
     if (file.getName().split(/\./)[-1] == "groovy") {
       return createGroovyfileBasedClosure(file,owner)
     } else {
@@ -31,8 +23,13 @@ class ExecutionService {
     return { ProcessContext ctx ->
       def groovyScript = createObjectFromGroovy(file, owner)
       try {
-          groovyScript.metaClass.println = {Object processOutput -> groovyScript.addOutput(processOutput)}
-          groovyScript.metaClass.print = {Object processOutput -> groovyScript.addOutput(processOutput)}
+          groovyScript.metaClass.println = { processOutput -> groovyScript.scriptlet.processOutput.append(processOutput + '\n') }
+          groovyScript.metaClass.print = { processOutput -> groovyScript.scriptlet.processOutput.append(processOutput + '\n')}
+          groovyScript.metaClass.executeCommand = { Object data ->
+              def process = data.execute()
+              process.errorStream.eachLine { groovyScript.scriptlet.processError.append(it + '\n')}
+              process.inputStream.eachLine { groovyScript.scriptlet.processOutput.append(it + '\n') }
+          }
           groovyScript.execute(ctx)
       } catch (Exception exc) {
         throw new PluginExecutionException("Execution of groovyScript '${file.getName()}' failed ': ${exc.getMessage()}", exc)
@@ -93,27 +90,38 @@ class ExecutionService {
     if (properties.contains('grailsApplication')) {
         plugin.grailsApplication = grailsApplication
     }
-    if (properties.contains('scriptlet')) {
-      switch (processable.class) {
-        case Scriptlet:
-        plugin.scriptlet = processable
-        break
-        case ScriptletBatch:
-        plugin.scriptlet = processable.processables
-        break
+
+      switch(processable.class) {
+          case Scriptlet:
+              plugin.metaClass.scriptlet = processable
+              plugin.metaClass.scriptletBatch = processable.scriptletBatch
+              break
+          case ScriptletBatch:
+              plugin.metaClass.scriptletBatch = processable
+              plugin.metaClass.scriptlet = processable.processables
       }
-      plugin.scriptlet = processable
-    }
-    if (properties.contains('scriptletBatch')) {
-      switch (processable.class) {
-        case Scriptlet:
-        plugin.scriptletBatch = processable.scriptletBatch
-        break
-        case ScriptletBatch:
-        plugin.scriptletBatch = processable
-        break
-      }
-    }
+
+//    if (properties.contains('scriptlet')) {
+//      switch (processable.class) {
+//        case Scriptlet:
+//        plugin.scriptlet = processable
+//        break
+//        case ScriptletBatch:
+//        plugin.scriptlet = processable.processables
+//        break
+//      }
+//      plugin.scriptlet = processable
+//    }
+//    if (properties.contains('scriptletBatch')) {
+//      switch (processable.class) {
+//        case Scriptlet:
+//        plugin.scriptletBatch = processable.scriptletBatch
+//        break
+//        case ScriptletBatch:
+//        plugin.scriptletBatch = processable
+//        break
+//      }
+//    }
     return plugin
   }
 }
