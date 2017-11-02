@@ -7,12 +7,15 @@ import (
 	"strconv"
 	"strings"
 
+	"io/ioutil"
+
 	"../lib"
-	"github.com/hokaccha/go-prettyjson"
+	prettyjson "github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
 )
 
 var action string
+var paramFile string
 
 type JsonResponse struct {
 	Executions []Execution `json:"executions"`
@@ -29,6 +32,7 @@ type Parameter struct {
 
 func init() {
 	executeCmd.Flags().StringSliceP("parameter", "p", nil, "a parameter to pass to the execution")
+	executeCmd.Flags().StringVarP(&paramFile, "file", "f", "", "a file in JSON format containing the parameters to pass to the execution")
 	RootCmd.AddCommand(executeCmd)
 }
 
@@ -41,7 +45,7 @@ var executeCmd = &cobra.Command{
 		} else if len(args) < 1 {
 			log.Fatalln("Please specify an action to execute.")
 		}
-		slicePFlag, _ := cmd.Flags().GetStringSlice("parameter")
+		sliceParams, _ := cmd.Flags().GetStringSlice("parameter")
 
 		action := args[0]
 
@@ -55,12 +59,25 @@ var executeCmd = &cobra.Command{
 
 		var emptyParams map[string]bool = make(map[string]bool)
 
+		if paramFile != "" {
+			paramByte, err := ioutil.ReadFile(paramFile)
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			var f map[string]interface{}
+			json.Unmarshal(paramByte, &f)
+			for k, v := range f {
+				sliceParams = append(sliceParams, string(k)+"="+v.(string))
+			}
+		}
+
 		for execId, execution := range jsonParameters.Executions {
 			for paramId, params := range execution.Parameters {
 				if params.ParameterValue == "" {
 					emptyParams[params.ParameterName] = true
 				}
-				for _, flag := range slicePFlag {
+				for _, flag := range sliceParams {
 					paramMap := strings.SplitN(flag, "=", 2)
 					if params.ParameterName == paramMap[0] {
 						jsonParameters.Executions[execId].Parameters[paramId].ParameterValue = paramMap[1]
