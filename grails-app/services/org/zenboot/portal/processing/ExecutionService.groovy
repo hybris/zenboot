@@ -32,7 +32,8 @@ class ExecutionService {
           }
           groovyScript.execute(ctx)
       } catch (Exception exc) {
-        throw new PluginExecutionException("Execution of groovyScript '${file.getName()}' failed ': ${exc.getMessage()}", exc)
+          owner.processError.append(exc.message)
+          throw new PluginExecutionException("Execution of groovyScript '${file.getName()}' failed ': ${exc.getMessage()}", exc)
       }
     }
   }
