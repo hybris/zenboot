@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
+	"../lib"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -54,9 +54,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		home, err := homedir.Dir()
-		if err != nil {
-			log.Fatalln(err)
-		}
+		lib.HandleError(err)
 
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".zenboot")

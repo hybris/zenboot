@@ -61,9 +61,7 @@ var executeCmd = &cobra.Command{
 		var sliceParams []string
 		if paramFile != "" {
 			paramByte, err := ioutil.ReadFile(paramFile)
-			if err != nil {
-				log.Fatalln(err)
-			}
+			lib.HandleError(err)
 
 			var f map[string]interface{}
 			json.Unmarshal(paramByte, &f)

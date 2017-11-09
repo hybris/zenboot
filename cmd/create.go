@@ -26,9 +26,7 @@ var createCmd = &cobra.Command{
 			log.Fatalln("Please prvoide an Execution Zone Template.")
 		}
 		paramByte, err := ioutil.ReadFile(paramFile)
-		if err != nil {
-			log.Fatalln(err)
-		}
+		lib.HandleError(err)
 
 		callback, err := rest.SendPost("executionzones/create", paramByte)
 		lib.HandleError(err)

@@ -27,9 +27,7 @@ var listParamsCmd = &cobra.Command{
 		action := args[0]
 
 		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/actions/" + action + "/listparams")
-		if err != nil {
-			log.Fatalln("Error: ", err)
-		}
+		lib.HandleError(err)
 
 		prettyjson, _ := prettyjson.Format(content)
 		fmt.Println(string(prettyjson))

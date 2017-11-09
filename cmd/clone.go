@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
 	"../lib"
@@ -22,9 +21,7 @@ var cloneCmd = &cobra.Command{
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
 
 		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/clone")
-		if err != nil {
-			log.Fatalln("Error: ", err)
-		}
+		lib.HandleError(err)
 
 		prettyjson, _ := prettyjson.Format(content)
 		fmt.Println(string(prettyjson))
