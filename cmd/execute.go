@@ -47,7 +47,8 @@ var executeCmd = &cobra.Command{
 			log.Fatalln("Please specify an action to execute.")
 		}
 
-		action := args[0]
+		action, err := lib.ValidateAction(args[0])
+		lib.HandleError(err)
 
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
 

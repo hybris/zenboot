@@ -24,7 +24,8 @@ var listParamsCmd = &cobra.Command{
 
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
 
-		action := args[0]
+		action, err := lib.ValidateAction(args[0])
+		lib.HandleError(err)
 
 		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/actions/" + action + "/listparams")
 		lib.HandleError(err)

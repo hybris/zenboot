@@ -2,10 +2,12 @@ package lib
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -22,6 +24,16 @@ func HandleError(err error) {
 	if err != nil {
 		log.Fatalln("There was an error: ", err)
 	}
+}
+
+// ValidateAction encodes an action to make it sutiable for a HTTP request.
+// It returns an encoded string and an error if the aciton has an invalid format.
+func ValidateAction(action string) (string, error) {
+	var err error
+	if url.QueryEscape(url.PathEscape(action)) != action {
+		err = errors.New("the specified action contains characters which have a special meaning in an URL")
+	}
+	return url.QueryEscape(url.PathEscape(action)), err
 }
 
 func (z Zenboot) SendGet(rest_call string) ([]byte, error) {
