@@ -65,7 +65,9 @@ var executeCmd = &cobra.Command{
 			lib.HandleError(err)
 
 			var f map[string]interface{}
-			json.Unmarshal(paramByte, &f)
+			if json.Unmarshal(paramByte, &f) != nil {
+				log.Fatalln("The content of the specified file at '" + paramFile + "' is not a valid JSON object.")
+			}
 			for k, v := range f {
 				sliceParams = append(sliceParams, string(k)+"="+v.(string))
 			}
