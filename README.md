@@ -2,9 +2,10 @@
 
 ## Configuration
 
-Before using the CLI, make sure there is a `zenboot.json` file in your home directory with the following format:
+Before using the CLI, make sure there is a `.zenboot.json` file in your home directory with the following format:
 ```
 {
+        "zenbooturl": "https://zenboot.hybris.com",
         "username": "i123456",
         "secret": "$ecretp@ssw0rd"
 }
