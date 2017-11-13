@@ -101,28 +101,6 @@ class ExecutionService {
               plugin.metaClass.scriptletBatch = processable
               plugin.metaClass.scriptlet = processable.processables
       }
-
-//    if (properties.contains('scriptlet')) {
-//      switch (processable.class) {
-//        case Scriptlet:
-//        plugin.scriptlet = processable
-//        break
-//        case ScriptletBatch:
-//        plugin.scriptlet = processable.processables
-//        break
-//      }
-//      plugin.scriptlet = processable
-//    }
-//    if (properties.contains('scriptletBatch')) {
-//      switch (processable.class) {
-//        case Scriptlet:
-//        plugin.scriptletBatch = processable.scriptletBatch
-//        break
-//        case ScriptletBatch:
-//        plugin.scriptletBatch = processable
-//        break
-//      }
-//    }
     return plugin
   }
 }
