@@ -78,6 +78,18 @@ cp SecurityConfigExample.groovy SecurityConfig.groovy
 vi SecurityConfig.groovy
 ```
 
+## Zenboot-Scripts
+Avoid using the object.execute() method to execute a command in groovy shell. Use executeCommand(Object command) instead of this.
+The object.execute() method writes the output into stdout and stderr which could cause overlapped process output if multiple scripts are running at the same time.
+
+e.g.
+```
+executeCommand('ls')
+or
+executeCommand(['ls', '-la'])
+``` 
+
+
 ## DISCLAIMER ##
 Don't use zenboot in production with Docker, because security!
 
