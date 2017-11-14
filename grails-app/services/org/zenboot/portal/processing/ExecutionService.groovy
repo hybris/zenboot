@@ -27,8 +27,9 @@ class ExecutionService {
           groovyScript.metaClass.print = { processOutput -> groovyScript.scriptlet.processOutput.append(processOutput + '\n')}
           groovyScript.metaClass.executeCommand = { data ->
               def process = data.execute()
+              process.waitForOrKill(3600 * 5)
               process.errorStream.eachLine { groovyScript.scriptlet.processError.append(it + '\n')}
-              process.inputStream.eachLine { groovyScript.scriptlet.processOutput.append(it + '\n') }
+              process.outputStream.eachLine { groovyScript.scriptlet.processOutput.append(it + '\n') }
           }
           groovyScript.execute(ctx)
       } catch (Exception exc) {
