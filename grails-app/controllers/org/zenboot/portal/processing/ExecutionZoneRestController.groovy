@@ -33,7 +33,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def applicationEventPublisher
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", exectypes: "GET", execzonetemplate: "GET",
-    cloneexecutionzone: "GET", listhosts: "GET", listhoststates: "GET", changeExecutionZoneParams: ["POST", "DELETE"]]
+    cloneexecutionzone: "GET", listhosts: "GET", listhoststates: "GET", changeExecutionZoneParams: ["POST", "DELETE"], changeExecutionZoneAttributes: ["POST"]]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -1417,62 +1417,66 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
         }
 
-            Set<ProcessingParameter> origin_parameters = zone.getProcessingParameters()
-            Set<ProcessingParameter> new_parameters = [] as SortedSet
-            Set<ProcessingParameter> validation = [] as SortedSet
+        if (hasError) {
+            return
+        }
 
-            if (request.method == 'POST') {
+        Set<ProcessingParameter> origin_parameters = zone.getProcessingParameters()
+        Set<ProcessingParameter> new_parameters = [] as SortedSet
+        Set<ProcessingParameter> validation = [] as SortedSet
+
+        if (request.method == 'POST') {
+            parameters.each { key, value ->
+
+                ProcessingParameter parameter = origin_parameters.find { it.name == key }
+
+                if (parameter) {
+                    parameter.value = value
+                    new_parameters.add(parameter)
+                    validation.add(parameter)
+                } else {
+                    zone.addProcessingParameter(key, value)
+                }
+            }
+
+            if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                validation.each { new_parameter ->
+                    ProcessingParameter originParameter = origin_parameters.find { it.name == new_parameter.name }
+
+                    if (originParameter) {
+                        if (origin_parameters.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, originParameter)) {
+                            //not allowed to change this param so change back
+                            new_parameters[new_parameter.name] = originParameter.value
+                        }
+                    }
+                }
+            }
+
+            new_parameters.each { para ->
+
+                ProcessingParameter test = zone.processingParameters.find {
+                    it.name == para.name
+                } as ProcessingParameter
+
+                if (test.value != para.value) {
+                    zone.processingParameters.find { it.name == param.name }.value = para.value
+                }
+            }
+
+        } else if (request.method == 'DELETE') {
+            if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
                 parameters.each { key, value ->
-
-                    ProcessingParameter parameter = origin_parameters.find { it.name == key }
-
-                    if (parameter) {
-                        parameter.value = value
-                        new_parameters.add(parameter)
-                        validation.add(parameter)
-                    } else {
-                        zone.addProcessingParameter(key, value)
+                    if (zone.processingParameters.find { it.name == key }) {
+                        zone.removeFromProcessingParameters(zone.processingParameters.find {
+                            it.name == key
+                        } as ProcessingParameter)
                     }
                 }
-
-                if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-                    validation.each { new_parameter ->
-                        ProcessingParameter originParameter = origin_parameters.find { it.name == new_parameter.name }
-
-                        if (originParameter) {
-                            if (origin_parameters.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, originParameter)) {
-                                //not allowed to change this param so change back
-                                new_parameters[new_parameter.name] = originParameter.value
-                            }
-                        }
-                    }
-                }
-
-                new_parameters.each { para ->
-
-                    ProcessingParameter test = zone.processingParameters.find {it.name == para.name} as ProcessingParameter
-
-                    if (test.value != para.value) {
-                        zone.processingParameters.find {it.name == param.name}.value = para.value
-                    }
-                }
-
+            } else {
+                this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to delete the parameters')
+                return
             }
-            else if (request.method == 'DELETE') {
-                if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-                    parameters.each { key, value ->
-                        if (zone.processingParameters.find { it.name == key } ) {
-                            zone.removeFromProcessingParameters(zone.processingParameters.find {
-                                it.name == key
-                            } as ProcessingParameter)
-                        }
-                    }
-                }
-                else {
-                    this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to delete the parameters')
-                    return
-                }
-            }
+        }
         if (zone.save(flush:true)){
             this.renderRestResult(HttpStatus.OK, null, null, 'Execution zone modified.')
             return
@@ -1483,7 +1487,124 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         }
     }
 
+    /**
+     * The method changes the execution zone attributes. It return CONFLICT if the execution zone could not be saved e.g. because of wrong
+     * datatype. Some of the values are already catched so that all correct values will be changed. In case of changing the description the
+     * access cache will be updated for this zone to ensure that users which roles does not match the new expression will no longer have access.
+     */
+    def changeExecutionZoneAttributes = {
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            ExecutionZone zone
+            Boolean hasError = Boolean.FALSE
+            Map<String, String> parameters = [:]
+            Boolean refreshAccessCache = Boolean.FALSE
 
+            if (params.execId) {
+                zone = ExecutionZone.get(params.execId as Long)
+                if (zone) {
+                    if (!userHasAccess(zone)) {
+                        this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to change the parameters ' +
+                                'of the executionZone with id ' + params.execId + '.')
+                        return
+                    }
+                } else {
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The execution zone with id ' + params.execId + ' does not exist.')
+                    return
+                }
+            }
+
+            request.withFormat {
+                xml {
+                    def xml
+                    try {
+                        xml = request.XML
+                    }
+                    catch (ConverterException e) {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
+                        hasError = Boolean.TRUE
+                        return
+                    }
+
+                    def xmlParameters = xml[0].children
+
+                    xmlParameters.each { node ->
+                        def name = ''
+                        def value = ''
+                        node.children.each { innerNode ->
+                            if (innerNode.name == 'parameterName') {
+                                name = innerNode.text()
+                            } else if (innerNode.name == 'parameterValue') {
+                                value = innerNode.text()
+                            }
+                        }
+                        parameters.put(name, value)
+                    }
+                }
+                json {
+                    String text = request.getReader().text
+                    def json
+
+                    try {
+                        json = new JSONObject(text)
+                    }
+                    catch (JSONException e) {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
+                        hasError = Boolean.TRUE
+                        return
+                    }
+
+                    def json_params = json.parameters
+
+                    json_params?.each { param ->
+                        parameters.put(param.parameterName, param.parameterValue)
+                    }
+                }
+            }
+
+            if (hasError) {
+                return
+            }
+
+            parameters.each { key, value ->
+                if (zone.hasProperty(key) && zone.properties[key] != value) {
+
+                    //Type and special cases
+                    if ('type' == key.toLowerCase()) {
+                        if (ExecutionZoneType.findByName(value) && zone.type != ExecutionZoneType.findByName(value)) {
+                            zone.type = ExecutionZoneType.findByName(value)
+                        }
+                    } else if (zone.properties[key] instanceof Long) {
+                        if (value.isNumber() && zone.properties[key] != Long.valueOf(value)) {
+                            zone.properties[key] = Long.valueOf(value)
+                        }
+                    } else if (zone.properties[key] instanceof Boolean) {
+                        if(value.trim() != '' && (value.toLowerCase() == 'true' || value.toLowerCase() == 'false'))
+                        zone.properties[key] = value.toBoolean()
+                    } else {
+                        zone.properties[key] = value
+                    }
+
+                    if (key == 'description') {
+                        refreshAccessCache = Boolean.TRUE
+                    }
+                }
+            }
+
+            if (!zone.save(flush: true)) {
+                this.renderRestResult(HttpStatus.CONFLICT, null, null, 'An error occurred while updating the execution zone.')
+                return
+            }
+
+            if (refreshAccessCache) {
+                accessService.refreshAccessCacheByZone(zone)
+            }
+
+            this.renderRestResult(HttpStatus.OK, null, null, 'Execution zone modified.')
+        }
+        else {
+            this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You have no permissions to change the attributes of an execution zone.')
+        }
+    }
 
     /**
      * Check if the user is already in the cache and has access to the requested execution zone.

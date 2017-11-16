@@ -36,6 +36,8 @@ class UrlMappings {
         "/rest/v1/executionzones/$execId/actions/$execAction/$quantity/execute?"(controller: 'executionZoneRest', action: 'execute')
         "/rest/v1/hosts?"(controller: 'executionZoneRest', action: 'listhosts')
         "/rest/v1/hoststates"(controller: 'executionZoneRest', action: 'listhoststates')
+        "/rest/v1/executionzones/$execId/changeparams"(controller: 'executionZoneRest', action: 'changeExecutionZoneParams')
+        "/rest/v1/executionzones/$execId/changeattributes"(controller: 'executionZoneRest', action: 'changeExecutionZoneAttributes')
 
         // templates
         name template : "/template/$action?/$id?" { controller='template' }
