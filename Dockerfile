@@ -65,11 +65,14 @@ RUN if [ -z "$VERSION" ]; \
         exit 1; \
     fi
 ARG ZENBOOT_WAR=https://github.com/hybris/zenboot/releases/download/v$VERSION/zenboot.war
+ARG ZENBOOT_CLI=https://github.com/hybris/zenboot/releases/download/v$VERSION/zenboot
 
 RUN mkdir -p /home/user/zenboot
 ADD $ZENBOOT_WAR $TOMCAT_HOME/webapps/zenboot.war
+ADD $ZENBOOT_CLI $TOMCAT_HOME/bin/zenboot
 ADD docker-provisioning/setenv.sh $TOMCAT_HOME/bin/setenv.sh
 RUN sudo chown user:user $TOMCAT_HOME/bin/setenv.sh
+RUN sudo chown user:user $TOMCAT_HOME/bin/zenboot
 RUN sudo chown user:user $TOMCAT_HOME/webapps/zenboot.war
 
 CMD bin/catalina.sh run 2>&1
