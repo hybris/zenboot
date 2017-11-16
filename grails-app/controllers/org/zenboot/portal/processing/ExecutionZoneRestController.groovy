@@ -33,7 +33,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def applicationEventPublisher
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", exectypes: "GET", execzonetemplate: "GET",
-    cloneexecutionzone: "GET", listhosts: "GET", listhoststates: "GET"]
+    cloneexecutionzone: "GET", listhosts: "GET", listhoststates: "GET", changeExecutionZoneParams: ["POST", "DELETE"]]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -1337,6 +1337,153 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
         }
     }
+
+    /**
+     * The method changes the processing parameters of an existing execution zone. It is possible to change / add processing parameters due add
+     * a new key / value parameter pair in the data or change the value of an existing one. To change / add processing parameters you have to use
+     * request method POST. If you want to remove processing parameters you have to use the request method DELETE. Keep in mind that all key / value
+     * pairs in your data will be removed.
+     *
+     * Request method POST checks if the user has the permission to change these parameters. In the case that the user has no permission, the
+     * specific parameter will be ignored.
+     * Request method DELETE required admin permissions
+     */
+    def changeExecutionZoneParams = {
+
+        ExecutionZone zone
+        Boolean hasError = Boolean.FALSE
+        Map<String, String> parameters =[:]
+
+        if (params.execId) {
+            zone = ExecutionZone.get(params.execId as Long)
+            if (zone) {
+                if (!userHasAccess(zone)) {
+                    this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to change the parameters ' +
+                            'of the executionZone with id ' + params.execId + '.')
+                    return
+                }
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The execution zone with id ' + params.execId + ' does not exist.')
+                return
+            }
+        }
+
+        request.withFormat {
+            xml {
+                def xml
+                try {
+                    xml = request.XML
+                }
+                catch (ConverterException e) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
+                    hasError = Boolean.TRUE
+                    return
+                }
+
+                def xmlParameters = xml[0].children
+
+                xmlParameters.each { node ->
+                    def name = ''
+                    def value = ''
+                    node.children.each { innerNode ->
+                        if (innerNode.name == 'parameterName') {
+                            name = innerNode.text()
+                        } else if (innerNode.name == 'parameterValue') {
+                            value = innerNode.text()
+                        }
+                    }
+                    parameters.put(name, value)
+                }
+            }
+            json {
+                String text = request.getReader().text
+                def json
+
+                try {
+                    json = new JSONObject(text)
+                }
+                catch (JSONException e) {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
+                    hasError = Boolean.TRUE
+                    return
+                }
+
+                def json_params = json.parameters
+
+                json_params?.each { param ->
+                   parameters.put(param.parameterName, param.parameterValue)
+                }
+            }
+        }
+
+            Set<ProcessingParameter> origin_parameters = zone.getProcessingParameters()
+            Set<ProcessingParameter> new_parameters = [] as SortedSet
+            Set<ProcessingParameter> validation = [] as SortedSet
+
+            if (request.method == 'POST') {
+                parameters.each { key, value ->
+
+                    ProcessingParameter parameter = origin_parameters.find { it.name == key }
+
+                    if (parameter) {
+                        parameter.value = value
+                        new_parameters.add(parameter)
+                        validation.add(parameter)
+                    } else {
+                        zone.addProcessingParameter(key, value)
+                    }
+                }
+
+                if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                    validation.each { new_parameter ->
+                        ProcessingParameter originParameter = origin_parameters.find { it.name == new_parameter.name }
+
+                        if (originParameter) {
+                            if (origin_parameters.value != new_parameter.value && !executionZoneService.actionParameterEditAllowed(new_parameter, originParameter)) {
+                                //not allowed to change this param so change back
+                                new_parameters[new_parameter.name] = originParameter.value
+                            }
+                        }
+                    }
+                }
+
+                new_parameters.each { para ->
+
+                    ProcessingParameter test = zone.processingParameters.find {it.name == para.name} as ProcessingParameter
+
+                    if (test.value != para.value) {
+                        zone.processingParameters.find {it.name == param.name}.value = para.value
+                    }
+                }
+
+            }
+            else if (request.method == 'DELETE') {
+                if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                    parameters.each { key, value ->
+                        if (zone.processingParameters.find { it.name == key } ) {
+                            zone.removeFromProcessingParameters(zone.processingParameters.find {
+                                it.name == key
+                            } as ProcessingParameter)
+                        }
+                    }
+                }
+                else {
+                    this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to delete the parameters')
+                    return
+                }
+            }
+        if (zone.save(flush:true)){
+            this.renderRestResult(HttpStatus.OK, null, null, 'Execution zone modified.')
+            return
+        }
+        else {
+            this.renderRestResult(HttpStatus.CONFLICT, null, null, 'An error occurred while updating the execution zone.')
+            return
+        }
+    }
+
+
 
     /**
      * Check if the user is already in the cache and has access to the requested execution zone.
