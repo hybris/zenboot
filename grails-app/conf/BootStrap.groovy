@@ -9,6 +9,7 @@ import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.PersonRole
 import org.zenboot.portal.security.Role
 
+import java.sql.Connection
 import java.util.concurrent.Callable
 
 class BootStrap {
@@ -80,14 +81,25 @@ class BootStrap {
             it.save(flush:true)
         }
 
-        def exists = sessionFactory.currentSession.createSQLQuery('SHOW INDEX FROM scriptlet_logslist WHERE KEY_NAME = \'idx_scriptlet_id\'').list()
+        Connection connection = sessionFactory.getCurrentSession().connection()
 
-        if(exists.size() == 0) {
-            String query = 'CREATE INDEX idx_scriptlet_id  ON scriptlet_logslist (scriptlet_id)'
+        if ('H2' == connection.getMetaData().databaseProductName) {
+            String query = 'CREATE INDEX IF NOT EXISTS idx_scriptlet_id ON scriptlet_logslist (scriptlet_id)'
 
             sessionFactory.currentSession.createSQLQuery(query).executeUpdate()
             sessionFactory.currentSession.flush()
             sessionFactory.currentSession.clear()
+        }
+        else if ('MySQL' == connection.getMetaData().databaseProductName) {
+            def exists = sessionFactory.currentSession.createSQLQuery('SHOW INDEX FROM scriptlet_logslist WHERE KEY_NAME = \'idx_scriptlet_id\'').list()
+
+            if(exists.size() == 0) {
+                String query = 'CREATE INDEX idx_scriptlet_id ON scriptlet_logslist (scriptlet_id)'
+
+                sessionFactory.currentSession.createSQLQuery(query).executeUpdate()
+                sessionFactory.currentSession.flush()
+                sessionFactory.currentSession.clear()
+            }
         }
 
         accessService.warmAccessCacheAsync()
