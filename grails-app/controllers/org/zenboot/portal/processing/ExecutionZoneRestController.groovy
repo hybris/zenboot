@@ -33,7 +33,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def applicationEventPublisher
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", exectypes: "GET", execzonetemplate: "GET",
-    cloneexecutionzone: "GET", listhosts: "GET", listhoststates: "GET", changeExecutionZoneParams: ["POST", "DELETE"], changeExecutionZoneAttributes: ["POST"]]
+    cloneexecutionzone: "GET", listhosts: "GET", listhoststates: "GET", changeExecutionZoneParams: ["POST", "DELETE"], changeExecutionZoneAttributes: ["POST"],
+    listDetailedActions: "GET"]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -1368,6 +1369,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 return
             }
         }
+        else {
+            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'ExecutionZone id (execId) not set.')
+            return
+        }
 
         request.withFormat {
             xml {
@@ -1512,6 +1517,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     return
                 }
             }
+            else {
+                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'ExecutionZone id (execId) not set.')
+                return
+            }
 
             request.withFormat {
                 xml {
@@ -1605,6 +1614,43 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You have no permissions to change the attributes of an execution zone.')
         }
     }
+
+    def listDetailedActions = {
+        ExecutionZone zone
+        Boolean hasError = Boolean.FALSE
+        def actions = []
+
+        if (params.execId) {
+            zone = ExecutionZone.get(params.execId as Long)
+            if (zone) {
+                if (!userHasAccess(zone)) {
+                    this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to change the parameters ' +
+                            'of the executionZone with id ' + params.execId + '.')
+                    return
+                }
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The execution zone with id ' + params.execId + ' does not exist.')
+                return
+            }
+        }
+
+        if (zone) {
+            actions = zone.actions
+        }
+        else {
+            actions = ExecutionZoneAction.getAll()
+        }
+
+        withFormat {
+            xml {}
+            json {
+                render actions as JSON
+            }
+        }
+
+    }
+
 
     /**
      * Check if the user is already in the cache and has access to the requested execution zone.
