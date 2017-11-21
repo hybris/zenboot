@@ -39,6 +39,7 @@ class UrlMappings {
         "/rest/v1/executionzones/$execId/changeparams"(controller: 'executionZoneRest', action: 'changeExecutionZoneParams')
         "/rest/v1/executionzones/$execId/changeattributes"(controller: 'executionZoneRest', action: 'changeExecutionZoneAttributes')
         "/rest/v1/listactions?"(controller: 'executionZoneRest', action: 'listDetailedActions')
+        "/rest/v1/listserviceurls?"(controller: 'executionZoneRest', action: 'listServiceUrls')
 
         // templates
         name template : "/template/$action?/$id?" { controller='template' }
