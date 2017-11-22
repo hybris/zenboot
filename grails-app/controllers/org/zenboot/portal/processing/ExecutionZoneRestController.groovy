@@ -1659,7 +1659,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         return
                     }
                 } else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + it + ' found.')
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + params.execId + ' found.')
                     return
                 }
             } else {
@@ -1848,7 +1848,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         return
                     }
                 } else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + it + ' found.')
+                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + params.execId + ' found.')
                     return
                 }
             } else {
@@ -1958,12 +1958,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     if (customer) {
                         customersCollection.add(customer)
                     } else {
-                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with email ' + it + ' found.')
+                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with email ' + params.email + ' found.')
                         return
                     }
                 }
 
-            } else if (params.customerID) {
+            } else if (params.customerId) {
                 if (params.customerId.contains(',')) {
                     List<String> iDs = params.customerId.split(',')
                     iDs.each {
@@ -1984,8 +1984,13 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                     }
                 } else {
                     if (params.customerId.isInteger()) {
-                        Customer customer = Customer.findById(it as Long)
-                        customersCollection.add(customer)
+                        Customer customer = Customer.findById(params.customerId as Long)
+                        if (customer) {
+                            customersCollection.add(customer)
+                        } else {
+                            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with id ' + params.customerId + ' found.')
+                            return
+                        }
                     } else {
                         this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The customerId param is invalid. ' +
                                 'It has to be a Long value or a list of Long values delimited by ","')
