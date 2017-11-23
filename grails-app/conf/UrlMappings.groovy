@@ -41,6 +41,9 @@ class UrlMappings {
         "/rest/v1/listactions?"(controller: 'executionZoneRest', action: 'listDetailedActions')
         "/rest/v1/listserviceurls?"(controller: 'executionZoneRest', action: 'listServiceUrls')
         "/rest/v1/listcustomers?"(controller: 'executionZoneRest', action: 'listCustomers')
+        "/rest/v1/listusernotifications?"(controller: 'executionZoneRest', action: 'listUserNotifications')
+        "/rest/v1/usernotifications/$notificationId/edit"(controller: 'executionZoneRest', action: 'editUserNotification')
+        "/rest/v1/usernotifications/create"(controller: 'executionZoneRest', action: 'createUserNotification')
 
         // templates
         name template : "/template/$action?/$id?" { controller='template' }
