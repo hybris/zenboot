@@ -62,19 +62,12 @@ class BootStrap {
         }
 
         //clean up hung stuff after restart
-        ScriptletBatch.findAll { state == Processable.ProcessState.RUNNING || state == Processable.ProcessState.WAITING }.each {
-            it.state = Processable.ProcessState.CANCELED
+        ScriptletBatch.findAll { state == Processable.ProcessState.RUNNING || state == Processable.ProcessState.WAITING || state == Processable.ProcessState.CANCELED }.each {
+            if (Processable.ProcessState.CANCELED == it.state) {
+                it.state = Processable.ProcessState.CANCELED
+            }
             it.processables.each { scriptlet ->
                 if (scriptlet.state == Processable.ProcessState.RUNNING || scriptlet.state == Processable.ProcessState.WAITING) {
-                    scriptlet.state = Processable.ProcessState.CANCELED
-                }
-            }
-            it.save(flush:true)
-        }
-
-        ScriptletBatch.findAll { state == Processable.ProcessState.CANCELED }.each {
-            it.processables.each { scriptlet ->
-                if (scriptlet?.state == Processable.ProcessState.RUNNING || scriptlet?.state == Processable.ProcessState.WAITING) {
                     scriptlet.state = Processable.ProcessState.CANCELED
                 }
             }
