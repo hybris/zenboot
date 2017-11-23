@@ -1,5 +1,4 @@
 import grails.util.Environment
-
 import org.zenboot.portal.Host
 import org.zenboot.portal.processing.ExecutionZone
 import org.zenboot.portal.processing.ExecutionZoneType
@@ -9,6 +8,8 @@ import org.zenboot.portal.processing.ScriptletBatch
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.PersonRole
 import org.zenboot.portal.security.Role
+
+import java.sql.Connection
 import java.util.concurrent.Callable
 
 class BootStrap {
@@ -18,6 +19,7 @@ class BootStrap {
     def grailsApplication
     def scriptDirectoryService
     def executorService
+    def sessionFactory
 
     def init = { servletContext ->
         //create fundamental user groups
@@ -60,9 +62,37 @@ class BootStrap {
         }
 
         //clean up hung stuff after restart
-        ScriptletBatch.findAll { state == Processable.ProcessState.RUNNING || state == Processable.ProcessState.WAITING }.each {
-            it.state = Processable.ProcessState.CANCELED
+        ScriptletBatch.findAll { state == Processable.ProcessState.RUNNING || state == Processable.ProcessState.WAITING || state == Processable.ProcessState.CANCELED }.each {
+            if (Processable.ProcessState.CANCELED != it.state) {
+                it.state = Processable.ProcessState.CANCELED
+            }
+            it.processables.each { scriptlet ->
+                if (scriptlet.state == Processable.ProcessState.RUNNING || scriptlet.state == Processable.ProcessState.WAITING) {
+                    scriptlet.state = Processable.ProcessState.CANCELED
+                }
+            }
             it.save(flush:true)
+        }
+
+        Connection connection = sessionFactory.getCurrentSession().connection()
+
+        if ('H2' == connection.getMetaData().databaseProductName) {
+            String query = 'CREATE INDEX IF NOT EXISTS idx_scriptlet_id ON scriptlet_logslist (scriptlet_id)'
+
+            sessionFactory.currentSession.createSQLQuery(query).executeUpdate()
+            sessionFactory.currentSession.flush()
+            sessionFactory.currentSession.clear()
+        }
+        else if ('MySQL' == connection.getMetaData().databaseProductName) {
+            def exists = sessionFactory.currentSession.createSQLQuery('SHOW INDEX FROM scriptlet_logslist WHERE KEY_NAME = \'idx_scriptlet_id\'').list()
+
+            if(exists.size() == 0) {
+                String query = 'CREATE INDEX idx_scriptlet_id ON scriptlet_logslist (scriptlet_id)'
+
+                sessionFactory.currentSession.createSQLQuery(query).executeUpdate()
+                sessionFactory.currentSession.flush()
+                sessionFactory.currentSession.clear()
+            }
         }
 
         accessService.warmAccessCacheAsync()
