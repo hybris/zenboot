@@ -12,10 +12,6 @@ script:
 - "./grailsw test-app unit: integration:"
 - "./grailsw test-app functional: 'org.zenboot.portal.api.**.*' -inline"
 - "./grailsw war"
-- "mkdir zenboot-cli/bin"
-- "go get -d ./..."
-- "GOOS=linux GOARCH=amd64 go build -o zenboot-cli/bin/zenboot-linux-amd64 zenboot-cli/zenboot.go"
-- "GOOS=darwin GOARCH=amd64 go build -o zenboot-cli/bin/zenboot-darwin-amd64 zenboot-cli/zenboot.go"
 notifications:
   email:
   - k9ert@gmx.de
