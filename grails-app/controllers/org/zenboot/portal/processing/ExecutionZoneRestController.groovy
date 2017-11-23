@@ -461,7 +461,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             if (params.long('execType')) {
                 executionZoneType = ExecutionZoneType.findById(params.execType as Long)
             } else if (params.execType instanceof String) {
-                executionZoneType = ExecutionZoneType.findByName(params.execType as String)
+                executionZoneType = ExecutionZoneType.findByNameIlike(params.execType as String)
             }
             else {
                 this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The executionZoneType (execType) has to be a long or a string')
@@ -974,7 +974,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
 
             if (parameters['type'] instanceof String) {
-                parameters['type'] = ExecutionZoneType.findByName(parameters['type'] as String).id
+                parameters['type'] = ExecutionZoneType.findByNameIlike(parameters['type'] as String).id
             }
 
             ExecutionZone newExecutionZone = new ExecutionZone(parameters)
@@ -1715,8 +1715,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
                     //Type and special cases
                     if ('type' == key.toLowerCase()) {
-                        if (ExecutionZoneType.findByName(value) && zone.type != ExecutionZoneType.findByName(value)) {
-                            zone.type = ExecutionZoneType.findByName(value)
+                        if (ExecutionZoneType.findByNameIlike(value) && zone.type != ExecutionZoneType.findByNameIlike(value)) {
+                            zone.type = ExecutionZoneType.findByNameIlike(value)
                         }
                     } else if (zone.properties[key] instanceof Long) {
                         if (value.isNumber() && zone.properties[key] != Long.valueOf(value)) {
