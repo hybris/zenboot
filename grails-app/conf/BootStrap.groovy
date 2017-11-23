@@ -63,7 +63,7 @@ class BootStrap {
 
         //clean up hung stuff after restart
         ScriptletBatch.findAll { state == Processable.ProcessState.RUNNING || state == Processable.ProcessState.WAITING || state == Processable.ProcessState.CANCELED }.each {
-            if (Processable.ProcessState.CANCELED == it.state) {
+            if (Processable.ProcessState.CANCELED != it.state) {
                 it.state = Processable.ProcessState.CANCELED
             }
             it.processables.each { scriptlet ->
