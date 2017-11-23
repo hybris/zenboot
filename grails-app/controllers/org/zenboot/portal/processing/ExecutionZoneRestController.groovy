@@ -203,6 +203,88 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                 url '/rest/v1/hoststates'
                             }
                         }
+                        restendpoint {
+                            name 'changeparams'
+                            description 'The method changes the parameters of an existing executionzone.'
+                            urls {
+                                url '/rest/v1/{execId}/changeparams'
+                            }
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                            }
+                            parameters 'Requires json or xml where all the parameters are stored which you want to change.'
+                        }
+                        restendpoint {
+                            name 'changeattributes'
+                            description 'The method changes the attributes of an existing executionzone.'
+                            urls {
+                                url '/rest/v1/executionzones/{execId}/changeattributes"'
+                            }
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                            }
+                            parameters 'Requires json or xml where all the attributes are stored which you want to change.'
+                        }
+                        restendpoint {
+                            name 'listactions'
+                            description 'The method returns a detailed list of execution zone actions. It is possible to specify the execution zone or a list of execution zones delimited by "," (?execId=1,2,3,5...).'
+                            urls {
+                                url '/rest/v1/listactions'
+                                specific '/rest/v1/listactions?execId=1'
+                                exampleurlmulti 'rest/v1/listactions?execId=1,2,3'
+                            }
+                        }
+                        restendpoint {
+                            name 'listserviceurls'
+                            description 'The method return a list with active hosts service urls. It is possible to specify the execution zone or a list of execution zones delimited by "," (?execId=1,2,3,5...)'
+                            urls {
+                                url '/rest/v1/listserviceurls'
+                                specific '/rest/v1/listserviceurls?execId=1'
+                                exampleurlmulti '/rest/v1/listserviceurls?execId=1,2,3'
+                            }
+                        }
+                        restendpoint {
+                            name 'listcustomers'
+                            description 'The method return a list with customers. It is possible to specify the customer by email or a list of emails delimited by "," (?email=my.email.com,my.email2.com,...). ' +
+                                    'It is also possible to get specify the customer by id or a list of ids delimted by "," (?customerId=1,2,...).'
+                            urls {
+                                url '/rest/v1/listcustomers'
+                                specific '/rest/v1/listcustomers?email=my@email.com'
+                                exampleurlmulti '/rest/v1/listcustomers?customerId=1,2,3'
+                            }
+                        }
+                        restendpoint {
+                            name 'listusernotifications'
+                            description 'The method return a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications.'
+                            urls {
+                                url '/rest/v1/listusernotifications'
+                                specific '/rest/v1/listusernotifications?enabled=true'
+                            }
+                            restriction 'admin only'
+                        }
+                        restendpoint {
+                            name 'editusernotification'
+                            description 'The method override the values of an existing user notification.'
+                            urls {
+                                url '/rest/v1/usernotifications/$notificationId/edit'
+                                specific '/rest/v1/usernotifications/1/edit'
+                            }
+                            restriction 'admin only'
+                            parameters 'Requires json or xml where all the properties are stored which you want to change.'
+                        }
+                        restendpoint {
+                            name 'createusernotification'
+                            description 'The method creates a new user notification.'
+                            urls {
+                                url '/rest/v1/usernotifications/create'
+                            }
+                            restriction 'admin only'
+                            parameters 'Requires json or xml where all the attributes are stored for the usernotification which you want to create.'
+                        }
                     }
                 }
 
@@ -217,6 +299,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 def execType = [description: 'The id or the name of the execution zone type. If not set the method returns all enabled execution zones of the user.', type: 'Long or String.',
                                 mandatory: 'No']
                 def hostState = [description: 'The state(s) of the host', type: 'String', mandatory: 'No']
+                def notificationId = [description: 'The id of the usernotification.', type: 'Long', mandatory: 'Yes']
+                def customerId = [description: 'The id of the customer', type: 'Long', mandatory: 'No']
 
                 def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters one or multiple times. The {quantity} parameter ensure that the user knows the number ' +
                         'of executions and will be used to compare with the calculated executions. The {runs} parameter could be used to execute scripts multiple times. To do this ' +
@@ -308,8 +392,59 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                        ]
                 ]
 
+                def changeparams = [description: 'The method changes the parameters of an existing executionzone.', execId: execId,
+                                    urls: [
+                                            url: '/rest/v1/{execId}/changeparams'
+                                    ]
+                ]
+
+                def changeattributes = [description: 'The method changes the attributes of an existing executionzone.', execId: execId,
+                                        urls: [
+                                                url: '\'/rest/v1/executionzones/{execId}/changeattributes"\''
+                                        ]
+                ]
+
+                def listserviceurls = [description: 'The method return a list with active hosts service urls. It is possible to specify the execution zone or a list of execution zones delimited by "," (?execId=1,2,3,5...)',
+                        execId: execId, urls: [
+                                url: '/rest/v1/listserviceurls',
+                                specific: '/rest/v1/listserviceurls?execId=1',
+                                exampleurlmulti: '/rest/v1/listserviceurls?execId=1,2,3'
+                        ]
+                ]
+
+                def listcustomers = [description: 'The method return a list with customers. It is possible to specify the customer by email or a list of emails delimited by "," (?email=my.email.com,my.email2.com,...). ' +
+                        'It is also possible to get specify the customer by id or a list of ids delimted by "," (?customerId=1,2,...).', customerId: customerId, urls: [
+                                url: '/rest/v1/listcustomers',
+                                specific: '/rest/v1/listcustomers?email=my@email.com',
+                                exampleurlmulti: '/rest/v1/listcustomers?customerId=1,2,3'
+                        ]
+
+                ]
+
+                def listusernotifications = [description: 'The method return a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications.', enabled: 'True or False',
+                                             urls: [
+                                                     url: '/rest/v1/listusernotifications',
+                                                     specific: '/rest/v1/listusernotifications?enabled=true'
+                                             ], restriction: 'admin only'
+                ]
+
+                def editusernotifications = [description: 'The method override the values of an existing user notification.', notificationId: notificationId,
+                                             urls: [
+                                                     url: '/rest/v1/usernotifications/$notificationId/edit',
+                                                     specific: '/rest/v1/usernotifications/1/edit'
+                                             ], restriction: 'admin only'
+                ]
+
+                def createusernotifications = [description: 'The method creates a new user notification.',
+                                               urls: [
+                                                       url: '/rest/v1/usernotifications/create'
+                                               ], restriction: 'admin only'
+                ]
+
                 render (contentType: "text/json") { restendpoints execute: executeEndPoint, list: listEndPoint, listparams: listparamsEndPoint, listactions: listactionsEndPoint,
-                        exectypes: exectypes, execzonetemplate: execzonetemplate, create: createzone, clone: cloneexecutionzone, hosts: listhosts, hoststates: listhostsstates }
+                        exectypes: exectypes, execzonetemplate: execzonetemplate, create: createzone, clone: cloneexecutionzone, hosts: listhosts, hoststates: listhostsstates,
+                changeparams: changeparams, changeattributes: changeattributes, listServiceUrls: listserviceurls, listcustomers: listcustomers, listusernotifications: listusernotifications,
+                editusernotifications: editusernotifications, createUserNotification: createusernotifications}
             }
         }
     }
@@ -1934,7 +2069,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     }
 
     /**
-     * The method return a list with customers. It is possible to specify the customer by email or a list of emails delimited by ',' (?email=my.email.com,my.email2.com,...) or. It is also possible
+     * The method return a list with customers. It is possible to specify the customer by email or a list of emails delimited by ',' (?email=my.email.com,my.email2.com,...). It is also possible
      * to get specify the customer by id or a list of ids delimted by ',' (?customerId=1,2,...).
      * If neither email nor customerId is set, the method returns a list of all customers.
      *
