@@ -31,7 +31,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def applicationEventPublisher
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", execzonetemplate: "GET",
-    cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: ["PUT"]]
+    cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: "PUT"]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {

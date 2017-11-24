@@ -49,6 +49,7 @@ class UrlMappings {
 
         //CustomerRest
         "/rest/v1/customers/list?"(controller: 'customerRest', action: 'listcustomers')
+        "/rest/v1/customers/$identifier/edit"(controller: 'customerRest', action: 'editcustomers')
 
         //UserNotificationRest
         "/rest/v1/usernotifications/list?"(controller: 'userNotificationRest', action: 'listusernotifications')

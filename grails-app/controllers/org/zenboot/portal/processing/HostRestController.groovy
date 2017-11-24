@@ -174,7 +174,7 @@ class HostRestController extends AbstractRestController {
                     host.state = HostState.BROKEN
                 }
                 if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-                    withFormat {
+                    request.withFormat {
                         xml {
                             def xml
                             try {
