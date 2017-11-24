@@ -28,7 +28,7 @@ class UrlMappings {
         "/rest/v1/help"(controller: 'executionZoneRest', action: 'help')
         "/rest/v1/executionzones/list?"(controller: 'executionZoneRest', action: 'list')
         "/rest/v1/executionzones/$execId/actions/list"(controller: 'executionZoneRest', action: 'listactions')
-        "/rest/v1/executionzones/$execId/actions/$execAction/listparams?"(controller: 'executionZoneRest', action: 'listparams')
+        "/rest/v1/executionzones/$execId/actions/$execAction/params/list?"(controller: 'executionZoneRest', action: 'listparams')
         "/rest/v1/executionzones/execzonetemplate"(controller: 'executionZoneRest', action: 'execzonetemplate')
         "/rest/v1/executionzones/create"(controller: 'executionZoneRest', action: 'createzone')
         "/rest/v1/executionzones/$execId/clone"(controller: 'executionZoneRest', action: 'cloneexecutionzone')
@@ -57,7 +57,7 @@ class UrlMappings {
 
         //ExecutionZoneTypeRest
         "/rest/v1/exectypes/list"(controller: 'executionZoneTypeRest', action: 'listexectypes')
-        "/rest/v1/exectypes/edit"(controller: 'executionZoneTypeRest', action: 'editexectype')
+        "/rest/v1/exectypes/$execTypeId/edit"(controller: 'executionZoneTypeRest', action: 'editexectype')
 
         // templates
         name template : "/template/$action?/$id?" { controller='template' }
