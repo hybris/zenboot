@@ -27,23 +27,37 @@ class UrlMappings {
         "/rest/v1"(controller: 'executionZoneRest', action: 'help')
         "/rest/v1/help"(controller: 'executionZoneRest', action: 'help')
         "/rest/v1/executionzones/list?"(controller: 'executionZoneRest', action: 'list')
-        "/rest/v1/executionzones/$execId/listactions"(controller: 'executionZoneRest', action: 'listactions')
+        "/rest/v1/executionzones/$execId/actions/list"(controller: 'executionZoneRest', action: 'listactions')
         "/rest/v1/executionzones/$execId/actions/$execAction/listparams?"(controller: 'executionZoneRest', action: 'listparams')
-        "/rest/v1/exectypes"(controller: 'executionZoneRest', action: 'exectypes')
         "/rest/v1/executionzones/execzonetemplate"(controller: 'executionZoneRest', action: 'execzonetemplate')
         "/rest/v1/executionzones/create"(controller: 'executionZoneRest', action: 'createzone')
         "/rest/v1/executionzones/$execId/clone"(controller: 'executionZoneRest', action: 'cloneexecutionzone')
         "/rest/v1/executionzones/$execId/actions/$execAction/$quantity/execute?"(controller: 'executionZoneRest', action: 'execute')
-        "/rest/v1/hosts?"(controller: 'executionZoneRest', action: 'listhosts')
-        "/rest/v1/hoststates"(controller: 'executionZoneRest', action: 'listhoststates')
-        "/rest/v1/executionzones/$execId/changeparams"(controller: 'executionZoneRest', action: 'changeExecutionZoneParams')
-        "/rest/v1/executionzones/$execId/changeattributes"(controller: 'executionZoneRest', action: 'changeExecutionZoneAttributes')
-        "/rest/v1/listactions?"(controller: 'executionZoneRest', action: 'listDetailedActions')
-        "/rest/v1/listserviceurls?"(controller: 'executionZoneRest', action: 'listServiceUrls')
-        "/rest/v1/listcustomers?"(controller: 'executionZoneRest', action: 'listCustomers')
-        "/rest/v1/listusernotifications?"(controller: 'executionZoneRest', action: 'listUserNotifications')
-        "/rest/v1/usernotifications/$notificationId/edit"(controller: 'executionZoneRest', action: 'editUserNotification')
-        "/rest/v1/usernotifications/create"(controller: 'executionZoneRest', action: 'createUserNotification')
+        "/rest/v1/executionzones/$execId/params/edit"(controller: 'executionZoneRest', action: 'changeExecutionZoneParams')
+        "/rest/v1/executionzones/$execId/attributes/edit"(controller: 'executionZoneRest', action: 'changeExecutionZoneAttributes')
+
+        //ExecutionZoneActionRest
+        "/rest/v1/actions/list?"(controller: 'executionZoneRest', action: 'listDetailedActions')
+
+        //ServiceUrlRest
+        "/rest/v1/serviceurls/list?"(controller: 'executionZoneRest', action: 'listServiceUrls')
+
+        //HostRest
+        "/rest/v1/hosts/list?"(controller: 'hostRest', action: 'listhosts')
+        "/rest/v1/hosts/hoststates/list"(controller: 'hostRest', action: 'listhoststates')
+
+        //CustomerRest
+        "/rest/v1/customers/list?"(controller: 'customerRest', action: 'listCustomers')
+
+        //UserNotificationRest
+        "/rest/v1/usernotifications/list?"(controller: 'userNotificationRest', action: 'listUserNotifications')
+        "/rest/v1/usernotifications/$notificationId/edit"(controller: 'userNotificationRest', action: 'editUserNotification')
+        "/rest/v1/usernotifications/create"(controller: 'userNotificationRest', action: 'createUserNotification')
+        "/rest/v1/usernotificaitons/$notificationId/delete"(controller: 'userNotificationRest', action: 'deleteUserNotification')
+
+        //ExecutionZoneTypeRest
+        "/rest/v1/exectypes/list"(controller: 'executionZoneTypeRest', action: 'listexectypes')
+        "/rest/v1/exectypes/edit"(controller: 'executionZoneTypeRest', action: 'editexectype')
 
         // templates
         name template : "/template/$action?/$id?" { controller='template' }
