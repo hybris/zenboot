@@ -4,6 +4,9 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
+import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
+import org.codehaus.groovy.grails.web.json.JSONException
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.Host
@@ -138,6 +141,101 @@ class HostRestController extends AbstractRestController {
                 hosts.put('hosts', host)
                 render hosts as JSON
             }
+        }
+    }
+
+    def edithosts = {
+        Host host
+        Boolean unknown = Boolean.FALSE
+        Boolean broken = Boolean.FALSE
+        Boolean hasError = Boolean.FALSE
+        def parameters = [:]
+
+        if (params.hostId && params.hostId.isInteger()) {
+
+            host = Host.findById(params.hostId as Long)
+
+            if (host) {
+                //host found - do nothing
+            } else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'Host with id ' + params.hostId + ' not found.')
+                return
+            }
+
+            if (params.markUnknown) {
+                unknown = params.markUnknown.toBoolean()
+            }
+
+            if (params.markBroken) {
+                broken = params.markBroen.toBoolean()
+            }
+
+            withFormat {
+                xml {
+                    def xml
+                    try {
+                        xml = request.XML
+                    }
+                    catch (ConverterException e) {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
+                        hasError = Boolean.TRUE
+                        return
+                    }
+
+                    def xmlParameters = xml[0].children
+
+                    xmlParameters.each { node ->
+                        def name = ''
+                        def value = ''
+                        node.children.each { innerNode ->
+                            if (innerNode.name == 'parameterName') {
+                                name = innerNode.text()
+                            } else if (innerNode.name == 'parameterValue') {
+                                value = innerNode.text()
+                            }
+                        }
+                        parameters.put(name, value)
+                    }
+                }
+                json {
+                    String text = request.getReader().text
+                    def json
+
+                    try {
+                        json = new JSONObject(text)
+                    }
+                    catch (JSONException e) {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
+                        hasError = Boolean.TRUE
+                        return
+                    }
+
+                    if (json.parameters) {
+                        json.parameters.each {
+                            parameters[it.parameterName] = it.parameterValue
+                        }
+                    }
+                }
+
+                if (parameters || parameters.every {it.value != '' && it.value != null }) {
+                    parameters.each { key, value ->
+                        if (host.hasProperty(key)) {
+
+                        } else {
+
+                        }
+                    }
+
+                } else {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received or wrong data structure. Please check documentation.')
+                    hasError = Boolean.TRUE
+                }
+
+
+            }
+        }
+        else {
+
         }
     }
 

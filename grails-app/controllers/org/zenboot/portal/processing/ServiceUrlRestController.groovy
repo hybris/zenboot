@@ -23,56 +23,36 @@ class ServiceUrlRestController extends AbstractRestController  {
     def listserviceurls = {
         def execZones = []
         if (params.execId) {
-            if (params.execId.contains(',')) {
-                List<String> execZoneIds = params.execId.split(',')
-                execZoneIds.each {
-                    if(it.isInteger()) {
-                        ExecutionZone zone = ExecutionZone.get(it as Long)
-                        if (zone) {
-                            if (accessService.userHasAccess(zone)) {
-                                execZones.add(zone)
-                            } else {
-                                this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to change the parameters ' +
-                                        'of the executionZone with id ' + params.execId + '.')
-                                return
-                            }
+            List<String> execZoneIds = params.execId.split(',')
+            execZoneIds.each {
+                if (it.isInteger()) {
+                    ExecutionZone zone = ExecutionZone.get(it as Long)
+                    if (zone) {
+                        if (accessService.userHasAccess(zone)) {
+                            execZones.add(zone)
                         } else {
-                            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + it + ' found.')
+                            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to change the parameters ' +
+                                    'of the executionZone with id ' + params.execId + '.')
                             return
                         }
-                    }
-                    else {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The execId param ' + it +' invalid. ' +
-                                'It has to be a Long value.')
-                        return
-                    }
-                }
-            } else if (params.execId.isInteger()) {
-                ExecutionZone zone = ExecutionZone.get(params.execId as Long)
-                if (zone) {
-                    if (accessService.userHasAccess(zone)){
-                        execZones.add(zone)
-                    }
-                    else {
-                        this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to get the serive urls ' +
-                                'of the executionZone with id ' + params.execId + '.')
+                    } else {
+                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + it + ' found.')
                         return
                     }
                 } else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + params.execId + ' found.')
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The execId param ' + it + ' invalid. ' +
+                            'It has to be a Long value.')
                     return
                 }
-            } else {
-                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The execId param invalid. ' +
-                        'It has to be a Long value or a list of Long values delimited by ","')
-                return
             }
         } else {
             if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
                 execZones = ExecutionZone.getAll()
             } else {
-                def execZoneIds = accessService.accessCache[springSecurityService.getCurrentUserId() as Long]?
-                        accessService.accessCache[springSecurityService.getCurrentUserId() as Long].findAll {it.value == true}.collect {it.key}
+                def execZoneIds = accessService.accessCache[springSecurityService.getCurrentUserId() as Long] ?
+                        accessService.accessCache[springSecurityService.getCurrentUserId() as Long].findAll {
+                            it.value == true
+                        }.collect { it.key }
                         : []
 
                 execZoneIds.each {

@@ -24,49 +24,27 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
         List<ExecutionZone> execZones = []
         int offset
         if (params.execId) {
-            if (params.execId.contains(',')) {
-                List<String> execZoneIds = params.execId.split(',')
-                execZoneIds.each {
-                    if(it.isInteger()) {
-                        ExecutionZone zone = ExecutionZone.get(it as Long)
-                        if (zone) {
-                            if (accessService.userHasAccess(zone)) {
-                                execZones.add(zone)
-                            } else {
-                                this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to get the actions ' +
-                                        'of the executionZone with id ' + params.execId + '.')
-                                return
-                            }
+            List<String> execZoneIds = params.execId.split(',')
+            execZoneIds.each {
+                if (it.isInteger()) {
+                    ExecutionZone zone = ExecutionZone.get(it as Long)
+                    if (zone) {
+                        if (accessService.userHasAccess(zone)) {
+                            execZones.add(zone)
                         } else {
-                            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + it + ' found.')
+                            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to get the actions ' +
+                                    'of the executionZone with id ' + params.execId + '.')
                             return
                         }
-                    }
-                    else {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The execId param ' + it +' invalid. ' +
-                                'It has to be a Long value.')
-                        return
-                    }
-                }
-            } else if (params.execId.isInteger()) {
-                ExecutionZone zone = ExecutionZone.get(params.execId as Long)
-                if (zone) {
-                    if (accessService.userHasAccess(zone)){
-                        execZones.add(zone)
-                    }
-                    else {
-                        this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to change the parameters ' +
-                                'of the executionZone with id ' + params.execId + '.')
+                    } else {
+                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + it + ' found.')
                         return
                     }
                 } else {
-                    this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No execution zone with id ' + params.execId + ' found.')
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The execId param ' + it + ' invalid. ' +
+                            'It has to be a Long value.')
                     return
                 }
-            } else {
-                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The execId param invalid. ' +
-                        'It has to be a Long value or a list of Long values delimited by ","')
-                return
             }
         } else {
             if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
@@ -174,8 +152,7 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
                     render paginationJSON as JSON
                 } else {
 
-                    def actionsJSON = [:]
-                    def actionsList = []
+                    def actionsJSON = []
                     execZones.each { ExecutionZone execZone ->
                         def list = execZone.actions as List
                         if (list.size() > (offset+100)) {
@@ -196,10 +173,9 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
                             }
                             actionJSON.put('processingParameters', processingParameters)
                             actionJSON.put('scriptletBatchIds', action.scriptletBatches.collect { it.id })
-                            actionsList.add(actionJSON)
+                            actionsJSON.add(actionJSON)
                         }
                     }
-                    actionsJSON.put('executionZoneActions', actionsList)
                     render actionsJSON as JSON
                 }
             }

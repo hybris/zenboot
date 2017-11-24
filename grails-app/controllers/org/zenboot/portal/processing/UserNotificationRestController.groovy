@@ -207,7 +207,7 @@ class UserNotificationRestController extends AbstractRestController {
                         parameters.put(name, value)
                     }
 
-                    if (parameters || parameters.any {it.value != '' || it.value != null }) {
+                    if (parameters || parameters.every {it.value != '' && it.value != null }) {
                         if(parameters.containsKey('enabled') && parameters.containsKey('message') && parameters.containsKey('notificationtype')) {
                             if (NotificationType.values().any {it.name().toLowerCase() == parameters['notificationtype'].toString().toLowerCase()}) {
                                 UserNotification newUserNotification = new UserNotification(enabled: parameters['enabled'], message: parameters['message'],
@@ -255,7 +255,7 @@ class UserNotificationRestController extends AbstractRestController {
                         }
                     }
 
-                    if (parameters || parameters.any {it.value != '' || it.value != null }) {
+                    if (parameters || parameters.every {it.value != '' && it.value != null }) {
                         if(parameters.containsKey('enabled') && parameters.containsKey('message') && parameters.containsKey('notificationtype')) {
                             if (NotificationType.values().any {it.name().toLowerCase() == parameters['notificationtype'].toString().toLowerCase()}) {
                                 UserNotification newUserNotification = new UserNotification(enabled: parameters['enabled'], message: parameters['message'],

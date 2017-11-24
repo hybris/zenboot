@@ -27,54 +27,28 @@ class CustomerRestController extends AbstractRestController {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             List<Customer> customersCollection = []
             if (params.email) {
-                if (params.email.contains(',')) {
-                    List<String> emails = params.email.split(',')
-                    emails.each {
-                        Customer customer = Customer.findByEmail(it)
-                        if (customer) {
-                            customersCollection.add(customer)
-                        } else {
-                            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with email ' + it + ' found.')
-                            return
-                        }
-                    }
-                } else {
-                    Customer customer = Customer.findByEmail(params.email as String)
+                List<String> emails = params.email.split(',')
+                emails.each {
+                    Customer customer = Customer.findByEmail(it)
                     if (customer) {
                         customersCollection.add(customer)
                     } else {
-                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with email ' + params.email + ' found.')
+                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with email ' + it + ' found.')
                         return
                     }
                 }
             } else if (params.customerId) {
-                if (params.customerId.contains(',')) {
-                    List<String> iDs = params.customerId.split(',')
-                    iDs.each {
-                        if (it.isInteger()) {
-                            Customer customer = Customer.findById(it as Long)
-                            if (customer) {
-                                customersCollection.add(customer)
-                            } else {
-                                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with id ' + it + ' found.')
-                                return
-                            }
-
-                        } else {
-                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The customerId param is invalid. ' +
-                                    'It has to be a Long value or a list of Long values delimited by ","')
-                            return
-                        }
-                    }
-                } else {
-                    if (params.customerId.isInteger()) {
-                        Customer customer = Customer.findById(params.customerId as Long)
+                List<String> iDs = params.customerId.split(',')
+                iDs.each {
+                    if (it.isInteger()) {
+                        Customer customer = Customer.findById(it as Long)
                         if (customer) {
                             customersCollection.add(customer)
                         } else {
-                            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with id ' + params.customerId + ' found.')
+                            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer with id ' + it + ' found.')
                             return
                         }
+
                     } else {
                         this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The customerId param is invalid. ' +
                                 'It has to be a Long value or a list of Long values delimited by ","')
@@ -113,11 +87,11 @@ class CustomerRestController extends AbstractRestController {
                     def customers = []
                     customersCollection.each { Customer customerData ->
                         def customer = [:]
-                        customer.put('id',customerData.id)
+                        customer.put('id', customerData.id)
                         customer.put('email', customerData.email)
                         customer.put('creationDate', customerData.creationDate)
                         def hosts = []
-                        customerData.hosts.each {Host customerHost ->
+                        customerData.hosts.each { Host customerHost ->
                             hosts.add(customerHost.cname)
                         }
                         customer.put('hosts', hosts)
