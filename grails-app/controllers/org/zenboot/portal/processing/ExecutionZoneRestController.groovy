@@ -103,7 +103,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             description 'The method returns all required parameters on an specific execution zone action. With an additional ?executions= you are able to generate a template for more executions.'
                             urls {
                                 url '/rest/v1/executionzones/{execId}/actions/{execAction}/params/list'
-                                specific '/rest/v1/executionzones/actions/{execAction}list?executions={integer}'
+                                specific '/rest/v1/executionzones/actions/{execAction}/list?executions={integer}'
                                 exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/params/list?executions=3'
                             }
                             execId {
