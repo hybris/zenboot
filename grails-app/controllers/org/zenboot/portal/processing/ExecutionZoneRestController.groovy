@@ -31,7 +31,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def applicationEventPublisher
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", execzonetemplate: "GET",
-    cloneexecutionzone: "POST", changeExecutionZoneParams: ["PUT", "DELETE"], changeExecutionZoneAttributes: ["PUT"]]
+    cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: ["PUT"]]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -1354,7 +1354,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
      * specific parameter will be ignored.
      * Request method DELETE required admin permissions
      */
-    def changeExecutionZoneParams = {
+    def changeexecutionzoneparams = {
 
         ExecutionZone zone
         Boolean hasError = Boolean.FALSE
@@ -1502,7 +1502,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
      * datatype. Some of the values are already catched so that all correct values will be changed. In case of changing the description the
      * access cache will be updated for this zone to ensure that users which roles does not match the new expression will no longer have access.
      */
-    def changeExecutionZoneAttributes = {
+    def changeexecutionzoneattributes = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             ExecutionZone zone
             Boolean hasError = Boolean.FALSE

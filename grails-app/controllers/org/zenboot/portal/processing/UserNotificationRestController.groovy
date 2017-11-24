@@ -15,7 +15,7 @@ import org.zenboot.portal.security.Role
 
 class UserNotificationRestController extends AbstractRestController {
 
-    static allowedMethods = [listUserNotifications: "GET", editUserNotification: "PUT", createUserNotification: "POST", deleteUserNotification: "DELETE"]
+    static allowedMethods = [listusernotifications: "GET", editusernotification: "PUT", createusernotification: "POST", deleteusernotification: "DELETE"]
 
     def springSecurityService
 
@@ -23,7 +23,7 @@ class UserNotificationRestController extends AbstractRestController {
      * The method return a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications. If the enabled parameter is not set, the method
      * return all available user notifications. Admin permissions are required the get the information of this resource.
      */
-    def listUserNotifications = {
+    def listusernotifications = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             List<UserNotification> userNotificationsData = []
             if (params.enabled != null) {
@@ -76,7 +76,7 @@ class UserNotificationRestController extends AbstractRestController {
     /**
      * The method override the values of an existing user notification. Admin permissions are required to edit an user notification.
      */
-    def editUserNotification = {
+    def editusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             Boolean hasError = Boolean.FALSE
             UserNotification userNotificationData
@@ -175,7 +175,7 @@ class UserNotificationRestController extends AbstractRestController {
     /**
      * The method creates a new user notification. Admin permissions are required to create a new one.
      */
-    def createUserNotification = {
+    def createusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             Boolean hasError = Boolean.FALSE
 
@@ -294,7 +294,7 @@ class UserNotificationRestController extends AbstractRestController {
     /**
      * The method deleted an user notification by id. Admiin permissions are required to delete an user notification.
      */
-    def deleteUserNotification = {
+    def deleteusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             if (params.notificationId) {
                 UserNotification userNotification = UserNotification.findById(params.notificationId as Long)

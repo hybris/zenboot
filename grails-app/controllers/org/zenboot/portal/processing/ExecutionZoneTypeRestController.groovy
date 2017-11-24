@@ -57,7 +57,7 @@ class ExecutionZoneTypeRestController extends AbstractRestController {
             ExecutionZoneType execType
             Boolean hasError = Boolean.FALSE
 
-            if (params.execTypeId && params.execTypeId.isInteger) {
+            if (params.execTypeId && params.execTypeId.isInteger()) {
                 execType = ExecutionZoneType.get(params.execTypeId as Long)
 
                 if (execType) {

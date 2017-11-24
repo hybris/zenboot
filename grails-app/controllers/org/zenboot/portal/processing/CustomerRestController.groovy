@@ -12,7 +12,7 @@ import org.zenboot.portal.security.Role
 
 class CustomerRestController extends AbstractRestController {
 
-    static allowedMethods = [listCustomers: "GET"]
+    static allowedMethods = [listcustomers: "GET"]
 
     def springSecurityService
 
@@ -23,7 +23,7 @@ class CustomerRestController extends AbstractRestController {
      *
      * Admin permissions are required.
      */
-    def listCustomers = {
+    def listcustomers = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             List<Customer> customersCollection = []
             if (params.email) {

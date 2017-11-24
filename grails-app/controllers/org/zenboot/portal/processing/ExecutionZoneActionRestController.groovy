@@ -10,7 +10,7 @@ import org.zenboot.portal.security.Role
 
 class ExecutionZoneActionRestController extends AbstractRestController  {
 
-    static allowedMethods = [listDetailedActions: "GET"]
+    static allowedMethods = [listdetailedactions: "GET"]
 
     def springSecurityService
     def accessService
@@ -20,7 +20,7 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
      * If you don't specify the execId the method tries to return all execution zone actions as once. If the number of results is bigger than 100, the pagination mechanism will be forced
      * so the method returns a list of prepared urls.
      */
-    def listDetailedActions = {
+    def listdetailedactions = {
         List<ExecutionZone> execZones = []
         int offset
         if (params.execId) {

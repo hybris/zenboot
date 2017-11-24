@@ -11,7 +11,7 @@ import org.zenboot.portal.security.Role
 
 class ServiceUrlRestController extends AbstractRestController  {
 
-    static allowedMethods = [listServiceUrls: "GET"]
+    static allowedMethods = [listserviceurls: "GET"]
 
     def springSecurityService
     def accessService
@@ -20,7 +20,7 @@ class ServiceUrlRestController extends AbstractRestController  {
      * The method return a list with active hosts service urls. It is possible to specify the execution zone or a list of execution zones delimited by ',' (?execId=1,2,3,5...). If the execId param is
      * not set, the method returns the service urls of all execution zones.
      */
-    def listServiceUrls = {
+    def listserviceurls = {
         def execZones = []
         if (params.execId) {
             if (params.execId.contains(',')) {
