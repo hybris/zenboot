@@ -228,7 +228,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                 mandatory 'Yes'
                             }
                             parameters 'Requires json or xml where all the parameters are stored which you want to change.'
-                            method 'PUT'
+                            method 'PUT or DELETE'
                         }
                         restendpoint {
                             name 'changeattributes'
@@ -435,7 +435,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                     urls: [
                                             url: '/rest/v1/executionzones/{execId}/params/edit',
                                             exampleurl: '/rest/v1/executionzones/1/params/edit'
-                                    ], method: 'PUT'
+                                    ], method: 'PUT or DELETE'
                 ]
 
                 def changeattributesEndpoint = [description: 'The method changes the attributes of an existing executionzone.', execId: execId,
