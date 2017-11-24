@@ -44,6 +44,7 @@ class UrlMappings {
 
         //HostRest
         "/rest/v1/hosts/list?"(controller: 'hostRest', action: 'listhosts')
+        "/rest/v1/hosts/$hostId/edit?"(controller: 'hostRest', action: 'edithost')
         "/rest/v1/hoststates/list"(controller: 'hostRest', action: 'listhoststates')
 
         //CustomerRest

@@ -9,13 +9,15 @@ import org.codehaus.groovy.grails.web.json.JSONException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
+import org.zenboot.portal.Customer
+import org.zenboot.portal.Environment
 import org.zenboot.portal.Host
 import org.zenboot.portal.HostState
 import org.zenboot.portal.security.Role
 
 class HostRestController extends AbstractRestController {
 
-    static allowedMethods = [listhosts: "GET", listhoststates: "GET"]
+    static allowedMethods = [listhosts: "GET", listhoststates: "GET", edithost: "PUT"]
 
     def springSecurityService
     def accessService
@@ -144,10 +146,12 @@ class HostRestController extends AbstractRestController {
         }
     }
 
-    def edithosts = {
+    /**
+     * The method changes the properties of of an existing host for given data as XML or JSON. To set ?markUnknown=true or ?markBroken=true and the end of the url will mark the host into
+     * one of these states. Changing the rest of the properties requires admin permissions.
+     */
+    def edithost = {
         Host host
-        Boolean unknown = Boolean.FALSE
-        Boolean broken = Boolean.FALSE
         Boolean hasError = Boolean.FALSE
         def parameters = [:]
 
@@ -162,80 +166,107 @@ class HostRestController extends AbstractRestController {
                 return
             }
 
-            if (params.markUnknown) {
-                unknown = params.markUnknown.toBoolean()
-            }
+            if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) || accessService.userHasAccess(host.getExecZone())) {
 
-            if (params.markBroken) {
-                broken = params.markBroen.toBoolean()
-            }
+                if (params.markUnknown) {
+                    host.state = HostState.UNKNOWN
+                } else if (params.markBroken) {
+                    host.state = HostState.BROKEN
+                }
+                if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+                    withFormat {
+                        xml {
+                            def xml
+                            try {
+                                xml = request.XML
+                            }
+                            catch (ConverterException e) {
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
+                                hasError = Boolean.TRUE
+                                return
+                            }
 
-            withFormat {
-                xml {
-                    def xml
-                    try {
-                        xml = request.XML
-                    }
-                    catch (ConverterException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                        hasError = Boolean.TRUE
-                        return
-                    }
+                            def xmlParameters = xml[0].children
 
-                    def xmlParameters = xml[0].children
-
-                    xmlParameters.each { node ->
-                        def name = ''
-                        def value = ''
-                        node.children.each { innerNode ->
-                            if (innerNode.name == 'parameterName') {
-                                name = innerNode.text()
-                            } else if (innerNode.name == 'parameterValue') {
-                                value = innerNode.text()
+                            xmlParameters.each { node ->
+                                def name = ''
+                                def value = ''
+                                node.children.each { innerNode ->
+                                    if (innerNode.name == 'parameterName') {
+                                        name = innerNode.text()
+                                    } else if (innerNode.name == 'parameterValue') {
+                                        value = innerNode.text()
+                                    }
+                                }
+                                parameters.put(name, value)
                             }
                         }
-                        parameters.put(name, value)
-                    }
-                }
-                json {
-                    String text = request.getReader().text
-                    def json
+                        json {
+                            String text = request.getReader().text
+                            def json
 
-                    try {
-                        json = new JSONObject(text)
+                            try {
+                                json = new JSONObject(text)
+                            }
+                            catch (JSONException e) {
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
+                                hasError = Boolean.TRUE
+                                return
+                            }
+
+                            if (json.parameters) {
+                                json.parameters.each {
+                                    parameters[it.parameterName] = it.parameterValue
+                                }
+                            }
+                        }
                     }
-                    catch (JSONException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
+
+                    if (parameters || parameters.every { it.value != '' && it.value != null }) {
+                        parameters.each { String key, String value ->
+                            if (host.hasProperty(key)) {
+                                if (key.toUpperCase() == 'ENVIRONMENT') {
+                                    Environment env = Environment.values().find { it.acronym == value.take(1) }
+                                    if (env) {
+                                        host.environment = env
+                                    } else {
+                                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No Environment found for value ' + value)
+                                        hasError = Boolean.TRUE
+                                    }
+                                } else if (key.toUpperCase() == 'CUSTOMER') {
+                                    Customer customer = value.isInteger() ? Customer.findById(value as Long) : Customer.findByEmail(value)
+                                    if (customer) {
+                                        host.owner = customer
+                                    } else {
+                                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer found for value ' + value)
+                                        hasError = Boolean.TRUE
+                                        return
+                                    }
+                                } else if (key.toUpperCase() == 'EXPIRYDATE') {
+                                    host.expiryDate = Date.parse('"yyyy-MM-dd hh:mm:ss"', value)
+                                } else if (key.toUpperCase() == 'CREATIONDATE') {
+                                    //ignore
+                                } else {
+                                    host.properties[key] = value
+                                }
+                            } else {
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.key + ' not exists for UserNotifications.')
+                                hasError = Boolean.TRUE
+                                return
+                            }
+                        }
+                    } else {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received or wrong data structure. Please check documentation.')
                         hasError = Boolean.TRUE
-                        return
-                    }
-
-                    if (json.parameters) {
-                        json.parameters.each {
-                            parameters[it.parameterName] = it.parameterValue
-                        }
                     }
                 }
 
-                if (parameters || parameters.every {it.value != '' && it.value != null }) {
-                    parameters.each { key, value ->
-                        if (host.hasProperty(key)) {
-
-                        } else {
-
-                        }
-                    }
-
+                if (host.save(flush: true)) {
+                    this.renderRestResult(HttpStatus.OK, null, null, 'Host changed.')
                 } else {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received or wrong data structure. Please check documentation.')
-                    hasError = Boolean.TRUE
+                    this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occurred while saving the host.')
                 }
-
-
             }
-        }
-        else {
-
         }
     }
 
