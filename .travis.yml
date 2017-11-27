@@ -17,7 +17,6 @@ script:
 notifications:
   email:
   - k9ert@gmx.de
-  - martin.sander@sap.com
   slack: yrpm:rDezlAPq20RKGIp10YUeHRnq
 deploy:
   provider: releases
