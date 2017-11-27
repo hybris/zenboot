@@ -99,8 +99,8 @@ class CustomerRestController extends AbstractRestController {
             def parameters = [:]
             Boolean hasError = Boolean.FALSE
 
-            if (params.identifer) {
-                customer = params.identifer.isInteger() ? Customer.findById(params.identifer as Long) : Customer.findByEmail(params.identifer)
+            if (params.identifier) {
+                customer = params.identifier.isInteger() ? Customer.findById(params.identifier as Long) : Customer.findByEmail(params.identifier)
             } else {
                 this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer found with id/email ' + params.identifier + ' .')
                 return
@@ -148,7 +148,13 @@ class CustomerRestController extends AbstractRestController {
 
                     if (json.parameters) {
                         json.parameters.each {
-                            parameters[it.parameterName] = it.parameterValue
+                            if (it.parameterName && it.parameterValue) {
+                                parameters[it.parameterName] = it.parameterValue
+                            } else {
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'paramterName or paramterValue is null or empty. Please check your data.')
+                                hasError = Boolean.TRUE
+                                return
+                            }
                         }
                     }
                 }
