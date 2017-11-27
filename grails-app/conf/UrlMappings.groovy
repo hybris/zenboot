@@ -33,7 +33,9 @@ class UrlMappings {
         "/rest/v1/executionzones/create"(controller: 'executionZoneRest', action: 'createzone')
         "/rest/v1/executionzones/$execId/clone"(controller: 'executionZoneRest', action: 'cloneexecutionzone')
         "/rest/v1/executionzones/$execId/actions/$execAction/$quantity/execute?"(controller: 'executionZoneRest', action: 'execute')
+        "/rest/v1/executionzones/$execId/params/list"(controller: 'executionZoneRest', action: 'listexecutionzoneparams')
         "/rest/v1/executionzones/$execId/params/edit"(controller: 'executionZoneRest', action: 'changeexecutionzoneparams')
+        "/rest/v1/executionzones/$execId/attributes/list"(controller: 'executionZoneRest', action: 'listexecutionzoneattributes')
         "/rest/v1/executionzones/$execId/attributes/edit"(controller: 'executionZoneRest', action: 'changeexecutionzoneattributes')
 
         //ExecutionZoneActionRest

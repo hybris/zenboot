@@ -31,7 +31,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def applicationEventPublisher
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", execzonetemplate: "GET",
-    cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: "PUT"]
+    cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: "PUT", listexecutionzoneattributes: "GET", listexecutionzoneparams: "GET"]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -103,7 +103,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             description 'The method returns all required parameters on an specific execution zone action. With an additional ?executions= you are able to generate a template for more executions.'
                             urls {
                                 url '/rest/v1/executionzones/{execId}/actions/{execAction}/params/list'
-                                specific '/rest/v1/executionzones/actions/{execAction}/list?executions={integer}'
+                                specific '/rest/v1/executionzones/{execId}/actions/{execAction}/list?executions={integer}'
                                 exampleurl '/rest/v1/executionzones/1/actions/sanitycheck/params/list?executions=3'
                             }
                             execId {
@@ -211,7 +211,21 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             name 'hoststates'
                             description 'The method returns a list of all possible host states'
                             urls {
-                                url '/rest/v1/hosts/hoststates/list'
+                                url '/rest/v1/hoststates/list'
+                            }
+                            method 'GET'
+                        }
+                        restendpoint {
+                            name 'listexecutionzoneparams'
+                            description 'This method returns a list with processing parameters of an execution zone.'
+                            urls {
+                                url '/rest/v1/executionzones/{execId}/params/list'
+                                exampleurl '/rest/v1/executionzones/1/params/list'
+                            }
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
                             }
                             method 'GET'
                         }
@@ -229,6 +243,21 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             }
                             parameters 'Requires json or xml where all the parameters are stored which you want to change.'
                             method 'PUT or DELETE'
+                        }
+                        restendpoint {
+                            name 'listexecutionzoneattributes'
+                            description 'This method returns a list with attributes of an execution zone.'
+                            urls {
+                                url '/rest/v1/executionzones/{execId}/attributes/list'
+                                exampleurl '/rest/v1/executionzones/1/attributes/list'
+                            }
+                            execId {
+                                description 'The id of the specific execution zone.'
+                                type 'Long'
+                                mandatory 'Yes'
+                            }
+                            method 'GET'
+
                         }
                         restendpoint {
                             name 'changeattributes'
@@ -317,6 +346,16 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                             restriction 'admin only'
                             method 'DELETE'
                         }
+                        restendpoint {
+                            name 'editcustomer'
+                            description 'The method changes the properties of an existing customer identified by id or email.'
+                            urls {
+                                url '/rest/v1/customers/$identifier/edit'
+                                exampleurl '/rest/v1/customers/1/edit or /rest/v1/customers/email@sap.com/edit'
+                            }
+                            restriction 'admin only'
+                            method 'PUT'
+                        }
                     }
                 }
 
@@ -334,6 +373,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 def notificationId = [description: 'The id of the usernotification.', type: 'Long', mandatory: 'Yes']
                 def customerId = [description: 'The id of the customer', type: 'Long', mandatory: 'No']
                 def execTypeId = [description: 'The id of the execution zone type', type: 'long', mandatory: 'Yes']
+                def identifier = [description: 'The id or email of the customer', type: 'long or string', mandatory: 'Yes']
 
                 def executeEndPoint = [description: 'The method execute the specific action of an execution zone based on the parameters one or multiple times. The {quantity} parameter ensure that the user knows the number ' +
                         'of executions and will be used to compare with the calculated executions. The {runs} parameter could be used to execute scripts multiple times. To do this ' +
@@ -369,7 +409,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                         'generate a template for more executions.', execId: execId, action: execAction,
                                           urls: [
                                               url: '/rest/v1/executionzones/{execId}/actions/{execAction}/params/list',
-                                              specific: '/rest/v1/executionzones/params/list?executions={integer}',
+                                              specific: '/rest/v1/executionzones/{execId}/actions/{execAction}/params/list?executions={integer}',
                                               exampleurl: '/rest/v1/executionzones/1/actions/sanitycheck/params/list?executions=3'
                                           ], method: 'GET'
                 ]
@@ -382,67 +422,67 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 ]
 
                 def exectypeslistEndpoint = [description: 'The method return all available execution zone types.',
-                                 urls: [
-                                         url: '/rest/v1/exectypes/list',
-                                         exampleurl: '/rest/v1/exectypes/list'
-                                 ], method: 'GET'
+                                             urls: [
+                                                     url: '/rest/v1/exectypes/list',
+                                                     exampleurl: '/rest/v1/exectypes/list'
+                                             ], method: 'GET'
                 ]
 
                 def exectypeseditEndpoint = [description: 'The method changes the properties of an existing execution zone type.', execTypeId: execTypeId,
-                                     urls: [
-                                             url: '/rest/v1/exectypes/{execTypeId}/edit',
-                                             exampleurl: '/rest/v1/exectypes/1/edit'
-                                     ], method: 'PUT'
+                                             urls: [
+                                                     url: '/rest/v1/exectypes/{execTypeId}/edit',
+                                                     exampleurl: '/rest/v1/exectypes/1/edit'
+                                             ], method: 'PUT'
                 ]
 
                 def execzonetemplateEndpoint = [description: 'The method return a template of an execution zone which could be used to create a new one.', restriction: 'admin only',
-                                        urls: [
-                                                url: '/rest/v1/executionzones/execzonetemplate',
-                                                exampleurl: '/rest/v1/executionzones/execzonetemplate'
-                                        ], method: 'GET'
+                                                urls: [
+                                                        url: '/rest/v1/executionzones/execzonetemplate',
+                                                        exampleurl: '/rest/v1/executionzones/execzonetemplate'
+                                                ], method: 'GET'
                 ]
 
                 def createzoneEndpoint = [description: 'The method return a template of an execution zone which could be used to create a new one.', restriction: 'admin only',
-                                  urls: [
-                                      url: '/rest/v1/executionzones/create',
-                                      exampleurl: '/rest/v1/executionzones/create'
-                                  ], method: 'POST'
-                ]
-
-                def cloneexecutionzoneEndpoint = [description: 'The method clones an existing execution zone.', restriction: 'admins only', execId: execId,
                                           urls: [
-                                              url: '/rest/v1/executionzones/{execId}/clone',
-                                              exampleurl: '/rest/v1/executionzones/1/clone'
+                                                  url: '/rest/v1/executionzones/create',
+                                                  exampleurl: '/rest/v1/executionzones/create'
                                           ], method: 'POST'
                 ]
 
+                def cloneexecutionzoneEndpoint = [description: 'The method clones an existing execution zone.', restriction: 'admins only', execId: execId,
+                                                  urls: [
+                                                          url: '/rest/v1/executionzones/{execId}/clone',
+                                                          exampleurl: '/rest/v1/executionzones/1/clone'
+                                                  ], method: 'POST'
+                ]
+
                 def listhostsEndpoint = [description: 'The method returns a list of all hosts. Could be specified by host state and executionzone.', execId: execId, hostState: hostState,
-                                 urls: [
-                                         all: '/rest/v1/hosts/list',
-                                         specific: '/rest/v1/hosts/list?hostState={hostState,hostState...}&execId={execId}',
-                                         exampleurl: '/rest/v1/hosts/list',
-                                         exampleurlmulti: '/rest/v1/hosts/list?hostState=completed,created&execId=104'
-                                 ], method: 'GET'
+                                         urls: [
+                                                 all: '/rest/v1/hosts/list',
+                                                 specific: '/rest/v1/hosts/list?hostState={hostState,hostState...}&execId={execId}',
+                                                 exampleurl: '/rest/v1/hosts/list',
+                                                 exampleurlmulti: '/rest/v1/hosts/list?hostState=completed,created&execId=104'
+                                         ], method: 'GET'
                 ]
 
                 def listhostsstatesEndpoint = [description: 'The method returns a list of all possible host states',
-                                       urls: [
-                                               url: '/rest/v1/hosts/hoststates'
-                                       ], method: 'GET'
+                                               urls: [
+                                                       url: '/rest/v1/hoststates/list'
+                                               ], method: 'GET'
                 ]
 
                 def changeparamsEndpoint = [description: 'The method changes the parameters of an existing executionzone.', execId: execId,
-                                    urls: [
-                                            url: '/rest/v1/executionzones/{execId}/params/edit',
-                                            exampleurl: '/rest/v1/executionzones/1/params/edit'
-                                    ], method: 'PUT or DELETE'
+                                            urls: [
+                                                    url: '/rest/v1/executionzones/{execId}/params/edit',
+                                                    exampleurl: '/rest/v1/executionzones/1/params/edit'
+                                            ], method: 'PUT or DELETE'
                 ]
 
                 def changeattributesEndpoint = [description: 'The method changes the attributes of an existing executionzone.', execId: execId,
-                                        urls: [
-                                                url: '/rest/v1/executionzones/{execId}/attributes/edit',
-                                                exampleurl: '/rest/v1/executionzones/1/attributes/edit'
-                                        ], method: 'PUT'
+                                                urls: [
+                                                        url: '/rest/v1/executionzones/{execId}/attributes/edit',
+                                                        exampleurl: '/rest/v1/executionzones/1/attributes/edit'
+                                                ], method: 'PUT'
                 ]
 
                 def listserviceurlsEndpoint = [description: 'The method return a list with active hosts service urls. It is possible to specify the execution zone or a list of execution zones delimited by "," (?execId=1,2,3,5...)',
@@ -454,11 +494,12 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 ]
 
                 def listcustomersEndpoint = [description: 'The method return a list with customers. It is possible to specify the customer by email or a list of emails delimited by "," (?email=my.email.com,my.email2.com,...). ' +
-                        'It is also possible to get specify the customer by id or a list of ids delimted by "," (?customerId=1,2,...).', customerId: customerId, urls: [
-                                url: '/rest/v1/customers/list',
-                                specific: '/rest/v1/customers/list?email=my@email.com',
-                                exampleurlmulti: '/rest/v1/customers/list?customerId=1,2,3'
-                        ], method: 'GET'
+                        'It is also possible to get specify the customer by id or a list of ids delimted by "," (?customerId=1,2,...).', customerId: customerId,
+                                             urls: [
+                                                     url: '/rest/v1/customers/list',
+                                                     specific: '/rest/v1/customers/list?email=my@email.com',
+                                                     exampleurlmulti: '/rest/v1/customers/list?customerId=1,2,3'
+                                             ], method: 'GET'
                 ]
 
                 def listusernotificationsEndpoint = [description: 'The method return a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications.', enabled: 'True or False',
@@ -497,11 +538,35 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                                   ], method: 'GET'
                 ]
 
+                def listexecutionzoneparamsEndpoint = [description: 'This method returns a list with processing parameters of an execution zone.', execId: execId,
+                                                       urls: [
+                                                               url: '/rest/v1/executionzones/{execId}/params/list',
+                                                               exampleurl: '/rest/v1/executionzones/{execId}/params/list'
+                                                       ], method: 'GET'
+                ]
+
+                def listexecutionzoneattributesEndpoint = [description: 'This method returns a list with attributes of an execution zone.', execId: execId,
+                                                           urls:[
+                                                                   url: '/rest/v1/executionzones/{execId}/attributes/list',
+                                                                   exampleurl: '/rest/v1/executionzones/{execId}/attributes/list'
+                                                           ], method: 'GET'
+                ]
+
+                def editcustomerEndpoint = [description: 'The method changes the properties of an existing customer identified by id or email.', identifier: identifier,
+                                            urls: [
+                                                    url: '/rest/v1/customers/$identifier/edit',
+                                                    exampleurl: '/rest/v1/customers/1/edit or /rest/v1/customers/email@sap.com/edit'
+                                            ],restriction: 'admin only', method: 'PUT'
+                ]
+
+
                 render (contentType: "text/json") { restendpoints execute: executeEndPoint, list: listEndPoint, listparams: listparamsEndPoint, listactions: listactionsEndPoint,
                         exectypes: exectypeslistEndpoint, exectypesedit: exectypeseditEndpoint, execzonetemplate: execzonetemplateEndpoint, create: createzoneEndpoint, clone: cloneexecutionzoneEndpoint,
                         hosts: listhostsEndpoint, hoststates: listhostsstatesEndpoint, changeparams: changeparamsEndpoint, changeattributes: changeattributesEndpoint, listServiceUrls: listserviceurlsEndpoint,
                         listcustomers: listcustomersEndpoint, listusernotifications: listusernotificationsEndpoint, editusernotifications: editusernotificationsEndpoint,
-                        createUserNotification: createusernotificationsEndpoint, deleteusernotifications: deleteusernotificationsEndpoint, listdetailedactionEndpoint: listdetailedactionEndpoint}
+                        createUserNotification: createusernotificationsEndpoint, deleteusernotifications: deleteusernotificationsEndpoint, listdetailedactionEndpoint: listdetailedactionEndpoint,
+                        listexecutionzoneparams: listexecutionzoneparamsEndpoint, listexecutionzoneattributes: listexecutionzoneattributesEndpoint, editcustomer: editcustomerEndpoint
+                }
             }
         }
     }
@@ -1341,6 +1406,157 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         }
         else {
             renderRestResult(HttpStatus.FORBIDDEN, null, null, 'This user has no permission to execute this execution Zone.')
+        }
+    }
+
+    /**
+     * This method returns a list with processing parameters of an execution zone.
+     */
+    def listexecutionzoneparams = {
+        ExecutionZone zone
+        if (params.execId) {
+            zone = ExecutionZone.get(params.execId as Long)
+            if (zone) {
+                if (!accessService.userHasAccess(zone)) {
+                    this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to request the parameters ' +
+                            'of the executionZone with id ' + params.execId + '.')
+                    return
+                }
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The execution zone with id ' + params.execId + ' does not exist.')
+                return
+            }
+        }
+        else {
+            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'ExecutionZone id (execId) not set.')
+            return
+        }
+
+        withFormat {
+            xml {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                String executionZoneParams = builder.bind {
+                    executionZoneParameters {
+                        zone.processingParameters.each { ProcessingParameter parameter ->
+                            executionZoneParameter {
+                                parameterName parameter.name
+                                parameterValue parameter.value
+                            }
+                        }
+                    }
+                }
+                def xml = XmlUtil.serialize(executionZoneParams).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
+                render contentType: "text/xml", xml
+            }
+            json {
+                def executionZoneParams = [:]
+                def executionZoneParam = [:]
+                    zone.processingParameters.each { ProcessingParameter parameter ->
+                        executionZoneParam.put(parameter.name, parameter.value)
+                    }
+                executionZoneParams.put('executionZoneParameters',executionZoneParam)
+                render executionZoneParams as JSON
+            }
+        }
+    }
+
+    /**
+     * The method returns a list with attributes of an execution zone.
+     */
+    def listexecutionzoneattributes = {
+        ExecutionZone zone
+        if (params.execId) {
+            zone = ExecutionZone.get(params.execId as Long)
+            if (zone) {
+                if (!accessService.userHasAccess(zone)) {
+                    this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'You have no permissions to request the parameters ' +
+                            'of the executionZone with id ' + params.execId + '.')
+                    return
+                }
+            }
+            else {
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'The execution zone with id ' + params.execId + ' does not exist.')
+                return
+            }
+        }
+        else {
+            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'ExecutionZone id (execId) not set.')
+            return
+        }
+
+        withFormat {
+            xml {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                String executionZoneAttributes = builder.bind {
+                    executionZoneAttributes {
+                        executionzoneAttribute {
+                            parameterName 'type'
+                            parameterValue zone.type.name
+                        }
+                        executionzoneAttribute {
+                            parameterName 'puppetEnvironment'
+                            parameterValue zone.puppetEnvironment
+                        }
+                        executionzoneAttribute {
+                            parameterName 'qualityStage'
+                            parameterValue zone.qualityStage
+                        }
+                        executionzoneAttribute {
+                            parameterName 'description'
+                            parameterValue zone.description
+                        }
+                        executionzoneAttribute {
+                            parameterName 'enabled'
+                            parameterValue zone.enabled
+                        }
+                        executionzoneAttribute {
+                            parameterName 'enableExposedProcessingParameters'
+                            parameterValue zone.enableExposedProcessingParameters
+                        }
+                        executionzoneAttribute {
+                            parameterName 'enableAutodeletion'
+                            parameterValue zone.enableAutodeletion
+                        }
+                        executionzoneAttribute {
+                            parameterName 'hostLimit'
+                            parameterValue zone.hostLimit
+                        }
+                        executionzoneAttribute {
+                            parameterName 'defaultLifetime'
+                            parameterValue zone.defaultLifetime
+                        }
+                    }
+                }
+
+                def xml = XmlUtil.serialize(executionZoneAttributes).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
+                render contentType: "text/xml", xml
+            }
+            json {
+                def executionZoneAttributes= [:]
+
+                def executionZoneAttribute = [:]
+                executionZoneAttribute.put('type', zone.type.name? zone.type.name : '')
+                executionZoneAttribute.put('puppetEnvironment', zone.puppetEnvironment? zone.puppetEnvironment : '')
+                executionZoneAttribute.put('qualityStage', zone.qualityStage? zone.qualityStage : '')
+                executionZoneAttribute.put('description', zone.description? zone.description : '')
+                executionZoneAttribute.put('enabled', zone.enabled)
+                executionZoneAttribute.put('enableExposedProcessingParameters', zone.enableExposedProcessingParameters)
+                executionZoneAttribute.put('enableAutodeletion', zone.enableAutodeletion)
+                executionZoneAttribute.put('hostLimit', zone.hostLimit? zone.hostLimit : '')
+                executionZoneAttribute.put('defaultLifetime', zone.defaultLifetime? zone.defaultLifetime : '')
+
+                executionZoneAttributes.put('executionZoneAttributes', executionZoneAttribute)
+
+                render executionZoneAttributes as JSON
+
+            }
         }
     }
 
