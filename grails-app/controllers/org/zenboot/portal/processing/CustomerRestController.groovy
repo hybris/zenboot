@@ -36,7 +36,7 @@ class CustomerRestController extends AbstractRestController {
                     if (customer) {
                         customersCollection.add(customer)
                     } else {
-                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer fount with id/email ' + it + ' .')
+                        this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer found with id/email ' + it + ' .')
                         return
                     }
                 }
@@ -90,87 +90,95 @@ class CustomerRestController extends AbstractRestController {
         }
     }
 
+    /**
+     * The method changes the properties of an existing customer identified by id or email.
+     */
     def editcustomers = {
-        Customer customer
-        def parameters = [:]
-        Boolean hasError = Boolean.FALSE
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            Customer customer
+            def parameters = [:]
+            Boolean hasError = Boolean.FALSE
 
-        if (params.identifer) {
-            customer = params.identifer.isInteger() ? Customer.findById(params.identifer as Long) : Customer.findByEmail(params.identifer)
-        } else {
-
-        }
-
-        request.withFormat {
-            xml {
-                def xml
-                try {
-                    xml = request.XML
-                }
-                catch (ConverterException e) {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                    hasError = Boolean.TRUE
-                    return
-                }
-
-                def xmlParameters = xml[0].children
-
-                xmlParameters.each { node ->
-                    def name = ''
-                    def value = ''
-                    node.children.each { innerNode ->
-                        if (innerNode.name == 'parameterName') {
-                            name = innerNode.text()
-                        } else if (innerNode.name == 'parameterValue') {
-                            value = innerNode.text()
-                        }
-                    }
-                    parameters.put(name, value)
-                }
-            }
-            json {
-                String text = request.getReader().text
-                def json
-
-                try {
-                    json = new JSONObject(text)
-                }
-                catch (JSONException e) {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                    hasError = Boolean.TRUE
-                    return
-                }
-
-                if (json.parameters) {
-                    json.parameters.each {
-                        parameters[it.parameterName] = it.parameterValue
-                    }
-                }
-            }
-        }
-
-        parameters.each { key, value ->
-            if (customer.hasProperty(key)) {
-                if ('CREATIONDATE' == key.toUpperCase()) {
-                    //creationdate should not be changed.
-                } else {
-                    customer.properties[key] = value
-                }
+            if (params.identifer) {
+                customer = params.identifer.isInteger() ? Customer.findById(params.identifer as Long) : Customer.findByEmail(params.identifer)
             } else {
-                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.key + ' not exists for UserNotifications.')
-                hasError = Boolean.TRUE
+                this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No customer found with id/email ' + params.identifier + ' .')
                 return
             }
-        }
 
-        if (hasError) {
-            return
-        }
+            request.withFormat {
+                xml {
+                    def xml
+                    try {
+                        xml = request.XML
+                    }
+                    catch (ConverterException e) {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
+                        hasError = Boolean.TRUE
+                        return
+                    }
 
-        if(customer.save(flush: true)) {
-            this.renderRestResult(HttpStatus.OK, null, null, 'Customer changed.')
+                    def xmlParameters = xml[0].children
+
+                    xmlParameters.each { node ->
+                        def name = ''
+                        def value = ''
+                        node.children.each { innerNode ->
+                            if (innerNode.name == 'parameterName') {
+                                name = innerNode.text()
+                            } else if (innerNode.name == 'parameterValue') {
+                                value = innerNode.text()
+                            }
+                        }
+                        parameters.put(name, value)
+                    }
+                }
+                json {
+                    String text = request.getReader().text
+                    def json
+
+                    try {
+                        json = new JSONObject(text)
+                    }
+                    catch (JSONException e) {
+                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
+                        hasError = Boolean.TRUE
+                        return
+                    }
+
+                    if (json.parameters) {
+                        json.parameters.each {
+                            parameters[it.parameterName] = it.parameterValue
+                        }
+                    }
+                }
+            }
+
+            parameters.each { key, value ->
+                if (customer.hasProperty(key)) {
+                    if ('CREATIONDATE' == key.toUpperCase()) {
+                        //creationdate should not be changed.
+                    } else {
+                        customer.properties[key] = value
+                    }
+                } else {
+                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.key + ' not exists for UserNotifications.')
+                    hasError = Boolean.TRUE
+                    return
+                }
+            }
+
+            if (hasError) {
+                return
+            }
+
+            if (customer.save(flush: true)) {
+                this.renderRestResult(HttpStatus.OK, null, null, 'Customer changed.')
+            } else {
+                this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occurred while saving the host.')
+            }
         } else {
-            this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occurred while saving the host.')
+            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'Only admins are allowed to request these resources.')
         }
     }
 }
