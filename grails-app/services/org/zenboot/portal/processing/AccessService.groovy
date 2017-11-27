@@ -51,8 +51,17 @@ class AccessService {
     }
 
     boolean userHasAccess(ExecutionZone zone) {
-        SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
-                testIfUserHasAccess(springSecurityService.currentUser, zone)
+        Long currentUserId = springSecurityService.getCurrentUserId() as Long
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            return Boolean.TRUE
+        } else {
+            if (accessCache[currentUserId] && accessCache[currentUserId][zone.id]) {
+                return accessCache[currentUserId][zone.id]
+            }
+            else {
+                return testIfUserHasAccess(Person.findById(currentUserId), zone)
+            }
+        }
     }
 
     // Might not be 100% Threadsafe but hopefully something above 99% ;-)
