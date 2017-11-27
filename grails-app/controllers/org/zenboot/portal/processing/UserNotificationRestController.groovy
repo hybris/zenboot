@@ -288,7 +288,7 @@ class UserNotificationRestController extends AbstractRestController {
     }
 
     /**
-     * The method deleted an user notification by id. Admiin permissions are required to delete an user notification.
+     * The method deleted an user notification by id. Admin permissions are required to delete an user notification.
      */
     def deleteusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
@@ -306,6 +306,8 @@ class UserNotificationRestController extends AbstractRestController {
             } else {
                 this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'UserNotificationId (notificationId) not set or wrong format.')
             }
+        } else {
+            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'Only admins are allowed to request these resources.')
         }
     }
 }

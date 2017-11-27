@@ -57,7 +57,7 @@ class UrlMappings {
         "/rest/v1/usernotifications/list?"(controller: 'userNotificationRest', action: 'listusernotifications')
         "/rest/v1/usernotifications/$notificationId/edit"(controller: 'userNotificationRest', action: 'editusernotification')
         "/rest/v1/usernotifications/create"(controller: 'userNotificationRest', action: 'createusernotification')
-        "/rest/v1/usernotificaitons/$notificationId/delete"(controller: 'userNotificationRest', action: 'deleteusernotification')
+        "/rest/v1/usernotifications/$notificationId/delete"(controller: 'userNotificationRest', action: 'deleteusernotification')
 
         //ExecutionZoneTypeRest
         "/rest/v1/exectypes/list"(controller: 'executionZoneTypeRest', action: 'listexectypes')

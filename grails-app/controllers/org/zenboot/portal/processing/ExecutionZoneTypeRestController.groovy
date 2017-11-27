@@ -125,10 +125,16 @@ class ExecutionZoneTypeRestController extends AbstractRestController {
 
                     if (json.parameters) {
                         json.parameters.each {
-                            if (execType.hasProperty(it.parameterName)) {
-                                execType.properties[it.parameterName] = it.parameterValue
+                            if (it.parameterName && it.parameterValue) {
+                                if (execType.hasProperty(it.parameterName)) {
+                                    execType.properties[it.parameterName] = it.parameterValue
+                                } else {
+                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.parameterName + ' not exists for ExecutionZoneType.')
+                                    hasError = Boolean.TRUE
+                                    return
+                                }
                             } else {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.parameterName + ' not exists for ExecutionZoneType.')
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'paramterName or paramterValue is null or empty. Please check your data.')
                                 hasError = Boolean.TRUE
                                 return
                             }
