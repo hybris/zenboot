@@ -2,6 +2,7 @@ package org.zenboot.portal.processing
 
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.annotation.Secured
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
@@ -21,56 +22,51 @@ class UserNotificationRestController extends AbstractRestController {
 
     /**
      * The method return a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications. If the enabled parameter is not set, the method
-     * return all available user notifications. Admin permissions are required the get the information of this resource.
+     * return all available user notifications.
      */
-    def listusernotifications = {
-        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-            List<UserNotification> userNotificationsData = []
-            if (params.enabled != null) {
-                userNotificationsData = UserNotification.findAllByEnabled(params.enabled.toBoolean())
-            }
-            else {
-                userNotificationsData = UserNotification.getAll()
-            }
+    @Secured(['permitAll'])
+    def listusernotifications() {
+        List<UserNotification> userNotificationsData = []
+        if (params.enabled != null) {
+            userNotificationsData = UserNotification.findAllByEnabled(params.enabled.toBoolean())
+        } else {
+            userNotificationsData = UserNotification.getAll()
+        }
 
-            withFormat {
-                xml {
-                    def builder = new StreamingMarkupBuilder()
-                    builder.encoding = 'UTF-8'
-                    String userNotificationsXML = builder.bind {
-                        usernotifications {
-                            userNotificationsData.each { UserNotification userNotificationData ->
-                                usernotification {
-                                    id userNotificationData.id
-                                    replacemewithmessage userNotificationData.message
-                                    notificationtype userNotificationData.type.name()
-                                    enabled userNotificationData.enabled
-                                }
+        withFormat {
+            xml {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+                String userNotificationsXML = builder.bind {
+                    usernotifications {
+                        userNotificationsData.each { UserNotification userNotificationData ->
+                            usernotification {
+                                id userNotificationData.id
+                                replacemewithmessage userNotificationData.message
+                                notificationtype userNotificationData.type.name()
+                                enabled userNotificationData.enabled
                             }
                         }
                     }
-                    def xml = XmlUtil.serialize(userNotificationsXML).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
-                    xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
-                    xml = xml.replaceAll('replacemewithmessage', 'message')
-                    render contentType: "text/xml", xml
                 }
-                json {
-                    def usernotifications = []
-                    userNotificationsData.each { UserNotification userNotificationData ->
-                        def usernotification = [:]
-                        usernotification.put('id', userNotificationData.id)
-                        usernotification.put('message', userNotificationData.message)
-                        usernotification.put('notificationtype', userNotificationData.type.name())
-                        usernotification.put('enabled', userNotificationData.enabled)
-                        usernotifications.add(usernotification)
-                    }
-                    render usernotifications as JSON
-                }
+                def xml = XmlUtil.serialize(userNotificationsXML).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
+                xml = xml.replaceAll('replacemewithmessage', 'message')
+                render contentType: "text/xml", xml
             }
-        } else {
-            this.renderRestResult(HttpStatus.FORBIDDEN, null, null, 'Only admins are allowed to request these resources.')
+            json {
+                def usernotifications = []
+                userNotificationsData.each { UserNotification userNotificationData ->
+                    def usernotification = [:]
+                    usernotification.put('id', userNotificationData.id)
+                    usernotification.put('message', userNotificationData.message)
+                    usernotification.put('notificationtype', userNotificationData.type.name())
+                    usernotification.put('enabled', userNotificationData.enabled)
+                    usernotifications.add(usernotification)
+                }
+                render usernotifications as JSON
+            }
         }
-
     }
 
     /**
