@@ -66,6 +66,11 @@ class BootStrap {
             if (Processable.ProcessState.CANCELED != it.state) {
                 it.state = Processable.ProcessState.CANCELED
             }
+
+            if (it.processables.any{scriptlet -> scriptlet == null}){
+                it.processables.removeAll([null])
+            }
+
             it.processables.each { scriptlet ->
                 if (scriptlet.state == Processable.ProcessState.RUNNING || scriptlet.state == Processable.ProcessState.WAITING) {
                     scriptlet.state = Processable.ProcessState.CANCELED
