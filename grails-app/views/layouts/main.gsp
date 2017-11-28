@@ -15,7 +15,7 @@
 	<div class="row-fluid" id="header">
 		<div class="span2" id="logo">
 			<g:link uri="/">
-				<img src="${resource(dir: 'images', file: 'zenboot-logo.png')}" alt="Zenboot Logo" />
+				<img src="${resource(dir: 'images', file: 'zenboot-logo.png')}" alt="Zenboot Logo"/>
 			</g:link>
 		</div>
 
@@ -78,7 +78,8 @@
 
 	<sec:ifLoggedIn>
         <asset:script type="text/javascript">
-            $(document).ready(function() {
+			$(window).load(function() {
+
                 zenboot.startProcessQueue('<g:createLink controller="scriptletBatch" action="ajaxList" />', 5000)
             });
        </asset:script>

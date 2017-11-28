@@ -9,7 +9,7 @@
       <div class="control-group ${entry.overlay ? 'info' : entry.value ? 'success' : ''}">
         <g:if test="${entry.visible || (!entry.visible && entry.value.empty)}">
           <sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-            <g:textField name="parameters.value" value="${entry.value}" />
+            <g:textField name="parameters.value" value="${entry.value}" required="required"/>
           </sec:ifAllGranted>
           <sec:ifNotGranted roles="${Role.ROLE_ADMIN}">
             <g:textField name="parameters.value" value="${entry.value}" readonly="${readonly}"/>

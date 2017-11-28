@@ -34,7 +34,5 @@ abstract class AbstractExecutionZoneCommand {
         }
     }
 
-
-
-    abstract AbstractExecutionZoneAction getExecutionZoneAction();
+    abstract AbstractExecutionZoneAction createExecutionZoneAction()
 }

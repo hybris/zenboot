@@ -33,7 +33,7 @@
                         <div class="controls">
                             <input type="checkbox" class="checkbox" name="${securityConfig.rememberMe.parameter}" id="remember_me" checked="checked"/>
                         </div>
-                    </tr>
+                    </div>
                 </table>
                 <g:submitButton name="submit" class="btn btn-primary" id='loginButton' value='${message(code: "springSecurity.login.button")}'/>
             </div>

@@ -1,6 +1,6 @@
 package org.zenboot.portal.processing
 
-import org.zenboot.portal.Template;
+import org.zenboot.portal.Template
 import org.zenboot.portal.Host
 import org.zenboot.portal.HostState
 
@@ -23,8 +23,6 @@ class ExecutionZone implements Likeable {
     boolean enableAutodeletion
 
     SortedSet templates
-
-    def accessService
 
     static hasMany = [actions:ExecutionZoneAction, processingParameters:ProcessingParameter, templates:Template, hosts:Host]
 
@@ -88,9 +86,6 @@ class ExecutionZone implements Likeable {
             existingParam.save()
         } else {
             this.processingParameters << param
-        }
-        this.withNewSession {
-          accessService.invalidateAccessCacheByZone(this)
         }
     }
 

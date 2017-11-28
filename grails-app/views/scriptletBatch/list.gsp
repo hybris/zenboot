@@ -1,4 +1,5 @@
 <%@ page import="org.zenboot.portal.processing.ScriptletBatch"%>
+<%@ page import="org.zenboot.portal.security.Role"%>
 <!doctype html>
 <html>
 <head>
@@ -68,17 +69,18 @@
 			</tbody>
 		</table>
 
-		<fieldset class="buttons spacer">
-			<filterpane:filterButton class="btn" text="Filter" />
-		</fieldset>
+		<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
+			<fieldset class="buttons spacer">
+				<filterpane:filterButton class="btn" text="Filter" />
+			</fieldset>
 
-		<filterpane:filterPane domain="ScriptletBatch" action="list" formMethod="get"
-							   excludeProperties=""
-							   associatedProperties="executionZoneAction.executionZone.description, executionZoneAction.executionZone.id, user.email, user.username, user.displayName"/>
-		<filterpane:isFiltered>
-			<h4>Current Filters:</h4>
-			<filterpane:currentCriteria domainBean="ScriptletBatch" action="list" fullAssociationPathFieldNames="no"/>
-		</filterpane:isFiltered>
+			<filterpane:filterPane domain="ScriptletBatch" action="list" formMethod="get" excludeProperties=""
+								   associatedProperties="executionZoneAction.executionZone.description, executionZoneAction.executionZone.id, user.email, user.username, user.displayName"/>
+			<filterpane:isFiltered>
+				<h4>Current Filters:</h4>
+				<filterpane:currentCriteria domainBean="ScriptletBatch" action="list" fullAssociationPathFieldNames="no"/>
+			</filterpane:isFiltered>
+		</sec:ifAllGranted>
 
 		<div class="pagination">
 			<filterpane:paginate total="${scriptletBatchInstanceTotal}" domainBean="ScriptletBatch"/>

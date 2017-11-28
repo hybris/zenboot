@@ -5,11 +5,15 @@ import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.security.PersonRole
 
+import javax.script.ScriptEngine
+import javax.script.ScriptEngineManager
 import java.util.concurrent.ConcurrentHashMap
 
 @SuppressWarnings("GroovyUnusedDeclaration")
 class AccessService {
     def springSecurityService
+    private static ScriptEngine engine = new ScriptEngineManager().getEngineByName("groovy")
+    private Binding binding = new Binding()
 
     /* The accessCache is a dynamic datastructure looking like this:
        {1={1=false, 2=true, 3=false, 4=false}, 2={1=false, 2=false, 3=false, 4=false}}
@@ -26,15 +30,16 @@ class AccessService {
        ==> ((1000 * (128 + 20)) + (1000 * (20 + 16))) * 1.8
        ==> about 320kb for 1000 Users on 1000 Zones
     */
-    def accessCache
+    def accessCache = new ConcurrentHashMap<Long, HashMap>()
 
     private boolean roleHasAccess(Role role, ExecutionZone executionZone) {
         def expression = role.executionZoneAccessExpression
         try {
-            return Eval.me("executionZone", executionZone, expression == null ? "" : expression)
+            binding.setVariable('executionZone',executionZone)
+            return engine.eval(expression == null ? "" : expression, binding)
 
         } catch (Exception e) {
-            log.error("executionZoneAccessExpression '$expression' from role '$role' threw an exception", e)
+            log.error("executionZoneAccessExpression '$expression' from role '$role' threw an exception: " + e.message)
             return false
         }
     }
@@ -46,8 +51,17 @@ class AccessService {
     }
 
     boolean userHasAccess(ExecutionZone zone) {
-        SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN) ||
-                testIfUserHasAccess(springSecurityService.currentUser, zone)
+        Long currentUserId = springSecurityService.getCurrentUserId() as Long
+        if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            return Boolean.TRUE
+        } else {
+            if (accessCache[currentUserId] && accessCache[currentUserId][zone.id]) {
+                return accessCache[currentUserId][zone.id]
+            }
+            else {
+                return testIfUserHasAccess(Person.findById(currentUserId), zone)
+            }
+        }
     }
 
     // Might not be 100% Threadsafe but hopefully something above 99% ;-)
@@ -58,17 +72,12 @@ class AccessService {
             return true
         }
 
-        if (!accessCache) {
-            log.info("initializing accessCache")
-            accessCache = new ConcurrentHashMap<Long, HashMap>()
-        }
-
         if (!accessCache[user.id]) {
             log.info("user ${user} not found in cache, creating")
             accessCache[user.id] = new ConcurrentHashMap<Long, Boolean>()
         }
 
-        if (!accessCache[user.id][zone.id]) {
+        if (accessCache[user.id][zone.id] == null) {
             def hasAccess = rolesHaveAccess(user.getAuthorities(), zone)
             // concurrency is quite unlikely here until users use multiple browsers
             // impact would be a clash with the invalidate-methods
@@ -99,7 +108,7 @@ class AccessService {
         * invalidate only for a zone
     */
     def invalidateAccessCacheByZone(ExecutionZone zone) {
-        if (zone && accessCache) {
+        if (zone) {
             log.info("invalidating ${zone} in accessCache")
             accessCache.each() { key, user ->
                 user.remove(zone.id)
@@ -107,24 +116,64 @@ class AccessService {
         }
     }
 
+    def refreshAccessCacheByZone(ExecutionZone zone) {
+        if (zone) {
+            def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
+            def userList = Person.getAll()
+            def adminList = PersonRole.findAllByRole(Role.findByAuthority(Role.ROLE_ADMIN))
+            Set<Person> persons_with_access = new HashSet<Person>()
+
+            cleanedRoles.each {
+                if (roleHasAccess(it, zone)) {
+                    if(PersonRole.findAllByRole(it)?.person) {
+                        persons_with_access.addAll(PersonRole.findAllByRole(it).person)
+                    }
+                }
+            }
+
+            userList = userList - adminList.person
+            persons_with_access = persons_with_access - adminList.person
+            def users_without_access = userList - persons_with_access
+
+            persons_with_access.each {
+
+                if (!accessCache[it.id]) {
+                    accessCache[it.id] = new ConcurrentHashMap<Long, HashMap>()
+                }
+
+                if (!accessCache[it.id][zone.id]) {
+                    accessCache[it.id][zone.id] = true
+                }
+            }
+
+            users_without_access.each {
+
+                if(!accessCache[it.id]) {
+                    accessCache[it.id] = new ConcurrentHashMap<Long, HashMap>()
+                }
+
+                if (accessCache[it.id][zone.id]) {
+                    accessCache[it.id][zone.id] = false
+                }
+            }
+        }
+    }
+
     def refreshAccessCacheByUser(Person user) {
 
         if (user) {
-
             if (user.getAuthorities().authority.contains(Role.ROLE_ADMIN)) {
                 //no cache required for admin user
                 return
             }
 
             //remove existing user from cache
-            accessCache?.remove(user.id)
+            accessCache.remove(user.id)
 
             log.info("Refreshing ${user} in accessCache")
             log.info("user has roles " + user.getAuthorities())
 
             ExecutionZone.findAll().each { zone -> testIfUserHasAccess(user, zone) }
-
-            log.info(accessCache[user.id].collect { it.value })
         }
         else {
             log.info("Cannot refresh access cache for null user")
@@ -133,14 +182,19 @@ class AccessService {
 
     def removeUserFromCacheByUser(Person user) {
         if (user) {
-            accessCache?.remove(user.id)
+            accessCache.remove(user.id)
             log.info("User ${user} removed from cache")
         }
     }
 
     def refreshAccessCacheByRole(Role role) {
 
-        if (role.authority == Role.ROLE_ADMIN) {
+        if (role == null) {
+            log.info("Cannot refresh access cache for null role")
+            return
+        }
+
+        if (Role.ROLE_ADMIN == role.authority) {
             //no cache required for admin user
             return
         }
@@ -150,7 +204,7 @@ class AccessService {
         users.each() { user -> refreshAccessCacheByUser(user) }
     }
 
-    def removeRoleFromChacheByRole(Role role) {
+    def removeRoleFromCacheByRole(Role role) {
         if (role) {
             def users = PersonRole.findAllByRole(role).person
 
@@ -165,20 +219,70 @@ class AccessService {
         }
     }
 
-
     // synchronized as nervous finger protection (might be triggerable via UI)
     def synchronized warmAccessCacheAsync() {
         runAsync {
             log.info("Warming the accessCache")
-            def execZones = ExecutionZone.findAll()
-            execZones.each() { zone ->
-                log.info("Warming accessCache for zone ${zone}")
-                Person.findAll().each() { user ->
-                    log.debug("Warming accessCache for person ${user}")
-                    testIfUserHasAccess(user, zone)
-                    Thread.sleep(50)
+            def preAccessCache
+            //all roles with exepressions
+            def cleanedRoles = Role.getAll().findAll { it.executionZoneAccessExpression && it.authority != Role.ROLE_ADMIN }
+            def execZones = ExecutionZone.getAll()
+
+            def rolesZoneAccess = new HashMap<Long, HashMap>(cleanedRoles.size())
+            int i= 1
+            cleanedRoles.each { role ->
+                rolesZoneAccess[role.id] = new HashMap<Long, Boolean>()
+
+                log.info('Testing role: ' + role.authority + ' | Progress role check: ' + i + ' / ' + cleanedRoles.size() )
+                execZones.each {
+                    if (roleHasAccess(role, it)) {
+                        rolesZoneAccess[role.id][it.id] = true
+                    }
+                }
+                i++
+            }
+
+            log.info('Role tests done.')
+
+            if (!preAccessCache) {
+                log.info("initializing accessCache")
+                preAccessCache = new ConcurrentHashMap<Long, HashMap>()
+            }
+
+            log.info('Fill cache with collected data.')
+            rolesZoneAccess.each { roleID, zoneMap ->
+                PersonRole.findAllByRole(Role.findById(roleID)).each { personRole ->
+
+                    if (!preAccessCache[personRole.person.id]) {
+                        log.info("user ${personRole.person} not found in cache, creating")
+                        preAccessCache[personRole.person.id] = new ConcurrentHashMap<Long, Boolean>()
+                    }
+
+                    zoneMap.each { zoneId, hasAccess ->
+                        preAccessCache[personRole.person.id][zoneId] = hasAccess
+                    }
                 }
             }
+
+            def persons = PersonRole.findAllByRoleNotEqual(Role.findByAuthority(Role.ROLE_ADMIN)).person.unique()
+
+            persons.each { person ->
+
+                if (!preAccessCache[person.id]) {
+                    log.info("user ${person} not found in cache, creating")
+                    preAccessCache[person.id] = new ConcurrentHashMap<Long, Boolean>()
+                }
+
+                execZones.each { zone ->
+                    if(preAccessCache[person.id][zone.id] == null) {
+                        preAccessCache[person.id][zone.id] = false
+                    }
+                }
+            }
+
+            preAccessCache.putAll(accessCache)
+            accessCache.putAll(preAccessCache)
+
             log.info("Finished Warming the accessCache")
         }
     }

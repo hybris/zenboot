@@ -74,6 +74,7 @@ grails.converters.encoding = "UTF-8"
 grails.converters.xml.default.deep = true
 grails.converters.json.default.deep = true
 grails.converters.json.circular.reference.behaviour = "INSERT_NULL"
+grails.converters.default.pretty.print = true
 
 // enable Sitemesh preprocessing of GSP pages
 grails.views.gsp.sitemesh.preprocess = true
@@ -156,32 +157,31 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/login/**':                            ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/logout/**':                           ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/plugins/**':                          ['IS_AUTHENTICATED_ANONYMOUSLY'],
-    //'/**/rest/**':                          ['IS_AUTHENTICATED_ANONYMOUSLY'],
-    '/**/rest/**':                          ['IS_AUTHENTICATED_FULLY'],
-    '/home/index':                          [Role.ROLE_USER],
-    '/executionZone/list':                  [Role.ROLE_USER],
-    '/executionZone/show':                  [Role.ROLE_USER],
-    '/executionZone/update':                [Role.ROLE_USER],
-    '/executionZone/ajaxGetParameters/**':  [Role.ROLE_USER],
-    '/executionZone/ajaxUserLike/**':       [Role.ROLE_USER],
-    '/executionZone/execute':               [Role.ROLE_USER],
-    '/scriptletBatch/list':                 [Role.ROLE_USER],
-    '/scriptletBatch/show':                 [Role.ROLE_USER],
-    '/exposedExecutionZoneAction/list':     [Role.ROLE_USER],
-    '/exposedExecutionZoneAction/show':     [Role.ROLE_USER],
-    '/exposedExecutionZoneAction/execute':  [Role.ROLE_USER],
-    '/scriptletBatch/ajaxList':             [Role.ROLE_USER],
-    '/host/list':                           [Role.ROLE_USER],
-    '/serviceUrl/list':                     [Role.ROLE_USER],
-    '/host/show':                           [Role.ROLE_USER],
-    '/serviceUrl/show':                     [Role.ROLE_USER],
-    '/scriptletBatch/list':                 [Role.ROLE_USER],
-    '/executionZone/ajaxGetReadme':         [Role.ROLE_USER],
+    '/**/rest/**':                          ['IS_AUTHENTICATED_REMEMBERED'],
+    '/home/index':                          ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZone/list':                  ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZone/show':                  ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZone/update':                ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZone/ajaxGetParameters/**':  ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZone/ajaxUserLike/**':       ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZone/execute':               ['IS_AUTHENTICATED_REMEMBERED'],
+    '/scriptletBatch/list':                 ['IS_AUTHENTICATED_REMEMBERED'],
+    '/scriptletBatch/show':                 ['IS_AUTHENTICATED_REMEMBERED'],
+    '/exposedExecutionZoneAction/list':     ['IS_AUTHENTICATED_REMEMBERED'],
+    '/exposedExecutionZoneAction/show':     ['IS_AUTHENTICATED_REMEMBERED'],
+    '/exposedExecutionZoneAction/execute':  ['IS_AUTHENTICATED_REMEMBERED'],
+    '/scriptletBatch/ajaxList':             ['IS_AUTHENTICATED_REMEMBERED'],
+    '/host/list':                           ['IS_AUTHENTICATED_REMEMBERED'],
+    '/serviceUrl/list':                     ['IS_AUTHENTICATED_REMEMBERED'],
+    '/host/show':                           ['IS_AUTHENTICATED_REMEMBERED'],
+    '/serviceUrl/show':                     ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZone/ajaxGetReadme':         ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZoneRest/**':                ['IS_AUTHENTICATED_REMEMBERED'],
+  
     //default
-    '/administration':                                  [Role.ROLE_ADMIN],
+    '/administration':                      [Role.ROLE_ADMIN],
     '/**':                                  [Role.ROLE_ADMIN],
-    "/console/**":          ['IS_AUTHENTICATED_ANONYMOUSLY'],
-    "/plugins/**": ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    "/console/**":                          ['IS_AUTHENTICATED_ANONYMOUSLY'],
 ]
 
 //fix pagination bug in bootstrap

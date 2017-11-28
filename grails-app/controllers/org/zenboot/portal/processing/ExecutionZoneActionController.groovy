@@ -22,16 +22,16 @@ class ExecutionZoneActionController extends AbstractRestController {
             return
         }
 
-        request.withFormat {
+        withFormat {
             xml {
                 render (contentType:"text/xml"){
                     status {
                         startDate batch.startDate
                         endDate batch.endDate
                         description batch.description
-                        scriptletBatch(state:batch.state, progress:batch.progress, errorClass:batch.exceptionClass, errorMessage:batch.exceptionMessage, size:batch.countProcessables()) {
+                        scriptletBatch(state: batch.state, progress: batch.progress, errorClass: batch.exceptionClass, errorMessage: batch.exceptionMessage, size: batch.countProcessables()) {
                             batch.processables.each {
-                                processable(description:it.description, state:it.state, processTime:it.processTime)
+                                processable(description: it.description, state: it.state, executionTime: it.processTime, processOutput: it.output, processError: it.exceptionMessage)
                             }
                         }
                     }
@@ -39,12 +39,12 @@ class ExecutionZoneActionController extends AbstractRestController {
              }
             json {
                 render (contentType:"text/json"){
-                    def scriptletBatch = [state:batch.state.name(), progress:batch.progress, size:batch.countProcessables(), errorClass:batch.exceptionClass, errorMessage:batch.exceptionMessage, proessables:array {
+                    def scriptletBatch = [state: batch.state.name(), progress: batch.progress, size: batch.countProcessables(), errorClass: batch.exceptionClass, errorMessage: batch.exceptionMessage, proessables: array {
                         batch.processables.each {
-                            processable(description:it.description, state:it.state.name(), processTime:it.processTime)
+                            processable(description: it.description, state: it.state.name(), executionTime: it.processTime, processOutput: it.output, processError: it.exceptionMessage)
                         }
                     }]
-                    status startDate:batch.startDate, endDate:batch.endDate,  description:batch.description,  scriptletBatch: scriptletBatch
+                    status startDate: batch.startDate, endDate: batch.endDate,  description: batch.description,  scriptletBatch: scriptletBatch
                 }
             }
         }

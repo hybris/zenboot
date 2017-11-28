@@ -37,9 +37,9 @@
 					<small><tpf:formatPeriod value="${new Period(q?.getProcessTime())}" /></small>
 				</td>
 				<td>
-					<g:if test="${q?.logged}">
+					<g:if test="${q?.logOutput}">
 						<sec:ifAllGranted roles="${Role.ROLE_ADMIN}">
-							<a class="zb-tooltip" onclick="javascript:$('#${itemId}_logged').slideToggle()" title="${message(code:'scriptletBatch.button.showLog', default:'Show Log')}">
+							<a class="zb-tooltip" onclick="javascript:$('#${itemId}_logOutput').slideToggle()" title="${message(code:'scriptletBatch.button.showLog', default:'Show Log')}">
 								<i class="icon-bullhorn"></i>
 							</a>
 						</sec:ifAllGranted >
@@ -71,8 +71,8 @@
 	</table>
 
 	<g:if test="${q?.state != ProcessState.WAITING}">
-		<g:if test="${q?.logged}">
-			<pre id="${itemId}_logged" aria-labelledby="processables-log" class="hide">${q?.logged}</pre>
+		<g:if test="${q?.logOutput}">
+			<pre id="${itemId}_logOutput" aria-labelledby="processables-log" class="hide" <g:if test="${q?.state == ProcessState.RUNNING}">style="display: block;"</g:if>>${q?.logOutput}</pre>
 		</g:if>
 		<g:if test="${q?.output}">
 			<pre id="${itemId}_output" class="alert alert-info hide" aria-labelledby="processables-output" <g:if test="${q?.state == ProcessState.RUNNING}">style="display: block;"</g:if>>${q?.output}</pre>

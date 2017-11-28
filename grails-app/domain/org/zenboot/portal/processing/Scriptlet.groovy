@@ -12,18 +12,22 @@ import org.zenboot.portal.processing.Processable.ProcessState
   */
 class Scriptlet extends Processable implements ProcessListener {
 
+    List logslist
     String logged
     String output
     String error
     int exitCode = -1
     File file
+    String tempFilePath
 
     transient def processOutput = new StringBuilder()
     transient def processError = new StringBuilder()
     transient def writer
     transient def appender
+    transient File tempfile
 
     static belongsTo = [scriptletBatch: ScriptletBatch]
+    static hasMany = [logslist:String]
 
     static constraints = { file(nullable:false) }
 
@@ -31,12 +35,17 @@ class Scriptlet extends Processable implements ProcessListener {
         output type: 'text'
         error type: 'text'
         logged type: 'text'
+        tempFilePath type: 'text'
+        logslist joinTable: [name: 'scriptlet_logslist', key: 'scriptlet_id', column: 'logslist_string', sqlType: 'text']
         // file sqlType: 'blob' // see #43
     }
 
     @Override
     protected void start(ProcessContext ctx) {
-        this.writer = new ScriptletOutputStringWriter(this)
+        tempfile = File.createTempFile('temp_' + String.valueOf(this.id),'.tmp')
+        tempFilePath = tempfile.getAbsolutePath()
+        logslist = []
+        this.writer = new ScriptletOutputStringWriter(tempfile)
         this.appender = createWriterAppender(this.writer)
         Logger.rootLogger.addAppender(this.appender)
         super.start(ctx)
@@ -44,11 +53,17 @@ class Scriptlet extends Processable implements ProcessListener {
 
     @Override
     protected void stop(ProcessContext ctx) {
-        super.stop(ctx)
         Logger.rootLogger.removeAppender(this.appender)
-        this.logged = this.writer.toString()
+        this.logslist = this.writer.toString().tokenize('\n')
+        this.logged = ''
         this.output = this.processOutput.toString()
         this.error = this.processError.toString()
+        this.writer = null
+        this.appender = null
+        this.processOutput = null
+        this.processError = null
+        this.tempfile.delete()
+        super.stop(ctx)
     }
 
     private WriterAppender createWriterAppender(StringWriter stringWriter) {
@@ -103,5 +118,20 @@ class Scriptlet extends Processable implements ProcessListener {
     @Override
     public int countExecutedProcessables() {
         (this.state == ProcessState.WAITING) ? 0 : 1
+    }
+
+    String getLogOutput() {
+        File logoutput
+
+        if(tempFilePath) {
+            logoutput = new File(tempFilePath)
+        }
+
+        if(logoutput?.exists()) {
+            return logoutput.readLines().join('\n')
+        }
+        else {
+            return (logslist == null || logslist.isEmpty()) ? logged : logslist.join('\n')
+        }
     }
 }

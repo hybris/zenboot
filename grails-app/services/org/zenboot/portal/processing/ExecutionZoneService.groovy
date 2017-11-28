@@ -13,6 +13,9 @@ import org.springframework.context.ApplicationEventPublisherAware
 import org.zenboot.portal.ControllerUtils
 import org.zenboot.portal.processing.meta.ParameterMetadata
 
+import javax.script.ScriptEngine
+import javax.script.ScriptEngineManager
+
 class ExecutionZoneService implements ApplicationEventPublisherAware {
     def runTimeAttributesService
     def grailsApplication
@@ -22,6 +25,8 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
     def hostService
     def accessService
     def scriptDirectoryService
+
+    private static ScriptEngine engine = new ScriptEngineManager().getEngineByName("groovy")
 
     void synchronizeExecutionZoneTypes() {
         //type name is the key to be able to resolve a type by name quickly
@@ -75,10 +80,26 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 		}
 	}
 
-    public List filterByAccessPermission(executionZoneInstanceList) {
-        executionZoneInstanceList.findAll() { executionZone ->
-            accessService.userHasAccess(executionZone)
+    List filterByAccessPermission(executionZones) {
+        List execZones = new ArrayList<ExecutionZone>()
+        Map execZonesCacheMap = accessService.accessCache[springSecurityService.getCurrentUserId()]
+
+        // if an entry in the cache for the user exists check cache, else update cache
+        if(execZonesCacheMap) {
+            executionZones.each {
+                if (execZonesCacheMap[it.id]?.value) {
+                    execZones.add(it)
+                }
+            }
         }
+        else {
+            executionZones.each { zone ->
+                if (accessService.userHasAccess(zone)) {
+                    execZones.add(zone)
+                }
+            }
+        }
+        return execZones
     }
 
     def getRange(filteredExecutionZoneInstanceList, params) {
@@ -166,7 +187,9 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
 
         processParameters.each {
-          execAction.addProcessingParameter(it)
+            if(it?.value?.trim()) {
+                execAction.addProcessingParameter(it)
+            }
         }
 
         if (runtimeAttributes) {
@@ -253,7 +276,7 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
             if (!actionParameterEditAllowed(processParam, originalParameter)) {
                 command.errors.reject('executionZone.failure.unallowedEdit',
                         [originalParameter.name] as Object[],
-                        'You are not allowed to edittt parameter {0}'
+                        'You are not allowed to edit parameter {0}'
                 )
             }
         }
@@ -261,18 +284,19 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
 
     private Set overlayExecutionZoneParameters(ParameterMetadataList paramMetaList, Set overlayParameters) {
         log.debug("Entering overlayExecutionZoneParameters")
-		    Set parameters = paramMetaList.unsatisfiedParameters
+		Set parameters = paramMetaList.unsatisfiedParameters
         log.debug("yet unsatisfied parameters: " + parameters)
+
         parameters.each { ParameterMetadata paramMetaData ->
           ProcessingParameter param = overlayParameters.find { it.name == paramMetaData.name }
-  			  if (param) {
-            log.debug("filling param "+ paramMetaData.name + " with "+ param.value)
-            paramMetaData.metaClass.value = param.value
-            paramMetaData.metaClass.overlay = true
+            if (param) {
+                  log.debug("filling param "+ paramMetaData.name + " with "+ param.value)
+                  paramMetaData.metaClass.value = param.value
+                  paramMetaData.metaClass.overlay = true
           } else {
-            log.debug("defaulting param "+ paramMetaData.name + " with " + paramMetaData.defaultValue)
-            paramMetaData.metaClass.value = paramMetaData.defaultValue
-  				  paramMetaData.metaClass.overlay = false
+                  log.debug("defaulting param "+ paramMetaData.name + " with " + paramMetaData.defaultValue)
+                  paramMetaData.metaClass.value = paramMetaData.defaultValue
+                  paramMetaData.metaClass.overlay = false
   			  }
 		    }
         // Now the other way around. We also want all the execZoneParams which
@@ -324,21 +348,14 @@ class ExecutionZoneService implements ApplicationEventPublisherAware {
       def expression = role.parameterEditExpression
 
       try {
-
-        def sharedData = new Binding()
-        def shell = new GroovyShell(sharedData)
-
-        sharedData.setProperty('parameterKey', parameter.name)
-        sharedData.setProperty('parameter', parameter)
-
-        return shell.evaluate(expression == null ? "" : expression)
-
+          def sharedData = new Binding()
+          sharedData.setProperty('parameterKey', parameter.name)
+          sharedData.setProperty('parameter', parameter)
+          return engine.eval(expression == null ? "" : expression, sharedData)
       } catch (Exception e) {
         this.log.error("parameterEditExpression for role '"+ role + " with " + expression +"' is throwing an exception", e)
         return false
       }
-
-
     }
 
     boolean canEdit(Set roles, ProcessingParameter parameter) {

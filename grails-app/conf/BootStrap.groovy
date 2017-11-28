@@ -1,12 +1,16 @@
 import grails.util.Environment
-
 import org.zenboot.portal.Host
 import org.zenboot.portal.processing.ExecutionZone
 import org.zenboot.portal.processing.ExecutionZoneType
 import org.zenboot.portal.processing.ExposedExecutionZoneAction
+import org.zenboot.portal.processing.Processable
+import org.zenboot.portal.processing.ScriptletBatch
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.PersonRole
 import org.zenboot.portal.security.Role
+
+import java.sql.Connection
+import java.util.concurrent.Callable
 
 class BootStrap {
 
@@ -14,6 +18,8 @@ class BootStrap {
     def accessService
     def grailsApplication
     def scriptDirectoryService
+    def executorService
+    def sessionFactory
 
     def init = { servletContext ->
         //create fundamental user groups
@@ -24,6 +30,8 @@ class BootStrap {
 
         //setup the sanity check (used for CI)
         this.setupSanityCheckExposedExecutionZoneAction()
+
+        setupBootstrapExecutionZoneAction()
 
         // setting up JSON-Marshallers
         // otherwise you're rendering out half of the heap-space
@@ -51,6 +59,40 @@ class BootStrap {
             returnArray['hostname'] = it.hostname
             returnArray['serviceUrls'] = it.serviceUrls
             return returnArray
+        }
+
+        //clean up hung stuff after restart
+        ScriptletBatch.findAll { state == Processable.ProcessState.RUNNING || state == Processable.ProcessState.WAITING || state == Processable.ProcessState.CANCELED }.each {
+            if (Processable.ProcessState.CANCELED != it.state) {
+                it.state = Processable.ProcessState.CANCELED
+            }
+            it.processables.each { scriptlet ->
+                if (scriptlet.state == Processable.ProcessState.RUNNING || scriptlet.state == Processable.ProcessState.WAITING) {
+                    scriptlet.state = Processable.ProcessState.CANCELED
+                }
+            }
+            it.save(flush:true)
+        }
+
+        Connection connection = sessionFactory.getCurrentSession().connection()
+
+        if ('H2' == connection.getMetaData().databaseProductName) {
+            String query = 'CREATE INDEX IF NOT EXISTS idx_scriptlet_id ON scriptlet_logslist (scriptlet_id)'
+
+            sessionFactory.currentSession.createSQLQuery(query).executeUpdate()
+            sessionFactory.currentSession.flush()
+            sessionFactory.currentSession.clear()
+        }
+        else if ('MySQL' == connection.getMetaData().databaseProductName) {
+            def exists = sessionFactory.currentSession.createSQLQuery('SHOW INDEX FROM scriptlet_logslist WHERE KEY_NAME = \'idx_scriptlet_id\'').list()
+
+            if(exists.size() == 0) {
+                String query = 'CREATE INDEX idx_scriptlet_id ON scriptlet_logslist (scriptlet_id)'
+
+                sessionFactory.currentSession.createSQLQuery(query).executeUpdate()
+                sessionFactory.currentSession.flush()
+                sessionFactory.currentSession.clear()
+            }
         }
 
         accessService.warmAccessCacheAsync()
@@ -112,6 +154,20 @@ class BootStrap {
                 url: "sanitycheck",
             )
             exposedAction.save()
+        }
+    }
+
+    private setupBootstrapExecutionZoneAction() {
+        ExecutionZoneType bootstrapType = ExecutionZoneType.findByName("initial")
+        ExecutionZone execZoneBootstrap = ExecutionZone.findByType(bootstrapType)
+        if (!execZoneBootstrap) {
+            execZoneBootstrap = new ExecutionZone(type:bootstrapType, description:"Populate server with default data")
+            execZoneBootstrap.save()
+
+            // Execute the action on startup - similar bug to RPI-2167
+  	    executorService.submit({
+	        this.executionZoneService.createAndPublishExecutionZoneAction(execZoneBootstrap, "bootstrap")
+	    } as Callable)
         }
     }
 

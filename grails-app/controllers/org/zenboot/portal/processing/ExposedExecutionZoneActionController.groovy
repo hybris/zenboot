@@ -65,7 +65,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
             chain(action:'show', id:cmd.actionId, model:[cmd:cmd])
             return
         } else {
-            ExecutionZoneAction action = cmd.getExecutionZoneAction()
+            ExecutionZoneAction action = cmd.createExecutionZoneAction()
             this.applicationEventPublisher.publishEvent(new ProcessingEvent(action, springSecurityService.currentUser))
             flash.message = message(code: 'default.created.message', args: [message(code: 'executionZoneAction.label', default: 'ExecutionZoneAction'), action.id])
         }
@@ -111,10 +111,10 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
     def save = { SaveExposedExecutionZoneActionCommand cmd ->
         executionZoneService.setParameters(cmd, params.parameters)
         if (cmd.hasErrors()) {
-            render(view:"create", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.executionZoneAction])
+            render(view:"create", model: [cmd:cmd, exposedExecutionZoneActionInstance:cmd.createExecutionZoneAction()])
             return
         }
-        def exposedExecutionZoneActionInstance = cmd.executionZoneAction
+        def exposedExecutionZoneActionInstance = cmd.createExecutionZoneAction()
         if (!exposedExecutionZoneActionInstance.save(flush: true)) {
             render(view: "create", model: [exposedExecutionZoneActionInstance: exposedExecutionZoneActionInstance])
             return
@@ -163,7 +163,7 @@ class ExposedExecutionZoneActionController extends AbstractRestController implem
             return
         }
 
-        def exposedExecutionZoneActionInstance = cmd.getExecutionZoneAction()
+        def exposedExecutionZoneActionInstance = cmd.createExecutionZoneAction()
 
         if (!exposedExecutionZoneActionInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'exposedExecutionZoneAction.label', default: 'ExposedExecutionZoneAction'), params.actionId])
@@ -249,7 +249,7 @@ class SaveExposedExecutionZoneActionCommand extends AbstractExecutionZoneCommand
     }
 
     @Override
-    ExposedExecutionZoneAction getExecutionZoneAction() {
+    ExposedExecutionZoneAction createExecutionZoneAction() {
         ExposedExecutionZoneAction exposedExcZnActn = new ExposedExecutionZoneAction(
             executionZone: ExecutionZone.get(this.execId),
             scriptDir: this.scriptDir,
@@ -268,7 +268,7 @@ class UpdateExposedExecutionZoneActionCommand extends SaveExposedExecutionZoneAc
     Long actionId
 
     @Override
-    ExposedExecutionZoneAction getExecutionZoneAction() {
+    ExposedExecutionZoneAction createExecutionZoneAction() {
         ExposedExecutionZoneAction exposedExcZnActn = ExposedExecutionZoneAction.get(actionId)
         exposedExcZnActn.url = this.url
         exposedExcZnActn.cronExpression = this.cronExpression
@@ -304,7 +304,7 @@ class ExecuteExposedExecutionZoneActionCommand {
         return this.errors.hasErrors()
     }*/
 
-    ExecutionZoneAction getExecutionZoneAction() {
+    ExecutionZoneAction createExecutionZoneAction() {
         ExposedExecutionZoneAction exposedAction = ExposedExecutionZoneAction.get(this.actionId)
         return executionZoneService.createExecutionZoneAction(exposedAction, this.exposedExecutionZoneActionParameters)
     }

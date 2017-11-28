@@ -3,4 +3,8 @@
 !docker-provisioning/ansible.cfg
 !target/*.war
 !docker-provisioning/setenv.sh
+<<<<<<< HEAD
 !conf/*
+=======
+!conf/server.xml
+>>>>>>> 1349cb2f3f2a366876f3433f4442cbcab7dba5c6
