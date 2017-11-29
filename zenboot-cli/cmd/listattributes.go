@@ -10,18 +10,17 @@ import (
 )
 
 func init() {
-	listCmd.AddCommand(listActionsCmd)
+	listCmd.AddCommand(listAttribsCmd)
 }
 
-var listActionsCmd = &cobra.Command{
-	Use:   "actions [flags]",
-	Short: "list all action names of the specific Execution Zone",
+var listAttribsCmd = &cobra.Command{
+	Use:   "attributes [flags]",
+	Short: "list all attributes of an Execution Zone",
 	Run: func(cmd *cobra.Command, args []string) {
-
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
 
-		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/actions/list")
-		lib.HandleError(err)
+        content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/attributes/list")
+        lib.HandleError(err)
 
 		prettyjson, _ := prettyjson.Format(content)
 		fmt.Println(string(prettyjson))
