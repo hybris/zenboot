@@ -67,6 +67,20 @@ func TestValidateAction(t *testing.T) {
 	}
 }
 
+func TestSendRequestWrongResponseStatus(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer ts.Close()
+
+	var rest = Zenboot{ZenbootUrl: ts.URL, Username: "none", Secret: "none"}
+
+	_, err := rest.SendRequest("GET", "help", nil)
+	if err == nil {
+		t.Error("Function succeeded despite the server being unavailable.")
+	}
+}
+
 func TestSendGet(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
