@@ -4,14 +4,10 @@ import grails.converters.JSON
 import grails.converters.XML
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.slurpersupport.NodeChild
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
-import org.codehaus.groovy.grails.web.json.JSONException
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
@@ -888,66 +884,126 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
             request.withFormat {
                 xml {
-                    def xml
-                    try {
-                        xml = request.XML
-                    }
-                    catch (ConverterException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                        hasError = Boolean.TRUE
-                        return
-                    }
+                    def xml = parseRequestDataToXML(request)
+                    if (xml) {
+                        def xmlExecutionZoneProperties = xml[0].children.findAll {
+                            it.name == 'executionZoneProperties'
+                        }
 
-                    def xmlExecutionZoneProperties = xml[0].children.findAll { it.name == 'executionZoneProperties' }
+                        xmlExecutionZoneProperties.each { node ->
+                            node.children.each { innerNode ->
+                                def name = ''
+                                def value = ''
+                                innerNode.children.each {
+                                    if (it.name == 'propertyName') {
+                                        name = it.text()
+                                    } else if (it.name == 'propertyValue') {
+                                        value = it.text()
+                                    }
+                                }
+                                parameters[name] = value
+                            }
+                        }
 
-                    xmlExecutionZoneProperties.each { node ->
-                        node.children.each { innerNode ->
-                            def name = ''
-                            def value = ''
-                            innerNode.children.each {
-                                if (it.name == 'propertyName') {
-                                    name = it.text()
-                                } else if (it.name == 'propertyValue') {
-                                    value = it.text()
+                        def xmlExecutionZoneParameters = xml[0].children.findAll { it.name == 'processingParameters' }
+
+                        if (xmlExecutionZoneParameters.size() != 0) {
+
+                            String[] keys = new String[xmlExecutionZoneParameters.size()]
+                            String[] values = new String[xmlExecutionZoneParameters.size()]
+                            String[] descriptions = new String[xmlExecutionZoneParameters.size()]
+                            String[] exposed = new String[xmlExecutionZoneParameters.size()]
+                            String[] published = new String[xmlExecutionZoneParameters.size()]
+
+                            xmlExecutionZoneParameters.eachWithIndex { processingParameters, index ->
+
+                                if (processingParameters.children.size() == 0) {
+                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Processing parameters are empty')
+                                    hasError = Boolean.TRUE
+                                }
+
+                                processingParameters.children.each { parameter ->
+                                    parameter.children.each {
+
+                                        if (it.text() == '') {
+                                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The value of a processing parameter cannot be empty')
+                                            hasError = Boolean.TRUE
+                                        }
+
+                                        if ('parameterName' == it.name) {
+                                            keys[index] = it.text()
+                                        } else if ('parameterValue' == it.name) {
+                                            values[index] = it.text()
+                                        } else if ('parameterDescription' == it.name) {
+                                            descriptions[index] = it.text()
+                                        } else if ('parameterExposed' == it.name) {
+                                            String exposedText = it.text()
+
+                                            if ('true' == exposedText.toLowerCase() || 'false' == exposedText.toLowerCase()) {
+                                                exposed[index] = exposedText.toLowerCase()
+                                            } else if (exposedText.isEmpty()) {
+                                                exposed[index] = 'false'
+                                            } else {
+                                                renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterExposed has to be true or false.')
+                                                hasError = Boolean.TRUE
+                                                return
+                                            }
+                                        } else if ('parameterPublished' == it.name) {
+                                            String publishedText = it.text()
+
+                                            if ('true' == publishedText.toLowerCase() || 'false' == publishedText.toLowerCase()) {
+                                                published[index] = publishedText.toLowerCase()
+                                            } else if (publishedText.isEmpty()) {
+                                                published[index] = 'false'
+                                            } else {
+                                                renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterPublished has to be true or false.')
+                                                hasError = Boolean.TRUE
+                                                return
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                            parameters[name] = value
+
+                            processingParams.put('parameters.key', keys)
+                            processingParams.put('parameters.value', values)
+                            processingParams.put('parameters.exposed', exposed)
+                            processingParams.put('parameters.published', published)
+                            processingParams.put('parameters.description', descriptions)
                         }
-                    }
-
-                    def xmlExecutionZoneParameters = xml[0].children.findAll { it.name == 'processingParameters' }
-
-                    if (xmlExecutionZoneParameters.size() != 0) {
-
-                        String[] keys = new String[xmlExecutionZoneParameters.size()]
-                        String[] values = new String[xmlExecutionZoneParameters.size()]
-                        String[] descriptions = new String[xmlExecutionZoneParameters.size()]
-                        String[] exposed = new String[xmlExecutionZoneParameters.size()]
-                        String[] published = new String[xmlExecutionZoneParameters.size()]
-
-                        xmlExecutionZoneParameters.eachWithIndex { processingParameters, index ->
-
-                            if (processingParameters.children.size() == 0) {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Processing parameters are empty')
-                                hasError = Boolean.TRUE
+                    } else { hasError = Boolean.TRUE }
+                }
+                json {
+                    def json = parseRequestDataToJSON(request)
+                    if (json) {
+                        if (json.executionZoneProperties) {
+                            json.executionZoneProperties.each {
+                                parameters[it.propertyName] = it.propertyValue
                             }
+                        }
 
-                            processingParameters.children.each { parameter ->
-                                parameter.children.each {
+                        if (json.processingParameters && json.processingParameters.size() != 0) {
 
-                                    if (it.text() == '') {
+                            String[] keys = new String[json.processingParameters.size()]
+                            String[] values = new String[json.processingParameters.size()]
+                            String[] descriptions = new String[json.processingParameters.size()]
+                            String[] exposed = new String[json.processingParameters.size()]
+                            String[] published = new String[json.processingParameters.size()]
+
+                            json.processingParameters.eachWithIndex { parameter, int index ->
+                                parameter.each {
+                                    if (it.value == '') {
                                         this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The value of a processing parameter cannot be empty')
                                         hasError = Boolean.TRUE
                                     }
-
-                                    if ('parameterName' == it.name) {
-                                        keys[index] = it.text()
-                                    } else if ('parameterValue' == it.name) {
-                                        values[index] = it.text()
-                                    } else if ('parameterDescription' == it.name) {
-                                        descriptions[index] = it.text()
-                                    } else if ('parameterExposed' == it.name) {
-                                        String exposedText = it.text()
+                                    if ('parameterName' == it.key) {
+                                        keys[index] = it.value
+                                    } else if ('parameterValue' == it.key) {
+                                        values[index] = it.value
+                                    } else if ('parameterDescription' == it.key) {
+                                        descriptions[index] = it.value
+                                    } else if ('parameterExposed' == it.key) {
+                                        String exposedText = it.value
 
                                         if ('true' == exposedText.toLowerCase() || 'false' == exposedText.toLowerCase()) {
                                             exposed[index] = exposedText.toLowerCase()
@@ -958,8 +1014,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                             hasError = Boolean.TRUE
                                             return
                                         }
-                                    } else if ('parameterPublished' == it.name) {
-                                        String publishedText = it.text()
+                                    } else if ('parameterPublished' == it.key) {
+                                        String publishedText = it.value
 
                                         if ('true' == publishedText.toLowerCase() || 'false' == publishedText.toLowerCase()) {
                                             published[index] = publishedText.toLowerCase()
@@ -973,88 +1029,14 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                                     }
                                 }
                             }
+
+                            processingParams.put('parameters.key', keys)
+                            processingParams.put('parameters.value', values)
+                            processingParams.put('parameters.exposed', exposed)
+                            processingParams.put('parameters.published', published)
+                            processingParams.put('parameters.description', descriptions)
                         }
-
-                        processingParams.put('parameters.key', keys)
-                        processingParams.put('parameters.value', values)
-                        processingParams.put('parameters.exposed', exposed)
-                        processingParams.put('parameters.published', published)
-                        processingParams.put('parameters.description', descriptions)
-                    }
-                }
-                json {
-                    String text = request.getReader().text
-                    def json
-
-                    try {
-                        json = new JSONObject(text)
-                    }
-                    catch (JSONException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                        hasError = Boolean.TRUE
-                        return
-                    }
-
-                    if (json.executionZoneProperties) {
-                        json.executionZoneProperties.each {
-                            parameters[it.propertyName] = it.propertyValue
-                        }
-                    }
-
-                    if (json.processingParameters && json.processingParameters.size() != 0) {
-
-                        String[] keys = new String[json.processingParameters.size()]
-                        String[] values = new String[json.processingParameters.size()]
-                        String[] descriptions = new String[json.processingParameters.size()]
-                        String[] exposed = new String[json.processingParameters.size()]
-                        String[] published = new String[json.processingParameters.size()]
-
-                        json.processingParameters.eachWithIndex { parameter, int index ->
-                            parameter.each {
-                                if(it.value == ''){
-                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'The value of a processing parameter cannot be empty')
-                                    hasError = Boolean.TRUE
-                                }
-                                if ('parameterName' == it.key) {
-                                    keys[index] = it.value
-                                } else if ('parameterValue' == it.key) {
-                                    values[index] = it.value
-                                } else if ('parameterDescription' == it.key) {
-                                    descriptions[index] = it.value
-                                } else if ('parameterExposed' == it.key) {
-                                    String exposedText = it.value
-
-                                    if ('true' == exposedText.toLowerCase() || 'false' == exposedText.toLowerCase()) {
-                                        exposed[index] = exposedText.toLowerCase()
-                                    } else if (exposedText.isEmpty()) {
-                                        exposed[index] = 'false'
-                                    } else {
-                                        renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterExposed has to be true or false.')
-                                        hasError = Boolean.TRUE
-                                        return
-                                    }
-                                } else if ('parameterPublished' == it.key) {
-                                    String publishedText = it.value
-
-                                    if ('true' == publishedText.toLowerCase() || 'false' == publishedText.toLowerCase()) {
-                                        published[index] = publishedText.toLowerCase()
-                                    } else if (publishedText.isEmpty()) {
-                                        published[index] = 'false'
-                                    } else {
-                                        renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Invalid value. parameterPublished has to be true or false.')
-                                        hasError = Boolean.TRUE
-                                        return
-                                    }
-                                }
-                            }
-                        }
-
-                        processingParams.put('parameters.key', keys)
-                        processingParams.put('parameters.value', values)
-                        processingParams.put('parameters.exposed', exposed)
-                        processingParams.put('parameters.published', published)
-                        processingParams.put('parameters.description', descriptions)
-                    }
+                    } else { hasError = Boolean.TRUE}
                 }
             }
 
@@ -1222,60 +1204,48 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         // get data from incoming json or xml
         request.withFormat {
             xml {
-                NodeChild xml
-                try {
-                    xml = request.XML as NodeChild
-                }
-                catch (ConverterException e) {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                    hasError = Boolean.TRUE
-                    return
-                }
+                def xml = parseRequestDataToXML(request)
+                if (xml) {
+                    def executions = xml.childNodes().findAll { it.name == 'execution' }
 
-                def executions = xml.childNodes().findAll { it.name == 'execution'}
+                    executions.each { exec ->
 
-                executions.each { exec ->
+                        Map<String, List> parameters = [:]
 
-                    Map<String, List> parameters =[:]
+                        origin_params.each { zoneparam ->
+                            parameters[zoneparam.name] = exec.childNodes().find {
+                                it.name == 'parameters'
+                            }.childNodes().findAll { it.name == 'parameter' }.find {
+                                it.childNodes().find { it.text() == zoneparam.name }
+                            }.children[1].text()
 
-                    origin_params.each { zoneparam ->
-                        parameters[zoneparam.name] = exec.childNodes().find {it.name == 'parameters'}.childNodes().findAll {it.name == 'parameter'}.find{it.childNodes().find{it.text() == zoneparam.name}}.children[1].text()
-
-                        if (!parameters[zoneparam.name] && zoneparam.value != '') {
-                            parameters[zoneparam.name] = zoneparam.value
+                            if (!parameters[zoneparam.name] && zoneparam.value != '') {
+                                parameters[zoneparam.name] = zoneparam.value
+                            }
                         }
+                        execution.add(parameters)
                     }
-                    execution.add(parameters)
-                }
-
+                } else { hasError = Boolean.TRUE}
             }
             json {
-                String text = request.getReader().text
-                def json
+                def json = parseRequestDataToJSON(request)
+                if (json) {
+                    def executions = json.executions
+                    executions?.parameters?.each { exec ->
+                        Map<String, List> parameters = [:]
+                        origin_params.each { zoneparam ->
 
-                try {
-                   json = new JSONObject(text)
-                }
-                catch (JSONException e) {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                    hasError = Boolean.TRUE
-                    return
-                }
+                            parameters[zoneparam.name] = exec.find {
+                                it.parameterName == zoneparam.name
+                            }?.parameterValue
 
-                def executions = json.executions
-
-                executions?.parameters?.each {exec ->
-                    Map<String, List> parameters =[:]
-                    origin_params.each { zoneparam ->
-
-                        parameters[zoneparam.name] = exec.find{it.parameterName == zoneparam.name}?.parameterValue
-
-                        if (!parameters[zoneparam.name] && zoneparam.value != '') {
-                            parameters[zoneparam.name] = zoneparam.value
+                            if (!parameters[zoneparam.name] && zoneparam.value != '') {
+                                parameters[zoneparam.name] = zoneparam.value
+                            }
                         }
+                        execution.add(parameters)
                     }
-                    execution.add(parameters)
-                }
+                } else { hasError = Boolean.TRUE }
             }
         }
 
@@ -1540,7 +1510,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
             json {
                 def executionZoneAttributes= [:]
-
                 def executionZoneAttribute = [:]
                 executionZoneAttribute.put('type', zone.type.name? zone.type.name : '')
                 executionZoneAttribute.put('puppetEnvironment', zone.puppetEnvironment? zone.puppetEnvironment : '')
@@ -1551,11 +1520,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
                 executionZoneAttribute.put('enableAutodeletion', zone.enableAutodeletion)
                 executionZoneAttribute.put('hostLimit', zone.hostLimit? zone.hostLimit : '')
                 executionZoneAttribute.put('defaultLifetime', zone.defaultLifetime? zone.defaultLifetime : '')
-
                 executionZoneAttributes.put('executionZoneAttributes', executionZoneAttribute)
-
                 render executionZoneAttributes as JSON
-
             }
         }
     }
@@ -1571,7 +1537,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
      * Request method DELETE required admin permissions
      */
     def changeexecutionzoneparams = {
-
         ExecutionZone zone
         Boolean hasError = Boolean.FALSE
         Map<String, String> parameters =[:]
@@ -1597,49 +1562,33 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
         request.withFormat {
             xml {
-                def xml
-                try {
-                    xml = request.XML
-                }
-                catch (ConverterException e) {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                    hasError = Boolean.TRUE
-                    return
-                }
+                def xml = parseRequestDataToXML(request)
+                if (xml) {
+                    def xmlParameters = xml[0].children
 
-                def xmlParameters = xml[0].children
-
-                xmlParameters.each { node ->
-                    def name = ''
-                    def value = ''
-                    node.children.each { innerNode ->
-                        if (innerNode.name == 'parameterName') {
-                            name = innerNode.text()
-                        } else if (innerNode.name == 'parameterValue') {
-                            value = innerNode.text()
+                    xmlParameters.each { node ->
+                        def name = ''
+                        def value = ''
+                        node.children.each { innerNode ->
+                            if (innerNode.name == 'parameterName') {
+                                name = innerNode.text()
+                            } else if (innerNode.name == 'parameterValue') {
+                                value = innerNode.text()
+                            }
                         }
+                        parameters.put(name, value)
                     }
-                    parameters.put(name, value)
-                }
+                } else { hasError = Boolean.TRUE }
             }
             json {
-                String text = request.getReader().text
-                def json
+                def json = parseRequestDataToJSON(request)
+                if (json) {
+                    def json_params = json.parameters
 
-                try {
-                    json = new JSONObject(text)
-                }
-                catch (JSONException e) {
-                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                    hasError = Boolean.TRUE
-                    return
-                }
-
-                def json_params = json.parameters
-
-                json_params?.each { param ->
-                   parameters.put(param.parameterName, param.parameterValue)
-                }
+                    json_params?.each { param ->
+                        parameters.put(param.parameterName, param.parameterValue)
+                    }
+                } else { hasError = Boolean.TRUE }
             }
         }
 
@@ -1745,49 +1694,33 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
 
             request.withFormat {
                 xml {
-                    def xml
-                    try {
-                        xml = request.XML
-                    }
-                    catch (ConverterException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                        hasError = Boolean.TRUE
-                        return
-                    }
+                    def xml = parseRequestDataToXML(request)
+                    if (xml) {
+                        def xmlParameters = xml[0].children
 
-                    def xmlParameters = xml[0].children
-
-                    xmlParameters.each { node ->
-                        def name = ''
-                        def value = ''
-                        node.children.each { innerNode ->
-                            if (innerNode.name == 'parameterName') {
-                                name = innerNode.text()
-                            } else if (innerNode.name == 'parameterValue') {
-                                value = innerNode.text()
+                        xmlParameters.each { node ->
+                            def name = ''
+                            def value = ''
+                            node.children.each { innerNode ->
+                                if (innerNode.name == 'parameterName') {
+                                    name = innerNode.text()
+                                } else if (innerNode.name == 'parameterValue') {
+                                    value = innerNode.text()
+                                }
                             }
+                            parameters.put(name, value)
                         }
-                        parameters.put(name, value)
-                    }
+                    } else { hasError = Boolean.TRUE }
                 }
                 json {
-                    String text = request.getReader().text
-                    def json
+                    def json = parseRequestDataToJSON(request)
+                    if (json) {
+                        def json_params = json.parameters
 
-                    try {
-                        json = new JSONObject(text)
-                    }
-                    catch (JSONException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                        hasError = Boolean.TRUE
-                        return
-                    }
-
-                    def json_params = json.parameters
-
-                    json_params?.each { param ->
-                        parameters.put(param.parameterName, param.parameterValue)
-                    }
+                        json_params?.each { param ->
+                            parameters.put(param.parameterName, param.parameterValue)
+                        }
+                    } else { hasError=Boolean.TRUE }
                 }
             }
 
