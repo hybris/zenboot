@@ -23,4 +23,23 @@ eventCompileEnd = {
             fileset(dir:"${basedir}/test/resources")
         }
     }
+
+    def buildResult
+    def errStat = 0
+
+    buildResult = ['go', 'get', '-d', './...'].execute()
+    buildResult.waitForProcessOutput(System.out, System.err)
+    errStat = buildResult.exitValue() != 0 ? buildResult.exitValue(): errStat
+
+    new File('zenboot-cli/bin').mkdirs()
+    def env = System.getenv().collect { k, v -> "$k=$v" }
+    goga = [['linux', 'amd64'], ['linux', '386'], ['darwin', 'amd64'], ['darwin', '386']].each {
+      buildResult = ['go', 'build', '-o', 'zenboot-cli/bin/zenboot-' + it[0] + '-' + it[1], 'zenboot-cli/zenboot.go'].execute(env.plus(["GOOS=${it[0]}", "GOARCH=${it[1]}"]), null)
+      buildResult.waitForProcessOutput(System.out, System.err)
+      errStat = buildResult.exitValue() != 0 ? buildResult.exitValue(): errStat
+    }
+
+    if (errStat != 0) {
+        System.err << "Building the CLI failed with exit code " + errStat
+    }
 }
