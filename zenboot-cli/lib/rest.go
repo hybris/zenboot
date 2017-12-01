@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -65,6 +66,10 @@ func (z Zenboot) SendRequest(request_type string, rest_call string, data []byte)
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("Server didn't respond with 200 OK: " + strconv.Itoa(resp.StatusCode))
+	}
 
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
