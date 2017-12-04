@@ -1529,10 +1529,10 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     /**
      * The method changes the processing parameters of an existing execution zone. It is possible to change / add processing parameters due add
      * a new key / value parameter pair in the data or change the value of an existing one. To change / add processing parameters you have to use
-     * request method POST. If you want to remove processing parameters you have to use the request method DELETE. Keep in mind that all key / value
+     * request method PUT. If you want to remove processing parameters you have to use the request method DELETE. Keep in mind that all key / value
      * pairs in your data will be removed.
      *
-     * Request method POST checks if the user has the permission to change these parameters. In the case that the user has no permission, the
+     * Request method PUT checks if the user has the permission to change these parameters. In the case that the user has no permission, the
      * specific parameter will be ignored.
      * Request method DELETE required admin permissions
      */
@@ -1663,7 +1663,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     }
 
     /**
-     * The method changes the execution zone attributes. It return CONFLICT if the execution zone could not be saved e.g. because of wrong
+     * The method changes the execution zone attributes. It return INTERNAL SERVER ERROR if the execution zone could not be saved e.g. because of wrong
      * datatype. Some of the values are already catched so that all correct values will be changed. In case of changing the description the
      * access cache will be updated for this zone to ensure that users which roles does not match the new expression will no longer have access.
      */

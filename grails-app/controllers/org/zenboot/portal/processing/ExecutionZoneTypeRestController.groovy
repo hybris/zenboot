@@ -16,7 +16,7 @@ class ExecutionZoneTypeRestController extends AbstractRestController {
     def accessService
 
     /**
-     * execTypes returns a list of all existing executionZoneTypes.
+     * The method returns a list of all existing executionZoneTypes.
      */
     def listexectypes = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {

@@ -26,8 +26,8 @@ class CustomerRestController extends AbstractRestController {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             List<Customer> customersCollection = []
 
-            if (params.identifer) {
-                List<String> identifiers = params.identifiers.split(',')
+            if (params.identifier) {
+                List<String> identifiers = params.identifier.split(',')
                 identifiers.each {
                     Customer customer = it.isInteger() ? Customer.findById(it as Long) : Customer.findByEmail(it)
                     if (customer) {

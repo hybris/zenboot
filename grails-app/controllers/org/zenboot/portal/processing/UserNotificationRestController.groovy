@@ -18,7 +18,7 @@ class UserNotificationRestController extends AbstractRestController {
     def springSecurityService
 
     /**
-     * The method return a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications. If the enabled parameter is not set, the method
+     * The method returns a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications. If the enabled parameter is not set, the method
      * return all available user notifications.
      */
     @Secured(['permitAll'])
@@ -67,7 +67,7 @@ class UserNotificationRestController extends AbstractRestController {
     }
 
     /**
-     * The method override the values of an existing user notification. Admin permissions are required to edit an user notification.
+     * The method overrides the values of an existing user notification. Admin permissions are required to edit an user notification.
      */
     def editusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
@@ -258,17 +258,18 @@ class UserNotificationRestController extends AbstractRestController {
     }
 
     /**
-     * The method deleted an user notification by id. Admin permissions are required to delete an user notification.
+     * The method deletes an user notification by id. Admin permissions are required to delete an user notification.
      */
     def deleteusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             if (params.notificationId) {
                 UserNotification userNotification = UserNotification.findById(params.notificationId as Long)
                 if (userNotification) {
-                    if (userNotification.delete(flush: true)) {
-                        this.renderRestResult(HttpStatus.OK, null, null, 'UserNotification with id ' + params.notificaitonId + ' deleted.')
-                    } else {
-                        this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occurred while deleting the usernotification.')
+                    try {
+                        userNotification.delete(flush: true)
+                        this.renderRestResult(HttpStatus.OK, null, null, 'UserNotification with id ' + params.notificationId + ' deleted.')
+                    } catch (Exception e) {
+                        this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occurred while deleting the usernotification: ' + e.getMessage())
                     }
                 } else {
                     this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No UserNotification with id ' + params.notificationId + ' found.')

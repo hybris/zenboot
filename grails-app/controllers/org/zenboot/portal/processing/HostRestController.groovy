@@ -112,6 +112,7 @@ class HostRestController extends AbstractRestController {
                     hosts {
                         hostsFromZone.each { hostElement ->
                             host {
+                                hostid hostElement.id
                                 hostname hostElement.hostname.toString()
                                 cname hostElement.cname
                                 hoststate hostElement.state.toString()
@@ -133,7 +134,7 @@ class HostRestController extends AbstractRestController {
             json {
                 Map hosts = [:]
                 List host = hostsFromZone.collect {
-                    [hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect {
+                    [hostid: it.id,hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect {
                         it.url
                     }]]
                 }

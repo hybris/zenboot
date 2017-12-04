@@ -63,9 +63,6 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
         if (params.offset && params.offset.isInteger()) {
             offset = params.offset as Integer
         }
-        else {
-            offset = 0
-        }
 
         withFormat {
             xml {
@@ -74,7 +71,7 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
 
                 int totalSize = execZones.sum {it.actions.size()} as Integer
 
-                if (100 < totalSize && offset == 0) {
+                if (100 < totalSize && offset == null) {
                     String actionsXML = builder.bind {
                         pagination {
                             execZones.each { ExecutionZone execZone ->
@@ -83,7 +80,7 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
                                 def pages = Math.round((zoneSize / 100) + 0.5) //round to next full page
 
                                 pages.times {
-                                    url "/zenboot/rest/v1/listactions?execId=" + execZone.id + "&offset=" + start
+                                    url "/zenboot/rest/v1/actions/list?execId=" + execZone.id + "&offset=" + start
 
                                     if ((start + 100) < zoneSize) {
                                         start += 100
@@ -134,7 +131,7 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
             json {
                 int totalSize = execZones.sum { it.actions.size() } as Integer
 
-                if (100 < totalSize && offset == 0) {
+                if (100 < totalSize && offset == null) {
                     def paginationJSON = []
                     execZones.each { ExecutionZone execZone ->
                         int start = 0
@@ -142,7 +139,7 @@ class ExecutionZoneActionRestController extends AbstractRestController  {
                         def pages = Math.round((zoneSize / 100) + 0.5) //round to next full page
 
                         pages.times {
-                            paginationJSON.add("/zenboot/rest/v1/listactions?execId=" + execZone.id + "&offset=" + start)
+                            paginationJSON.add("/zenboot/rest/v1/actions/list?execId=" + execZone.id + "&offset=" + start)
 
                             if ((start + 100) < zoneSize) {
                                 start += 100
