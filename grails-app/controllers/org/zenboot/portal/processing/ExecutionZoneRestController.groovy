@@ -29,7 +29,8 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def scriptletBatchService
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", execzonetemplate: "GET",
-    cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: "PUT", listexecutionzoneattributes: "GET", listexecutionzoneparams: "GET"]
+                             cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: "PUT", listexecutionzoneattributes: "GET", listexecutionzoneparams: "GET",
+                             listscriptletsdetails: "GET"]
 
     @Override
     void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
@@ -1786,7 +1787,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         }
 
         String scriptletBatchName = params.scriptletBatchName
-
         File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
                 + "/" + zone.type.name + "/scripts/" + scriptletBatchName)
 
@@ -1826,8 +1826,6 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
             }
             json {
                 def scriptletbatch = [:]
-
-
                 if(batchflow.batchPlugin) {
                     scriptletbatch.put('name', batchflow.batchPlugin.file.name)
                     scriptletbatch.put('author', batchflow.batchPlugin.metadata.author)
