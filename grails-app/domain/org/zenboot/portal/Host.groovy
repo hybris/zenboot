@@ -20,6 +20,7 @@ public class Host {
     Customer owner
     String iaasUser
     Environment environment
+    String metaInformation
 
     static belongsTo = [execZone:ExecutionZone]
 
@@ -40,6 +41,7 @@ public class Host {
         state(nullable:false)
         hostname(nullable:false)
         environment(nullable:false)
+        metaInformation(nullable: true, blank: true)
     }
 
 

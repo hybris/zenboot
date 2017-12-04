@@ -117,6 +117,7 @@ class HostRestController extends AbstractRestController {
                                 cname hostElement.cname
                                 hoststate hostElement.state.toString()
                                 ipadress hostElement.ipAddress
+                                metaInformation SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)? hostElement.metaInformation : ''
                                 serviceUrls {
                                     hostElement.serviceUrls.each { singleurl ->
                                         serviceUrl singleurl.url
@@ -134,7 +135,7 @@ class HostRestController extends AbstractRestController {
             json {
                 Map hosts = [:]
                 List host = hostsFromZone.collect {
-                    [hostid: it.id,hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect {
+                    [hostid: it.id,hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, metaInformation: SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)? it.metaInformation : '', serviceUrls: [it.serviceUrls.collect {
                         it.url
                     }]]
                 }
