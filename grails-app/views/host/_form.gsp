@@ -128,3 +128,12 @@
 		<g:select id="owner" name="owner.id" from="${org.zenboot.portal.Customer.list()}" optionKey="id" value="${hostInstance?.owner?.id}" class="many-to-one" noSelection="['null': '']"  />
 	</div>
 </div>
+
+<div class="fieldcontain" ${hasErrors(bean: hostInstance, field: 'metaInformation', 'error')} >
+	<label class="control-label" for="owner">
+		<g:message code="host.metaInformation.label" default="metaInformation" />
+	</label>
+	<div class="controls">
+		<g:textField name="metaInformation" value="${hostInstance.metaInformation}" />
+	</div>
+</div>
