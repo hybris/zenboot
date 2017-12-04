@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.ControllerUtils
+import org.zenboot.portal.processing.flow.ScriptletFlowElement
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 import org.zenboot.portal.Template
@@ -25,6 +26,7 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
     def executionZoneService
     def grailsLinkGenerator
     def applicationEventPublisher
+    def scriptletBatchService
 
     static allowedMethods = [index: "GET" , help: "GET", list: "GET", execute: "POST", listparams: "GET", listactions: "GET", createzone: "POST", execzonetemplate: "GET",
     cloneexecutionzone: "POST", changeexecutionzoneparams: ["PUT", "DELETE"], changeexecutionzoneattributes: "PUT", listexecutionzoneattributes: "GET", listexecutionzoneparams: "GET"]
@@ -1766,6 +1768,85 @@ class ExecutionZoneRestController extends AbstractRestController implements Appl
         }
         else {
             this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You have no permissions to change the attributes of an execution zone.')
+        }
+    }
+
+    /**
+     * The method returns a list of detailed information about the scriptletbatch and releated scriptlet metadata details.
+     */
+    def listscriptletsdetails = {
+        ExecutionZone zone
+        if (params.execId && params.execId.isInteger()) {
+            zone = ExecutionZone.findById(params.execId)
+        }
+
+        if (!zone) {
+            this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No executionzonetype in execution zone for id ' + params.execId + ' found.')
+            return
+        }
+
+        String scriptletBatchName = params.scriptletBatchName
+
+        File stackDir = new File(scriptDirectoryService.getZenbootScriptsDir().getAbsolutePath()
+                + "/" + zone.type.name + "/scripts/" + scriptletBatchName)
+
+        if (!isValidScriptDir(stackDir)) {
+            return
+        }
+
+        def batchflow = scriptletBatchService.getScriptletBatchFlow(stackDir, zone.type)
+
+        withFormat {
+            xml {
+                def builder = new StreamingMarkupBuilder()
+                builder.encoding = 'UTF-8'
+
+                String zones = builder.bind {
+                    if (batchflow.batchPlugin) {
+                        scriptletbatch {
+                            name batchflow.batchPlugin.file.name
+                            author batchflow.batchPlugin.metadata.author
+                            description batchflow.batchPlugin.metadata.description
+                            batchflow.flowElements.each { ScriptletFlowElement flowelement ->
+                                scriptlet {
+                                    name flowelement.file.name
+                                    author flowelement.metadata.author
+                                    description flowelement.metadata.description
+                                    if(flowelement.plugin) {
+                                        plugin 'Plugin'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                def xml = XmlUtil.serialize(zones).replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+                xml = xml.replaceAll('<([^/]+?)/>', '<$1></$1>')
+                render contentType: "text/xml", xml
+            }
+            json {
+                def scriptletbatch = [:]
+
+
+                if(batchflow.batchPlugin) {
+                    scriptletbatch.put('name', batchflow.batchPlugin.file.name)
+                    scriptletbatch.put('author', batchflow.batchPlugin.metadata.author)
+                    scriptletbatch.put('description', batchflow.batchPlugin.metadata.description)
+                    def scriptlets = []
+                    batchflow.flowElements.each { ScriptletFlowElement flowelement ->
+                        def scriptlet = [:]
+                        scriptlet.put('name', flowelement.file.name)
+                        scriptlet.put('author', flowelement.metadata.author)
+                        scriptlet.put('description', flowelement.metadata.description)
+                        if(flowelement.plugin) {
+                            scriptlet.put('plugin', 'Plugin')
+                        }
+                        scriptlets.add(scriptlet)
+                    }
+                    scriptletbatch.put('scriptlets', scriptlets)
+                }
+                render(contentType: "text/json") { scriptletbatch } as JSON
+            }
         }
     }
 
