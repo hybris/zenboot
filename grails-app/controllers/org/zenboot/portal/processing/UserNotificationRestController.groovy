@@ -5,9 +5,6 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
-import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
-import org.codehaus.groovy.grails.web.json.JSONException
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.NotificationType
@@ -21,7 +18,7 @@ class UserNotificationRestController extends AbstractRestController {
     def springSecurityService
 
     /**
-     * The method return a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications. If the enabled parameter is not set, the method
+     * The method returns a list of user notifications. It is possible to specify the enabled param to get all enabled or disabled user notifications. If the enabled parameter is not set, the method
      * return all available user notifications.
      */
     @Secured(['permitAll'])
@@ -70,7 +67,7 @@ class UserNotificationRestController extends AbstractRestController {
     }
 
     /**
-     * The method override the values of an existing user notification. Admin permissions are required to edit an user notification.
+     * The method overrides the values of an existing user notification. Admin permissions are required to edit an user notification.
      */
     def editusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
@@ -91,66 +88,51 @@ class UserNotificationRestController extends AbstractRestController {
 
             request.withFormat {
                 xml {
-                    def xml
-                    try {
-                        xml = request.XML
-                    }
-                    catch (ConverterException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                        hasError = Boolean.TRUE
-                        return
-                    }
+                    def xml = parseRequestDataToXML(request)
 
-                    def xmlParameters = xml[0].children
-                    def parameters = [:]
+                    if (xml) {
+                        def xmlParameters = xml[0].children
+                        def parameters = [:]
 
-                    xmlParameters.each { node ->
-                        def name = ''
-                        def value = ''
-                        node.children.each { innerNode ->
-                            if (innerNode.name == 'parameterName') {
-                                name = innerNode.text()
-                            } else if (innerNode.name == 'parameterValue') {
-                                value = innerNode.text()
+                        xmlParameters.each { node ->
+                            def name = ''
+                            def value = ''
+                            node.children.each { innerNode ->
+                                if (innerNode.name == 'parameterName') {
+                                    name = innerNode.text()
+                                } else if (innerNode.name == 'parameterValue') {
+                                    value = innerNode.text()
+                                }
                             }
+                            parameters.put(name, value)
                         }
-                        parameters.put(name, value)
-                    }
 
-                    parameters.each {
-                        if (userNotificationData.hasProperty(it.key)) {
-                            userNotificationData.properties[it.key] = it.value
-                        } else {
-                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.key + ' not exists for UserNotifications.')
-                            hasError = Boolean.TRUE
-                            return
-                        }
-                    }
-                }
-                json {
-                    String text = request.getReader().text
-                    def json
-
-                    try {
-                        json = new JSONObject(text)
-                    }
-                    catch (JSONException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                        hasError = Boolean.TRUE
-                        return
-                    }
-
-                    if (json.parameters) {
-                        json.parameters.each {
-                            if (userNotificationData.hasProperty(it.parameterName)) {
-                                userNotificationData.properties[it.parameterName] = it.parameterValue
+                        parameters.each {
+                            if (userNotificationData.hasProperty(it.key)) {
+                                userNotificationData.properties[it.key] = it.value
                             } else {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.parameterName + ' not exists for UserNotifications.')
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.key + ' not exists for UserNotifications.')
                                 hasError = Boolean.TRUE
                                 return
                             }
                         }
-                    }
+                    } else { hasError = Boolean.TRUE }
+                }
+                json {
+                    def json = parseRequestDataToJSON(request)
+                    if (json) {
+                        if (json.parameters) {
+                            json.parameters.each {
+                                if (userNotificationData.hasProperty(it.parameterName)) {
+                                    userNotificationData.properties[it.parameterName] = it.parameterValue
+                                } else {
+                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.parameterName + ' not exists for UserNotifications.')
+                                    hasError = Boolean.TRUE
+                                    return
+                                }
+                            }
+                        }
+                    } else { hasError = Boolean.TRUE }
                 }
             }
 
@@ -177,105 +159,93 @@ class UserNotificationRestController extends AbstractRestController {
 
             request.withFormat {
                 xml {
-                    def xml
-                    try {
-                        xml = request.XML
-                    }
-                    catch (ConverterException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                        hasError = Boolean.TRUE
-                        return
-                    }
+                    def xml = parseRequestDataToXML(request)
+                    if (xml) {
+                        def xmlParameters = xml[0].children
+                        def parameters = [:]
 
-                    def xmlParameters = xml[0].children
-                    def parameters = [:]
-
-                    xmlParameters.each { node ->
-                        def name = ''
-                        def value = ''
-                        node.children.each { innerNode ->
-                            if (innerNode.name == 'parameterName') {
-                                name = innerNode.text()
-                            } else if (innerNode.name == 'parameterValue') {
-                                value = innerNode.text()
+                        xmlParameters.each { node ->
+                            def name = ''
+                            def value = ''
+                            node.children.each { innerNode ->
+                                if (innerNode.name == 'parameterName') {
+                                    name = innerNode.text()
+                                } else if (innerNode.name == 'parameterValue') {
+                                    value = innerNode.text()
+                                }
                             }
+                            parameters.put(name, value)
                         }
-                        parameters.put(name, value)
-                    }
 
-                    if (parameters || parameters.every {it.value != '' && it.value != null }) {
-                        if(parameters.containsKey('enabled') && parameters.containsKey('message') && parameters.containsKey('notificationtype')) {
-                            if (NotificationType.values().any {it.name().toLowerCase() == parameters['notificationtype'].toString().toLowerCase()}) {
-                                UserNotification newUserNotification = new UserNotification(enabled: parameters['enabled'], message: parameters['message'],
-                                        type: NotificationType.valueOf(parameters['notificationtype'] as String))
+                        if (parameters || parameters.every { it.value != '' && it.value != null }) {
+                            if (parameters.containsKey('enabled') && parameters.containsKey('message') && parameters.containsKey('notificationtype')) {
+                                if (NotificationType.values().any {
+                                    it.name().toLowerCase() == parameters['notificationtype'].toString().toLowerCase()
+                                }) {
+                                    UserNotification newUserNotification = new UserNotification(enabled: parameters['enabled'], message: parameters['message'],
+                                            type: NotificationType.valueOf(parameters['notificationtype'] as String))
 
-                                if (!newUserNotification.save(flush: true)) {
-                                    this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occured while saving the new user notification. Please check your data.')
+                                    if (!newUserNotification.save(flush: true)) {
+                                        this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occured while saving the new user notification. Please check your data.')
+                                        hasError = Boolean.TRUE
+                                    }
+                                } else {
+                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No type of UserNotification found for value ' + parameters['notificationtype'] +
+                                            '. Please check documentation.')
                                     hasError = Boolean.TRUE
+                                    return
                                 }
                             } else {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No type of UserNotification found for value ' + parameters['notificationtype'] +
-                                        '. Please check documentation.')
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Parameter missing. Please check documentation.')
                                 hasError = Boolean.TRUE
                                 return
                             }
                         } else {
-                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Parameter missing. Please check documentation.')
+                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received or wrong data structure. Please check documentation.')
                             hasError = Boolean.TRUE
                             return
                         }
-                    } else {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received or wrong data structure. Please check documentation.')
-                        hasError = Boolean.TRUE
-                        return
-                    }
+                    } else { hasError = Boolean.TRUE }
                 }
                 json {
-                    String text = request.getReader().text
-                    def json
+                    def json = parseRequestDataToJSON(request)
+                    if (json) {
+                        def parameters = [:]
 
-                    try {
-                        json = new JSONObject(text)
-                    }
-                    catch (JSONException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                        hasError = Boolean.TRUE
-                        return
-                    }
-
-                    def parameters = [:]
-
-                    if (json.parameters) {
-                        json.parameters.each {
-                            parameters[it.parameterName] = it.parameterValue
+                        if (json.parameters) {
+                            json.parameters.each {
+                                parameters[it.parameterName] = it.parameterValue
+                            }
                         }
-                    }
 
-                    if (parameters || parameters.every {it.value != '' && it.value != null }) {
-                        if(parameters.containsKey('enabled') && parameters.containsKey('message') && parameters.containsKey('notificationtype')) {
-                            if (NotificationType.values().any {it.name().toLowerCase() == parameters['notificationtype'].toString().toLowerCase()}) {
-                                UserNotification newUserNotification = new UserNotification(enabled: parameters['enabled'], message: parameters['message'],
-                                        type: NotificationType.valueOf(parameters['notificationtype'] as String))
+                        if (parameters || parameters.every { it.value != '' && it.value != null }) {
+                            if (parameters.containsKey('enabled') && parameters.containsKey('message') && parameters.containsKey('notificationtype')) {
+                                if (NotificationType.values().any {
+                                    it.name().toLowerCase() == parameters['notificationtype'].toString().toLowerCase()
+                                }) {
+                                    UserNotification newUserNotification = new UserNotification(enabled: parameters['enabled'], message: parameters['message'],
+                                            type: NotificationType.valueOf(parameters['notificationtype'] as String))
 
-                                if (!newUserNotification.save(flush: true)) {
-                                    this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occured while saving the new user notification. Please check your data.')
+                                    if (!newUserNotification.save(flush: true)) {
+                                        this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occured while saving the new user notification. Please check your data.')
+                                        hasError = Boolean.TRUE
+                                    }
+                                } else {
+                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No type of UserNotification found for value ' + parameters['notificationtype'] +
+                                            '. Please check documentation.')
                                     hasError = Boolean.TRUE
+                                    return
                                 }
                             } else {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No type of UserNotification found for value ' + parameters['notificationtype'] +
-                                        '. Please check documentation.')
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Parameter missing. Please check documentation.')
                                 hasError = Boolean.TRUE
                                 return
                             }
                         } else {
-                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Parameter missing. Please check documentation.')
+                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received or wrong data structure. Please check documentation.')
                             hasError = Boolean.TRUE
-                            return
                         }
-                    } else {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'No data received or wrong data structure. Please check documentation.')
-                        hasError = Boolean.TRUE
-                    }
+                    } else { hasError = Boolean.TRUE }
                 }
             }
             if (hasError) {
@@ -288,17 +258,18 @@ class UserNotificationRestController extends AbstractRestController {
     }
 
     /**
-     * The method deleted an user notification by id. Admin permissions are required to delete an user notification.
+     * The method deletes an user notification by id. Admin permissions are required to delete an user notification.
      */
     def deleteusernotification = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
             if (params.notificationId) {
                 UserNotification userNotification = UserNotification.findById(params.notificationId as Long)
                 if (userNotification) {
-                    if (userNotification.delete(flush: true)) {
-                        this.renderRestResult(HttpStatus.OK, null, null, 'UserNotification with id ' + params.notificaitonId + ' deleted.')
-                    } else {
-                        this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occurred while deleting the usernotification.')
+                    try {
+                        userNotification.delete(flush: true)
+                        this.renderRestResult(HttpStatus.OK, null, null, 'UserNotification with id ' + params.notificationId + ' deleted.')
+                    } catch (Exception e) {
+                        this.renderRestResult(HttpStatus.INTERNAL_SERVER_ERROR, null, null, 'An error occurred while deleting the usernotification: ' + e.getMessage())
                     }
                 } else {
                     this.renderRestResult(HttpStatus.NOT_FOUND, null, null, 'No UserNotification with id ' + params.notificationId + ' found.')

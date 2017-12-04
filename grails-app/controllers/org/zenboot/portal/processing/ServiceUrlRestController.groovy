@@ -17,7 +17,7 @@ class ServiceUrlRestController extends AbstractRestController  {
     def accessService
 
     /**
-     * The method return a list with active hosts service urls. It is possible to specify the execution zone or a list of execution zones delimited by ',' (?execId=1,2,3,5...). If the execId param is
+     * The method returns a list with active hosts service urls. It is possible to specify the execution zone or a list of execution zones delimited by ',' (?execId=1,2,3,5...). If the execId param is
      * not set, the method returns the service urls of all execution zones.
      */
     def listserviceurls = {

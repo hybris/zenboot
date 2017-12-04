@@ -37,6 +37,7 @@ class UrlMappings {
         "/rest/v1/executionzones/$execId/params/edit"(controller: 'executionZoneRest', action: 'changeexecutionzoneparams')
         "/rest/v1/executionzones/$execId/attributes/list"(controller: 'executionZoneRest', action: 'listexecutionzoneattributes')
         "/rest/v1/executionzones/$execId/attributes/edit"(controller: 'executionZoneRest', action: 'changeexecutionzoneattributes')
+        "/rest/v1/executionzones/$execId/actions/$scriptletBatchName/details"(controller: 'executionZoneRest', action: 'listscriptletsdetails')
 
         //ExecutionZoneActionRest
         "/rest/v1/actions/list?"(controller: 'executionZoneActionRest', action: 'listdetailedactions')

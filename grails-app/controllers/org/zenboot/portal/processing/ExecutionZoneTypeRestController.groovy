@@ -4,9 +4,6 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
-import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
-import org.codehaus.groovy.grails.web.json.JSONException
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.security.Role
@@ -19,7 +16,7 @@ class ExecutionZoneTypeRestController extends AbstractRestController {
     def accessService
 
     /**
-     * execTypes returns a list of all existing executionZoneTypes.
+     * The method returns a list of all existing executionZoneTypes.
      */
     def listexectypes = {
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
@@ -74,72 +71,56 @@ class ExecutionZoneTypeRestController extends AbstractRestController {
 
             request.withFormat {
                 xml {
-                    def xml
-                    try {
-                        xml = request.XML
-                    }
-                    catch (ConverterException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                        hasError = Boolean.TRUE
-                        return
-                    }
+                    def xml = parseRequestDataToXML(request)
+                    if (xml) {
+                        def xmlParameters = xml[0].children
+                        def parameters = [:]
 
-                    def xmlParameters = xml[0].children
-                    def parameters = [:]
-
-                    xmlParameters.each { node ->
-                        def name = ''
-                        def value = ''
-                        node.children.each { innerNode ->
-                            if (innerNode.name == 'parameterName') {
-                                name = innerNode.text()
-                            } else if (innerNode.name == 'parameterValue') {
-                                value = innerNode.text()
-                            }
-                        }
-                        parameters.put(name, value)
-                    }
-
-                    parameters.each {
-                        if (execType.hasProperty(it.key)) {
-                            execType.properties[it.key] = it.value
-                        } else {
-                            this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.key + ' not exists for UserNotifications.')
-                            hasError = Boolean.TRUE
-                            return
-                        }
-                    }
-                }
-                json {
-                    String text = request.getReader().text
-                    def json
-
-                    try {
-                        json = new JSONObject(text)
-                    }
-                    catch (JSONException e) {
-                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                        hasError = Boolean.TRUE
-                        return
-                    }
-
-                    if (json.parameters) {
-                        json.parameters.each {
-                            if (it.parameterName && it.parameterValue) {
-                                if (execType.hasProperty(it.parameterName)) {
-                                    execType.properties[it.parameterName] = it.parameterValue
-                                } else {
-                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.parameterName + ' not exists for ExecutionZoneType.')
-                                    hasError = Boolean.TRUE
-                                    return
+                        xmlParameters.each { node ->
+                            def name = ''
+                            def value = ''
+                            node.children.each { innerNode ->
+                                if (innerNode.name == 'parameterName') {
+                                    name = innerNode.text()
+                                } else if (innerNode.name == 'parameterValue') {
+                                    value = innerNode.text()
                                 }
+                            }
+                            parameters.put(name, value)
+                        }
+
+                        parameters.each {
+                            if (execType.hasProperty(it.key)) {
+                                execType.properties[it.key] = it.value
                             } else {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'paramterName or paramterValue is null or empty. Please check your data.')
+                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.key + ' not exists for UserNotifications.')
                                 hasError = Boolean.TRUE
                                 return
                             }
                         }
-                    }
+                    } else { hasError = Boolean.TRUE}
+                }
+                json {
+                    def json = parseRequestDataToJSON(request)
+                    if (json) {
+                        if (json.parameters) {
+                            json.parameters.each {
+                                if (it.parameterName && it.parameterValue) {
+                                    if (execType.hasProperty(it.parameterName)) {
+                                        execType.properties[it.parameterName] = it.parameterValue
+                                    } else {
+                                        this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'Property ' + it.parameterName + ' not exists for ExecutionZoneType.')
+                                        hasError = Boolean.TRUE
+                                        return
+                                    }
+                                } else {
+                                    this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, 'paramterName or paramterValue is null or empty. Please check your data.')
+                                    hasError = Boolean.TRUE
+                                    return
+                                }
+                            }
+                        }
+                    } else { hasError = Boolean.TRUE}
                 }
             }
 

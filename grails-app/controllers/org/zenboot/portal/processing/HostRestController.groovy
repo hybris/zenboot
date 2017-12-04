@@ -4,9 +4,6 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityUtils
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
-import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
-import org.codehaus.groovy.grails.web.json.JSONException
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.zenboot.portal.AbstractRestController
 import org.zenboot.portal.Customer
@@ -115,6 +112,7 @@ class HostRestController extends AbstractRestController {
                     hosts {
                         hostsFromZone.each { hostElement ->
                             host {
+                                hostid hostElement.id
                                 hostname hostElement.hostname.toString()
                                 cname hostElement.cname
                                 hoststate hostElement.state.toString()
@@ -136,7 +134,7 @@ class HostRestController extends AbstractRestController {
             json {
                 Map hosts = [:]
                 List host = hostsFromZone.collect {
-                    [hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect {
+                    [hostid: it.id,hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, serviceUrls: [it.serviceUrls.collect {
                         it.url
                     }]]
                 }
@@ -176,49 +174,33 @@ class HostRestController extends AbstractRestController {
                 if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
                     request.withFormat {
                         xml {
-                            def xml
-                            try {
-                                xml = request.XML
-                            }
-                            catch (ConverterException e) {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.message)
-                                hasError = Boolean.TRUE
-                                return
-                            }
+                            def xml = parseRequestDataToXML(request)
+                            if (xml) {
+                                def xmlParameters = xml[0].children
 
-                            def xmlParameters = xml[0].children
-
-                            xmlParameters.each { node ->
-                                def name = ''
-                                def value = ''
-                                node.children.each { innerNode ->
-                                    if (innerNode.name == 'parameterName') {
-                                        name = innerNode.text()
-                                    } else if (innerNode.name == 'parameterValue') {
-                                        value = innerNode.text()
+                                xmlParameters.each { node ->
+                                    def name = ''
+                                    def value = ''
+                                    node.children.each { innerNode ->
+                                        if (innerNode.name == 'parameterName') {
+                                            name = innerNode.text()
+                                        } else if (innerNode.name == 'parameterValue') {
+                                            value = innerNode.text()
+                                        }
                                     }
+                                    parameters.put(name, value)
                                 }
-                                parameters.put(name, value)
-                            }
+                            } else { hasError = Boolean.TRUE }
                         }
                         json {
-                            String text = request.getReader().text
-                            def json
-
-                            try {
-                                json = new JSONObject(text)
-                            }
-                            catch (JSONException e) {
-                                this.renderRestResult(HttpStatus.BAD_REQUEST, null, null, e.getMessage())
-                                hasError = Boolean.TRUE
-                                return
-                            }
-
-                            if (json.parameters) {
-                                json.parameters.each {
-                                    parameters[it.parameterName] = it.parameterValue
+                            def json = parseRequestDataToJSON(request)
+                            if (json) {
+                                if (json.parameters) {
+                                    json.parameters.each {
+                                        parameters[it.parameterName] = it.parameterValue
+                                    }
                                 }
-                            }
+                            } else { hasError = Boolean.TRUE }
                         }
                     }
 
