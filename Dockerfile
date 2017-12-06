@@ -11,7 +11,7 @@
 FROM debian:stretch
 EXPOSE 8080
 RUN apt-get update && \
-    apt-get -y install locales sudo procps wget unzip && \
+    apt-get -y install locales sudo procps wget unzip gnupg && \
     apt-get -y install openjdk-8-jdk && \
     echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user \
@@ -90,7 +90,7 @@ RUN if [ -z "$VERSION" ]; \
         exit 1; \
     fi
 ARG ZENBOOT_WAR=https://github.com/hybris/zenboot/releases/download/v$VERSION/zenboot.war
-ARG ZENBOOT_CLI=https://github.com/hybris/zenboot/releases/download/v$VERSION/zenboot
+ARG ZENBOOT_CLI=https://github.com/hybris/zenboot/releases/download/v$VERSION/zenboot-linux-amd64
 
 RUN mkdir -p /home/user/zenboot
 ADD $ZENBOOT_WAR $TOMCAT_HOME/webapps/zenboot.war

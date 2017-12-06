@@ -63,7 +63,7 @@ wait_for_travis
 
 echo "waiting for the artifact to appear on github"
 SUCCESS=false
-for i in $(seq 1 30); do
+for i in $(seq 1 60); do
     if curl -X HEAD -sf "https://github.com/hybris/zenboot/releases/download/v${VERSION}/zenboot.war" -o /dev/null
     then
         SUCCESS=true
