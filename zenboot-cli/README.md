@@ -1,5 +1,17 @@
 # Zenboot Command Line Interface
 
+## Building and installing the CLI
+
+The CLI is written in Golang. To build it, install Golang on your computer (e.g. brew install go) and set the GOPATH. After that, get all the dependencies with
+```
+go get
+```
+in the zenboot-cli directory and run
+```
+go build zenboot.go
+```
+to build the CLI. The binary file called 'zenboot' can be installed in /usr/local/bin on OS X or Linux. On Windows add it to an appropriate folder and set the PATH variable accordingly.
+
 ## Configuration
 
 Before using the CLI, make sure there is a `.zenboot.json` file in your home directory with the following format:

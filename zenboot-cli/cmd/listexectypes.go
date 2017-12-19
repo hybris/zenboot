@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 
 	"../lib"
 	"github.com/hokaccha/go-prettyjson"
@@ -10,17 +9,17 @@ import (
 )
 
 func init() {
-	listCmd.AddCommand(listActionsCmd)
+	listCmd.AddCommand(listexectypesCmd)
 }
 
-var listActionsCmd = &cobra.Command{
-	Use:   "actions [flags]",
-	Short: "list all action names of the specific Execution Zone",
+var listexectypesCmd = &cobra.Command{
+	Use:   "exectypes [flags]",
+	Short: "list all exectypes",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
 
-		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/actions/list")
+		content, err := rest.SendGet("exectypes/list")
 		lib.HandleError(err)
 
 		prettyjson, _ := prettyjson.Format(content)
