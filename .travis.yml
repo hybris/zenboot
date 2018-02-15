@@ -2,8 +2,6 @@ language: groovy
 jdk: oraclejdk8
 env: GO_VERSION=1.9 GOROOT="/usr/lib/go-1.9" GOPATH="${TRAVIS_BUILD_DIR}/.go" PATH="/usr/lib/go-1.9/bin:${PATH}"
 before_install:
-- openssl aes-256-cbc -K $encrypted_86c85184f8a5_key -iv $encrypted_86c85184f8a5_iv
-  -in .travis/id_rsa.enc -out .travis/id_rsa -d
 - sudo add-apt-repository -y ppa:gophers/archive
 - sudo apt-get update -qq
 - sudo apt-get install -y xmlindent
@@ -14,7 +12,7 @@ script:
 - "./grailsw war"
 notifications:
   email:
-  - k9ert@gmx.de
+  - rpi@sap.com
   slack: yrpm:rDezlAPq20RKGIp10YUeHRnq
 deploy:
   provider: releases
