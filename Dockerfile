@@ -99,5 +99,6 @@ ADD $ZENBOOT_CLI /usr/local/bin/zenboot
 ADD docker-provisioning/setenv.sh $TOMCAT_HOME/bin/setenv.sh
 RUN sudo chown user:user $TOMCAT_HOME/bin/setenv.sh
 RUN sudo chown user:user $TOMCAT_HOME/webapps/zenboot.war
+RUN sudo chmod +x /usr/local/bin/zenboot
 
 CMD bin/catalina.sh run 2>&1
