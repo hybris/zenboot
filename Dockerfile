@@ -76,12 +76,12 @@ RUN curl -o /usr/local/bin/kubectl -LO https://storage.googleapis.com/kubernetes
       && chmod +x /usr/local/bin/kubectl
 
 # install Azure-cli
+# workaround for https://github.com/Azure/azure-cli/issues/3863
+RUN wget ftp.de.debian.org/debian/pool/main/o/openssl/libssl1.0.0_1.0.2l-1~bpo8+1_amd64.deb && dpkg -i libssl1.0.0_1.0.2l-1~bpo8+1_amd64.deb
 RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
      sudo tee /etc/apt/sources.list.d/azure-cli.list
 RUN apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
 RUN apt-get update && apt-get install azure-cli
-# workaround for https://github.com/Azure/azure-cli/issues/3863
-RUN wget ftp.de.debian.org/debian/pool/main/o/openssl/libssl1.0.0_1.0.2l-1~bpo8+1_amd64.deb && dpkg -i libssl1.0.0_1.0.2l-1~bpo8+1_amd64.deb
 
 USER user
 
