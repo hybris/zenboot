@@ -17,7 +17,7 @@ var listnotificationsCmd = &cobra.Command{
 	Short: "list all notifications",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		content, err := rest.SendGet("usernotifications/list")
 		lib.HandleError(err)

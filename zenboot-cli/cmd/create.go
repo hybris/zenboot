@@ -20,7 +20,7 @@ var createCmd = &cobra.Command{
 	Use:   "create [flags]",
 	Short: "create a new execution zone based on the data in the JSON object",
 	Run: func(cmd *cobra.Command, args []string) {
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		if len(paramFile) <= 0 {
 			log.Fatalln("Please prvoide an Execution Zone Template.")

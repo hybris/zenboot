@@ -17,7 +17,7 @@ var listexectypesCmd = &cobra.Command{
 	Short: "list all exectypes",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		content, err := rest.SendGet("exectypes/list")
 		lib.HandleError(err)

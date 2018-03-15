@@ -50,7 +50,7 @@ var executeCmd = &cobra.Command{
 		action, err := lib.ValidateAction(args[0])
 		lib.HandleError(err)
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		parameters, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/actions/" + action + "/listparams")
 		lib.HandleError(err)

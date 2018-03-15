@@ -17,8 +17,8 @@ var listParametersCmd = &cobra.Command{
 	Use:   "parameters [flags] [action]",
 	Short: "list all required parameters of an Execution Zone or one of its actions",
 	Run: func(cmd *cobra.Command, args []string) {
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
-        var url = ""
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
+		var url = ""
 
         if len(args) < 1 {
 		    url = "executionzones/" + strconv.Itoa(id) + "/params/list"

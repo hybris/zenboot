@@ -28,7 +28,7 @@ var listcustomersCmd = &cobra.Command{
 	Short: "list all customers",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		content, err := rest.SendGet("customers/list")
 		lib.HandleError(err)

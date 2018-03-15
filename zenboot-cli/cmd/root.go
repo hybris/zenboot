@@ -13,6 +13,7 @@ var cfgFile string
 var username string
 var secret string
 var zenbootUrl string
+var ignore []string
 var id int
 var default_zenbootUrl string = "https://zenboot.hybris.com"
 
@@ -31,6 +32,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&zenbootUrl, "zenbooturl", "z", "", "The zenboot instance to use (default is https://zenboot.hybris.com)")
 	RootCmd.PersistentFlags().StringVarP(&username, "username", "u", "", "The username to connect to zenboot (default is empty)")
 	RootCmd.PersistentFlags().StringVarP(&secret, "secret", "s", "", "The password to connect (default is empty)")
+	RootCmd.PersistentFlags().StringSliceVarP(&ignore, "ignore", "i", []string{""}, "Ignore a list of non-fatal errors (currently only 'cert')")
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.zenboot.json)")
 	RootCmd.PersistentFlags().IntVarP(&id, "executionzone", "e", 0, "the id of the Execution Zone in which to execute.")
 	initConfig()

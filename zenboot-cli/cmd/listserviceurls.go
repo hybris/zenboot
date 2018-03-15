@@ -17,7 +17,7 @@ var listserviceurlsCmd = &cobra.Command{
 	Short: "list all serviceurls",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		content, err := rest.SendGet("serviceurls/list")
 		lib.HandleError(err)

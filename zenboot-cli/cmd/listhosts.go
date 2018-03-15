@@ -32,7 +32,7 @@ var listhostsCmd = &cobra.Command{
 	Short: "list all CREATED and COMPLETED hosts [matching the given execution zone]",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		var filter string
 
