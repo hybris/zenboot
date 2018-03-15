@@ -19,8 +19,8 @@ var listAttribsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
-        content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/attributes/list")
-        lib.HandleError(err)
+		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/attributes/list")
+		lib.HandleError(err)
 
 		prettyjson, _ := prettyjson.Format(content)
 		fmt.Println(string(prettyjson))

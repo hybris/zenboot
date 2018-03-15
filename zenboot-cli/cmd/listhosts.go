@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
 
 	"../lib"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 type HostsResponse struct {
@@ -20,7 +20,6 @@ type Host struct {
 	IPAdress    string   `json:"ipaddress"`
 	ServiceUrls []string `json:"serviceUrls"`
 }
-
 
 func init() {
 	listhostsCmd.Flags().IntVarP(&id, "executionzone", "e", 0, "Zone filter for hosts")

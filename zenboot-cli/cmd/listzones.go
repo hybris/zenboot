@@ -45,8 +45,8 @@ var listzonesCmd = &cobra.Command{
 		filteredZones := ExecutionZonesResponse{}
 		if domain != "" || zoneType != "" {
 			for _, executionZone := range jsonZones.ExecutionZones {
-				if strings.Contains(executionZone.ExecDescription, domain) && strings.Contains(executionZone.ExecType, zoneType){
-						filteredZones.ExecutionZones = append(filteredZones.ExecutionZones, executionZone)
+				if strings.Contains(executionZone.ExecDescription, domain) && strings.Contains(executionZone.ExecType, zoneType) {
+					filteredZones.ExecutionZones = append(filteredZones.ExecutionZones, executionZone)
 				}
 			}
 		} else {

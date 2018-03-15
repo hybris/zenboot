@@ -13,10 +13,10 @@ type CustomersResponse struct {
 }
 
 type Customer struct {
-	Id              int      `json:"id"`
-    Email           string   `json:"email"`
-	CreationDate    string   `json:"creationDate"`
-	Hosts           []string `json:"hosts"`
+	Id           int      `json:"id"`
+	Email        string   `json:"email"`
+	CreationDate string   `json:"creationDate"`
+	Hosts        []string `json:"hosts"`
 }
 
 func init() {

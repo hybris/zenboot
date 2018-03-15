@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+
 	"../lib"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
 )
-
 
 func init() {
 	listCmd.AddCommand(listhoststatesCmd)

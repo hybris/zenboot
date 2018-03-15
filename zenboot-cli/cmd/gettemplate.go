@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+
 	"../lib"
 	"github.com/spf13/cobra"
-	"os"
-	"bufio"
 )
 
 var path string
