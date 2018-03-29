@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytes"
+	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -19,6 +20,7 @@ type Zenboot struct {
 	ZenbootUrl string
 	Username   string
 	Secret     string
+	Ignore     []string
 }
 
 func HandleError(err error) {
@@ -49,7 +51,7 @@ func (z Zenboot) SendPost(rest_call string, data []byte) ([]byte, error) {
 
 func (z Zenboot) SendRequest(request_type string, rest_call string, data []byte) ([]byte, error) {
 
-	var client = getClient()
+	var client = getClient(z.Ignore)
 	var data_buffer = bytes.NewBuffer(data)
 
 	req, err := http.NewRequest(request_type, z.ZenbootUrl+ENDPOINT+rest_call, data_buffer)
@@ -83,18 +85,23 @@ func (z Zenboot) SendRequest(request_type string, rest_call string, data []byte)
 
 var getClient = get_client
 
-func get_client() *http.Client {
+func get_client(ignore []string) *http.Client {
 	var netTransport = &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: 5 * time.Second,
 		}).Dial,
 		TLSHandshakeTimeout: 5 * time.Second,
 	}
+	for _, i := range ignore {
+		if i == "cert" {
+			netTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		}
+	}
+
 	var client = &http.Client{
 		Timeout:   time.Second * 10,
 		Transport: netTransport,
 	}
-
 	return client
 }
 

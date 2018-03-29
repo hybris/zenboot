@@ -1,11 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+
 	"../lib"
 	"github.com/spf13/cobra"
-	"os"
-	"bufio"
 )
 
 var path string
@@ -20,7 +21,7 @@ var gettemplateCmd = &cobra.Command{
 	Short: "generate a template file for creating new zones",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		if path == "" {
 			path = "./template.json"

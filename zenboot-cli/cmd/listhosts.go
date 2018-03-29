@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
 
 	"../lib"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 type HostsResponse struct {
@@ -21,7 +21,6 @@ type Host struct {
 	ServiceUrls []string `json:"serviceUrls"`
 }
 
-
 func init() {
 	listhostsCmd.Flags().IntVarP(&id, "executionzone", "e", 0, "Zone filter for hosts")
 	listCmd.AddCommand(listhostsCmd)
@@ -32,7 +31,7 @@ var listhostsCmd = &cobra.Command{
 	Short: "list all CREATED and COMPLETED hosts [matching the given execution zone]",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		var filter string
 

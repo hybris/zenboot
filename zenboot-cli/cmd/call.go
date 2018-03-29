@@ -21,7 +21,7 @@ var callCmd = &cobra.Command{
 		}
 		rest_call := args[0]
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		content, err := rest.SendGet(rest_call)
 		lib.HandleError(err)

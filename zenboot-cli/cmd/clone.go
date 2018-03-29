@@ -18,7 +18,7 @@ var cloneCmd = &cobra.Command{
 	Short: "clone an existing Execution Zone",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret}
+		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
 		content, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/clone")
 		lib.HandleError(err)
