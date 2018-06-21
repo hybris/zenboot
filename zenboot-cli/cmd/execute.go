@@ -52,7 +52,7 @@ var executeCmd = &cobra.Command{
 
 		var rest = lib.Zenboot{ZenbootUrl: zenbootUrl, Username: username, Secret: secret, Ignore: ignore}
 
-		parameters, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/actions/" + action + "/listparams")
+		parameters, err := rest.SendGet("executionzones/" + strconv.Itoa(id) + "/actions/" + action + "/params/list")
 		lib.HandleError(err)
 
 		jsonParameters := JsonResponse{}
