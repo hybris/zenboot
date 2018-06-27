@@ -36,6 +36,7 @@ class Scriptlet extends Processable implements ProcessListener {
         error type: 'text'
         logged type: 'text'
         tempFilePath type: 'text'
+        file type: 'longblob'
         logslist joinTable: [name: 'scriptlet_logslist', key: 'scriptlet_id', column: 'logslist_string', sqlType: 'text']
         // file sqlType: 'blob' // see #43
     }
