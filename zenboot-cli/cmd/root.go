@@ -63,7 +63,7 @@ func initConfig() {
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println("Can't find a config file: ", err)
+		fmt.Println("Unable to find config file. $HOME/.zenboot.[json,yaml,toml] expected.", err)
 	}
 }
 
