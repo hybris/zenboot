@@ -1,0 +1,46 @@
+{
+    "version": 1,
+    "jobs": [
+        {
+            "build_only": true,
+            "docker_file": "infrabox/initial-image/Dockerfile",
+            "name": "initial-image",
+            "resources": {
+                "limits": {
+                    "cpu": 2,
+                    "memory": 4096
+                }
+            },
+            "type": "docker",
+            "deployments": [{
+                "type": "docker-registry",
+                "host": "v2-registry.dhcp.wdf.sap.corp:5000",
+                "repository": "zenboot-builder"
+            }]
+        },
+        {
+            "build_only": false,
+            "name": "unit-and-integration-tests",
+            "docker_file": "infrabox/u-and-i-tests/Dockerfile",
+            "resources": { "limits": { "cpu": 1, "memory": 1024 } },
+            "type": "docker",
+            "depends_on": ["initial-image"]
+        },
+        {
+            "build_only": false,
+            "name": "functional-tests",
+            "docker_file": "infrabox/f-tests/Dockerfile",
+            "resources": { "limits": { "cpu": 1, "memory": 1024 } },
+            "type": "docker",
+            "depends_on": ["initial-image"]
+        },
+        {
+            "build_only": false,
+            "name": "build-war",
+            "docker_file": "infrabox/build-war/Dockerfile",
+            "resources": { "limits": { "cpu": 1, "memory": 1024 } },
+            "type": "docker",
+            "depends_on": ["initial-image","unit-and-integration-tests","functional-tests"]
+        }
+    ] 
+}
