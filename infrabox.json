@@ -8,13 +8,13 @@
             "resources": {
                 "limits": {
                     "cpu": 2,
-                    "memory": 4096
+                    "memory": 8192
                 }
             },
             "type": "docker",
             "deployments": [{
                 "type": "docker-registry",
-                "host": "v2-registry.dhcp.wdf.sap.corp:5000",
+                "host": "v2-registry.dhcp.wdf.sap.corp",
                 "repository": "zenboot-builder"
             }]
         },
@@ -40,7 +40,7 @@
             "docker_file": "infrabox/build-war/Dockerfile",
             "resources": { "limits": { "cpu": 1, "memory": 1024 } },
             "type": "docker",
-            "depends_on": ["initial-image","unit-and-integration-tests","functional-tests"]
+            "depends_on": ["unit-and-integration-tests","functional-tests"]
         }
     ] 
 }
