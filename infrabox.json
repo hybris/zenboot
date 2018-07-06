@@ -22,7 +22,7 @@
             "build_only": false,
             "name": "unit-and-integration-tests",
             "docker_file": "infrabox/u-and-i-tests/Dockerfile",
-            "resources": { "limits": { "cpu": 1, "memory": 1024 } },
+            "resources": { "limits": { "cpu": 2, "memory": 4096 } },
             "type": "docker",
             "depends_on": ["initial-image"]
         },
@@ -30,7 +30,7 @@
             "build_only": false,
             "name": "functional-tests",
             "docker_file": "infrabox/f-tests/Dockerfile",
-            "resources": { "limits": { "cpu": 1, "memory": 1024 } },
+            "resources": { "limits": { "cpu": 2, "memory": 4096 } },
             "type": "docker",
             "depends_on": ["initial-image"]
         },
@@ -38,7 +38,7 @@
             "build_only": false,
             "name": "build-war",
             "docker_file": "infrabox/build-war/Dockerfile",
-            "resources": { "limits": { "cpu": 1, "memory": 1024 } },
+            "resources": { "limits": { "cpu": 2, "memory": 4096 } },
             "type": "docker",
             "depends_on": ["unit-and-integration-tests","functional-tests"]
         }
