@@ -26,7 +26,12 @@ class ZenbootUserDetailsContextMapper implements UserDetailsContextMapper {
             def lowerCaseUsername = username.toLowerCase()
 
             def email = ctx.getAttributeSortedStringSet(mailKey)[0] ?: ''
-            def displayName = ctx.getAttributeSortedStringSet(displayNameKey)[0] ?: username
+            def displayName = ''
+            try {
+                displayName = ctx.getAttributeSortedStringSet(displayNameKey)[0] ?: username
+            } catch(NullPointerException e) {
+                displayName = username
+            }
 
             // if LDAP is switched off, users should not be able to log in - i.e. use a random password
             def password = RandomStringUtils.randomAlphanumeric(30)
