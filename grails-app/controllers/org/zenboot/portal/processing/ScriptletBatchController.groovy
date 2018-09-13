@@ -77,8 +77,10 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true}
             batches = new ArrayList<ScriptletBatch>()
             execList.each { key, value ->
-                Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
-                actions.each {batches.addAll(it.scriptletBatches)}
+                if (ExecutionZone.id == key){
+                    Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
+                    actions.each {batches.addAll(it.scriptletBatches)}
+                }
             }
 
             // Get size for pagination
