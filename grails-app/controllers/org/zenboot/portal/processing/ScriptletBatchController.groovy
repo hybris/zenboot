@@ -77,7 +77,7 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true}
             batches = new ArrayList<ScriptletBatch>()
             execList.each { key, value ->
-                if (ExecutionZone.id == key){
+                if(key == params.filter.executionZoneAction.executionZone.id.toInteger()){
                     Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
                     actions.each {batches.addAll(it.scriptletBatches)}
                 }
