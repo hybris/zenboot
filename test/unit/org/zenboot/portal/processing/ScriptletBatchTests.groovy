@@ -112,4 +112,12 @@ class ScriptletBatchTests {
         processUnit.process = process
         return processUnit
     }
+
+    void testFilters(){
+        def key = 3
+        def params = [:]
+        assertEquals("Wrong result for filter", true, ScriptletBatchController.checkFilter(params,key))
+        params = [filter: [executionZoneAction: [executionZone: [id: '4']]]]
+        assertEquals("Wrong result for filter", false, ScriptletBatchController.checkFilter(params,key))
+    }
 }

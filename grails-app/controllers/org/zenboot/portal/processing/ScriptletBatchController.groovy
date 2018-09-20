@@ -77,7 +77,7 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true}
             batches = new ArrayList<ScriptletBatch>()
             execList.each { key, value ->
-                if(key == params.filter?.executionZoneAction?.executionZone?.id?.toInteger() || params.filter == null) {
+                if(checkFilter(params, key)) {
                     Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
                     actions.each {batches.addAll(it.scriptletBatches)}
                 }
@@ -116,6 +116,10 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             filterParams: FilterPaneUtils.extractFilterParams(params),
             parameters: parameters
         ]
+    }
+
+    static def checkFilter(params, key){
+        return (params.filter == null || params.filter?.executionZoneAction?.executionZone?.id?.toInteger() == key)
     }
 
     private Closure countTaskCreator(params, ScriptletBatch) {
