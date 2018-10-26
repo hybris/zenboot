@@ -60,31 +60,9 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
         } else {
             batches = getAllScripletBatchesForCurrentUser(params)
 
+            batches = applySortAndRangeOntoScripletBatches(batches, params)
             // Get size for pagination
             batchCount = batches.size()
-
-            // Sort result by sortablecolumn vom list.gsp
-            switch (params.sort) {
-                case 'user': params.order =='desc'? batches = batches.sort{it.user.displayName ?: it.user.username}.reverse() : batches.sort{it.user.displayName ?: it.user.username}
-                    break
-                case 'description': params.order =='desc'? batches = batches.sort{it.description}.reverse() : batches.sort{it.description}
-                    break
-                case 'creationDate': params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
-                    break
-                case 'endDate': params.order =='desc'? batches = batches.sort{it.endDate}.reverse() : batches.sort{it.endDate}
-                    break
-                case 'startDate': params.order =='desc'? batches = batches.sort{it.startDate}.reverse() : batches.sort{it.startDate}
-                    break
-                case 'state': params.order =='desc'? batches = batches.sort{it.state}.reverse() : batches.sort{it.state}
-                    break
-                case 'executionZoneAction.executionZone': params.order =='desc'? batches = batches.sort{it.executionZoneAction.executionZone}.reverse() : batches.sort{it.executionZoneAction.executionZone}
-                    break
-                default:
-                    params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
-                    break
-            }
-            //use a range do avoid displaying all at once
-            batches = scriptletBatchService.getRange(batches, params)
         }
 
         [
@@ -93,6 +71,30 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             filterParams: FilterPaneUtils.extractFilterParams(params),
             parameters: parameters
         ]
+    }
+
+    private def applySortAndRangeOntoScripletBatches(batches, params) {
+        switch (params.sort) {
+            case 'user': params.order =='desc'? batches = batches.sort{it.user.displayName ?: it.user.username}.reverse() : batches.sort{it.user.displayName ?: it.user.username}
+                break
+            case 'description': params.order =='desc'? batches = batches.sort{it.description}.reverse() : batches.sort{it.description}
+                break
+            case 'creationDate': params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
+                break
+            case 'endDate': params.order =='desc'? batches = batches.sort{it.endDate}.reverse() : batches.sort{it.endDate}
+                break
+            case 'startDate': params.order =='desc'? batches = batches.sort{it.startDate}.reverse() : batches.sort{it.startDate}
+                break
+            case 'state': params.order =='desc'? batches = batches.sort{it.state}.reverse() : batches.sort{it.state}
+                break
+            case 'executionZoneAction.executionZone': params.order =='desc'? batches = batches.sort{it.executionZoneAction.executionZone}.reverse() : batches.sort{it.executionZoneAction.executionZone}
+                break
+            default:
+                params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
+                break
+        }
+
+        return scriptletBatchService.getRange(batches, params)
     }
 
     private def getAllScripletBatchesForCurrentUser(params) {
