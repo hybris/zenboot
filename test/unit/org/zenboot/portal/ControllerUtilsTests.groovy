@@ -33,7 +33,7 @@ class ControllerUtilsTests extends GroovyTestCase {
     def myMap = ControllerUtils.getParameterMap(params)
     println "myMap is now:" +  myMap
 
-    // and so we have to deactivate that untill we get an idea how to test properly
+    // and so we have to deactivate that until we get an idea how to test properly
     if (false) {
       assertEquals("CUSTOMER_EMAIL is not empty/existing", null,myMap["CUSTOMER_EMAIL"] )
       assertEquals("DOMAIN is wrong", "wurst.com",myMap["DOMAIN"] )
