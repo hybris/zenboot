@@ -58,30 +58,7 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             waitAll(batchCountTask)
             batchCount = batchCountTask.internalPromise.value
         } else {
-            // Filter deactivated because we have atm around 60000 entries in this db column
-            // Because for non admin user the page loads every time all entries which needs between 20 sec to 1 min
-            // we decided to disable the filter for users. Now we get the allowed scriptletbatches via the execution zones
-            // where the user has access. See RPI-2405
-
-            //Past:
-            // batches = filterPaneService.filter(params - [max: params.max, offset: params.offset], ScriptletBatch)
-            // batches = scriptletBatchService.filterByAccessPermission(batches)
-
-            //Now:
-            // If currently logged in user not exists in the cache, refresh cache for this person
-            if (!accessService.accessCache[springSecurityService.getCurrentUserId()]) {
-                accessService.refreshAccessCacheByUser(Person.findById(springSecurityService.getCurrentUserId()))
-            }
-
-            // Get all execution zones where this currently logged in user has access and collect scriptletbatches from executionzoneactions
-            def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true}
-            batches = new ArrayList<ScriptletBatch>()
-            execList.each { key, value ->
-                if(checkFilter(params, key)) {
-                    Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
-                    actions.each {batches.addAll(it.scriptletBatches)}
-                }
-            }
+            batches = getAllScripletBatchesForCurrentUser(params)
 
             // Get size for pagination
             batchCount = batches.size()
@@ -118,8 +95,34 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
         ]
     }
 
-    static def checkFilter(params, key){
-        return (params.filter == null || params.filter?.executionZoneAction?.executionZone?.id?.toInteger() == key)
+    private def getAllScripletBatchesForCurrentUser(params) {
+        // Filter deactivated because we have atm around 60000 entries in this db column
+        // Because for non admin user the page loads every time all entries which needs between 20 sec to 1 min
+        // we decided to disable the filter for users. Now we get the allowed scriptletbatches via the execution zones
+        // where the user has access. See RPI-2405
+
+        //Past:
+        // batches = filterPaneService.filter(params - [max: params.max, offset: params.offset], ScriptletBatch)
+        // batches = scriptletBatchService.filterByAccessPermission(batches)
+
+        //Now:
+        // If currently logged in user not exists in the cache, refresh cache for this person
+        if (!accessService.accessCache[springSecurityService.getCurrentUserId()]) {
+            accessService.refreshAccessCacheByUser(Person.findById(springSecurityService.getCurrentUserId()))
+        }
+
+        // Get all execution zones where this currently logged in user has access and collect scriptletbatches from executionzoneactions
+        def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true}
+
+        def batches = new ArrayList<ScriptletBatch>()
+        execList.each { key, value ->
+            if(params.filter == null || params.filter?.executionZoneAction?.executionZone?.id?.toInteger() == key) {
+                Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
+                actions.each {batches.addAll(it.scriptletBatches)}
+            }
+        }
+
+        return batches
     }
 
     private Closure countTaskCreator(params, ScriptletBatch) {
