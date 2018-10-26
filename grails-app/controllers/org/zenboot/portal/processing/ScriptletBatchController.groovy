@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus
 import static grails.async.Promises.task
 import static grails.async.Promises.waitAll
 
-class ScriptletBatchController implements ApplicationEventPublisherAware{
+class ScriptletBatchController implements ApplicationEventPublisherAware {
 
     PageRenderer groovyPageRenderer
     def executionZoneService
@@ -61,43 +61,60 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             batches = getAllScripletBatchesForCurrentUser(params)
 
             batches = applySortAndRangeOntoScripletBatches(batches, params)
+
             // Get size for pagination
             batchCount = batches.size()
         }
 
         [
-            scriptletBatchInstanceList: batches,
-            scriptletBatchInstanceTotal: batchCount,
-            filterParams: FilterPaneUtils.extractFilterParams(params),
-            parameters: parameters
+                scriptletBatchInstanceList: batches,
+                scriptletBatchInstanceTotal: batchCount,
+                filterParams: FilterPaneUtils.extractFilterParams(params),
+                parameters: parameters
         ]
     }
 
     private def applySortAndRangeOntoScripletBatches(batches, params) {
         switch (params.sort) {
-            case 'user': params.order =='desc'? batches = batches.sort{it.user.displayName ?: it.user.username}.reverse() : batches.sort{it.user.displayName ?: it.user.username}
+            case 'user': params.order == 'desc' ? batches = batches.sort {
+                it.user.displayName ?: it.user.username
+            }.reverse() : batches.sort { it.user.displayName ?: it.user.username }
                 break
-            case 'description': params.order =='desc'? batches = batches.sort{it.description}.reverse() : batches.sort{it.description}
+            case 'description': params.order == 'desc' ? batches = batches.sort {
+                it.description
+            }.reverse() : batches.sort { it.description }
                 break
-            case 'creationDate': params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
+            case 'creationDate': params.order == 'desc' ? batches = batches.sort {
+                it.creationDate
+            }.reverse() : batches.sort { it.creationDate }
                 break
-            case 'endDate': params.order =='desc'? batches = batches.sort{it.endDate}.reverse() : batches.sort{it.endDate}
+            case 'endDate': params.order == 'desc' ? batches = batches.sort { it.endDate }.reverse() : batches.sort {
+                it.endDate
+            }
                 break
-            case 'startDate': params.order =='desc'? batches = batches.sort{it.startDate}.reverse() : batches.sort{it.startDate}
+            case 'startDate': params.order == 'desc' ? batches = batches.sort {
+                it.startDate
+            }.reverse() : batches.sort { it.startDate }
                 break
-            case 'state': params.order =='desc'? batches = batches.sort{it.state}.reverse() : batches.sort{it.state}
+            case 'state': params.order == 'desc' ? batches = batches.sort { it.state }.reverse() : batches.sort {
+                it.state
+            }
                 break
-            case 'executionZoneAction.executionZone': params.order =='desc'? batches = batches.sort{it.executionZoneAction.executionZone}.reverse() : batches.sort{it.executionZoneAction.executionZone}
+            case 'executionZoneAction.executionZone': params.order == 'desc' ? batches = batches.sort {
+                it.executionZoneAction.executionZone
+            }.reverse() : batches.sort { it.executionZoneAction.executionZone }
                 break
             default:
-                params.order =='desc'? batches = batches.sort{it.creationDate}.reverse() : batches.sort{it.creationDate}
+                params.order == 'desc' ? batches = batches.sort { it.creationDate }.reverse() : batches.sort {
+                    it.creationDate
+                }
                 break
         }
 
         return scriptletBatchService.getRange(batches, params)
     }
 
-    private def getAllScripletBatchesForCurrentUser(params) {
+    private List<ScriptletBatch> getAllScripletBatchesForCurrentUser(params) {
         // Filter deactivated because we have atm around 60000 entries in this db column
         // Because for non admin user the page loads every time all entries which needs between 20 sec to 1 min
         // we decided to disable the filter for users. Now we get the allowed scriptletbatches via the execution zones
@@ -114,13 +131,13 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
         }
 
         // Get all execution zones where this currently logged in user has access and collect scriptletbatches from executionzoneactions
-        def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true}
+        def execList = accessService.accessCache[springSecurityService.getCurrentUserId()].findAll { it.value == true }
 
         def batches = new ArrayList<ScriptletBatch>()
         execList.each { key, value ->
-            if(params.filter == null || params.filter?.executionZoneAction?.executionZone?.id?.toInteger() == key) {
+            if (params.filter == null || params.filter?.executionZoneAction?.executionZone?.id?.toInteger() == key) {
                 Set<ExecutionZoneAction> actions = ExecutionZone.get(key).actions
-                actions.each {batches.addAll(it.scriptletBatches)}
+                actions.each { batches.addAll(it.scriptletBatches) }
             }
         }
 
@@ -138,7 +155,7 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
         params.offset = 0
 
         def criteria = ScriptletBatch.createCriteria()
-        def result = criteria.list (max:params.max, offset: params.offset){
+        def result = criteria.list(max: params.max, offset: params.offset) {
             not {
                 ilike('description', 'cron%')
             }
@@ -147,26 +164,26 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
 
         request.withFormat {
             json {
-                def output = [queue:[]]
+                def output = [queue: []]
                 for (q in result) {
                     output.queue << [
-                        creationDate : q.creationDate,
-                        description:q.description,
-                        state:q.state.name(),
-                        progress: q.getProgress()
+                            creationDate: q.creationDate,
+                            description : q.description,
+                            state       : q.state.name(),
+                            progress    : q.getProgress()
                     ]
                 }
                 render output as JSON
             }
             html {
-                [scriptletBatchInstanceList:result]
+                [scriptletBatchInstanceList: result]
             }
         }
     }
 
     def ajaxSteps = { GetScriptletBatchStepsCommand cmd ->
         if (cmd.hasErrors()) {
-            return render(view:"/ajaxError", model:[result:cmd])
+            return render(view: "/ajaxError", model: [result: cmd])
         }
 
         ScriptletBatch batch = cmd.getScriptletBatch()
@@ -174,16 +191,16 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
             response.setStatus(HttpStatus.OK.value())
             withFormat {
                 json {
-                    def  result = []
+                    def result = []
                     batch.processables.each { Processable proc ->
                         result << [
-                            markup: this.getScriptletBatchStepMarkup(proc),
-                            status: proc.state.name()
+                                markup: this.getScriptletBatchStepMarkup(proc),
+                                status: proc.state.name()
                         ]
                     }
                     render result as JSON
                 }
-                html { render(template:'steps', model:[steps:batch.processables]) }
+                html { render(template: 'steps', model: [steps: batch.processables]) }
             }
         } else {
             response.setStatus(HttpStatus.GONE.value())
@@ -191,24 +208,24 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
         }
     }
 
-	private getScriptletBatchStepMarkup(Processable proc) {
-		def writer = new StringWriter()
-		groovyPageRenderer.renderTo([template:'/scriptletBatch/steps', model:[steps:proc]], writer)
+    private getScriptletBatchStepMarkup(Processable proc) {
+        def writer = new StringWriter()
+        groovyPageRenderer.renderTo([template: '/scriptletBatch/steps', model: [steps: proc]], writer)
         return writer.toString()
-	}
+    }
 
     def show() {
         def scriptletBatchInstance = ScriptletBatch.get(params.id as Long)
         if (!scriptletBatchInstance) {
-			    flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
-          redirect(action: "list")
-          return
-        } else if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-          if (!accessService.userHasAccess(scriptletBatchInstance.executionZoneAction.executionZone)) {
-            flash.message = message(code: 'default.no.access.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
             redirect(action: "list")
             return
-          }
+        } else if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
+            if (!accessService.userHasAccess(scriptletBatchInstance.executionZoneAction.executionZone)) {
+                flash.message = message(code: 'default.no.access.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+                redirect(action: "list")
+                return
+            }
         }
 
         [scriptletBatchInstance: scriptletBatchInstance]
@@ -217,25 +234,25 @@ class ScriptletBatchController implements ApplicationEventPublisherAware{
     def delete() {
         def scriptletBatchInstance = ScriptletBatch.get(params.id)
         if (!scriptletBatchInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
             redirect(action: "list")
             return
         }
 
         if (SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
 
-          try {
-              scriptletBatchInstance.delete(flush: true)
-  			      flash.message = message(code: 'default.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
-              redirect(action: "list")
-          }
-          catch (DataIntegrityViolationException e) {
-  			       flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
-              redirect(action: "show", id: params.id)
-          }
+            try {
+                scriptletBatchInstance.delete(flush: true)
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+                redirect(action: "list")
+            }
+            catch (DataIntegrityViolationException e) {
+                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
+                redirect(action: "show", id: params.id)
+            }
         } else {
-          flash.message = message(code: 'default.not.allowed.message')
-          redirect(action: "list")
+            flash.message = message(code: 'default.not.allowed.message')
+            redirect(action: "list")
         }
     }
 
@@ -258,7 +275,7 @@ class GetScriptletBatchStepsCommand {
     Long scriptletId
 
     static constraints = {
-        scriptletId nullable:false, validator: { value, commandObj ->
+        scriptletId nullable: false, validator: { value, commandObj ->
             ScriptletBatch.get(commandObj.scriptletId) != null
         }
     }
