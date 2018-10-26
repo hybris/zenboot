@@ -8,12 +8,11 @@
 # Contributors:
 # Codenvy, S.A. - initial API and implementation
 
-FROM debian:jessie
+FROM debian:stretch
 EXPOSE 8080
-RUN echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get -y install locales sudo procps wget unzip && \
-    apt-get -y install -t jessie-backports openjdk-8-jdk && \
+RUN apt-get update && \
+    apt-get -y install locales sudo procps wget unzip gnupg && \
+    apt-get -y install openjdk-8-jdk && \
     echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,sudo -d /home/user --shell /bin/bash -m user \
     && apt-get -y autoremove \
@@ -49,11 +48,40 @@ COPY conf/server.xml /home/user/tomcat/conf
 
 ADD zenboot.properties /etc/zenboot/zenboot.properties
 USER root
+RUN echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
 RUN sudo apt-get update && sudo apt-get install -y curl ansible openssh-client sshpass socat dnsutils jq less vim netcat-openbsd git \
     && apt-get -y autoremove \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/*
 ADD docker-provisioning/ansible.cfg /etc/ansible/ansible.cfg
+
+## Install docker in order to potentially use docker via socket at runtime
+RUN apt-get update && sudo apt-get install -y \
+     apt-transport-https \
+     ca-certificates \
+     curl \
+     gnupg2 \
+     software-properties-common
+RUN curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo apt-key add -
+RUN apt-key fingerprint 0EBFCD88 | grep -q "9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88"
+RUN add-apt-repository \
+      "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+      $(lsb_release -cs) \
+      stable"
+RUN apt-get update && apt-get install -y docker-ce
+
+# Install kubectl
+RUN curl -o /usr/local/bin/kubectl -LO https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kubectl \
+      && chmod +x /usr/local/bin/kubectl
+
+# install Azure-cli
+# workaround for https://github.com/Azure/azure-cli/issues/3863
+RUN wget ftp.de.debian.org/debian/pool/main/o/openssl/libssl1.0.0_1.0.2l-1~bpo8+1_amd64.deb && dpkg -i libssl1.0.0_1.0.2l-1~bpo8+1_amd64.deb
+RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ stretch main" | \
+     sudo tee /etc/apt/sources.list.d/azure-cli.list
+RUN apt-key adv --keyserver packages.microsoft.com --recv-keys EB3E94ADBE1229CF
+RUN apt-get update && apt-get install azure-cli
 
 USER user
 
@@ -63,11 +91,14 @@ RUN if [ -z "$VERSION" ]; \
         exit 1; \
     fi
 ARG ZENBOOT_WAR=https://github.com/hybris/zenboot/releases/download/v$VERSION/zenboot.war
+ARG ZENBOOT_CLI=https://github.com/hybris/zenboot/releases/download/v$VERSION/zenboot-linux-amd64
 
 RUN mkdir -p /home/user/zenboot
 ADD $ZENBOOT_WAR $TOMCAT_HOME/webapps/zenboot.war
+ADD $ZENBOOT_CLI /usr/local/bin/zenboot
 ADD docker-provisioning/setenv.sh $TOMCAT_HOME/bin/setenv.sh
 RUN sudo chown user:user $TOMCAT_HOME/bin/setenv.sh
 RUN sudo chown user:user $TOMCAT_HOME/webapps/zenboot.war
+RUN sudo chmod +x /usr/local/bin/zenboot
 
 CMD bin/catalina.sh run 2>&1

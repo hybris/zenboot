@@ -65,6 +65,7 @@ navigation = {
             notifications controller: 'userNotification', titleText: 'User Notifications', action: 'list'
             dbConsole titleText: 'DB Console', action: 'dbconsole'
             accessCache titleText:'Access Cache', action: 'accessCache'
+            dbCleanup titleText: 'Database Cleanup', action: 'database_cleanup'
         }
     }
 }

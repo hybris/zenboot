@@ -5,6 +5,8 @@ import grails.gsp.PageRenderer
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.grails.plugin.filterpane.FilterPaneUtils
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.ApplicationEventPublisherAware
 import org.zenboot.portal.security.Person
 import org.zenboot.portal.security.Role
 
@@ -15,7 +17,7 @@ import org.springframework.http.HttpStatus
 import static grails.async.Promises.task
 import static grails.async.Promises.waitAll
 
-class ScriptletBatchController {
+class ScriptletBatchController implements ApplicationEventPublisherAware{
 
     PageRenderer groovyPageRenderer
     def executionZoneService
@@ -23,12 +25,18 @@ class ScriptletBatchController {
     def springSecurityService
     def scriptletBatchService
     def filterPaneService
+    def applicationEventPublisher
 
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
+    }
+
+    @Override
+    void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.applicationEventPublisher = eventPublisher
     }
 
     def list() {
@@ -118,7 +126,13 @@ class ScriptletBatchController {
         params.order = 'desc'
         params.offset = 0
 
-        def result = ScriptletBatch.list(params)
+        def criteria = ScriptletBatch.createCriteria()
+        def result = criteria.list (max:params.max, offset: params.offset){
+            not {
+                ilike('description', 'cron%')
+            }
+            order(params.sort as String, params.order as String)
+        }
 
         request.withFormat {
             json {
@@ -173,7 +187,7 @@ class ScriptletBatchController {
 	}
 
     def show() {
-        def scriptletBatchInstance = ScriptletBatch.get(params.id)
+        def scriptletBatchInstance = ScriptletBatch.get(params.id as Long)
         if (!scriptletBatchInstance) {
 			    flash.message = message(code: 'default.not.found.message', args: [message(code: 'scriptletBatch.label', default: 'scriptletBatch'), params.id])
           redirect(action: "list")
@@ -184,9 +198,7 @@ class ScriptletBatchController {
             redirect(action: "list")
             return
           }
-
         }
-
 
         [scriptletBatchInstance: scriptletBatchInstance]
     }
@@ -213,8 +225,20 @@ class ScriptletBatchController {
         } else {
           flash.message = message(code: 'default.not.allowed.message')
           redirect(action: "list")
-          return
         }
+    }
+
+    def rerun() {
+        ScriptletBatch scriptletBatchInstance = ScriptletBatch.get(params.id)
+        ExecutionZoneAction reRunAction = scriptletBatchInstance.getExecutionZoneAction()
+        Map parameters = [:]
+        reRunAction.processingParameters.each {
+            parameters[it.name] = it.value
+        }
+
+        ExecutionZoneAction newAction = executionZoneService.createExecutionZoneAction(reRunAction.executionZone, reRunAction.scriptDir, parameters)
+        applicationEventPublisher.publishEvent(new ProcessingEvent(newAction, springSecurityService.currentUser, "Rerun of previous executed action."))
+        redirect(action: "show", params: [id: params.id])
     }
 }
 

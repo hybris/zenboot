@@ -6,7 +6,7 @@ enum Environment {
     STAGING('s'),
     PRODUCTION('p'),
     UAT('u'),
-    INTEGRATION('i'),
+    INTEGRATION('i')
 
     String acronym
 
