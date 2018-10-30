@@ -34,7 +34,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&secret, "secret", "s", "", "The password to connect (default is empty)")
 	RootCmd.PersistentFlags().StringSliceVarP(&ignore, "ignore", "i", []string{""}, "Ignore a list of non-fatal errors (currently only 'cert')")
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.zenboot.json)")
-	RootCmd.PersistentFlags().IntVarP(&id, "executionzone", "e", 0, "the id of the Execution Zone in which to execute.")
+	RootCmd.PersistentFlags().IntVarP(&id, "executionzone", "e", 0, "the id of the Execution Zone in which to execute")
 	initConfig()
 
 	if zenbootUrl == "" {
@@ -63,7 +63,7 @@ func initConfig() {
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println("Can't find a config file: ", err)
+		fmt.Println("Unable to find config file. $HOME/.zenboot.[json,yaml,toml] expected.", err)
 	}
 }
 
