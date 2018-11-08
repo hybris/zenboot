@@ -112,6 +112,7 @@ class HostRestController extends AbstractRestController {
                     hosts {
                         hostsFromZone.each { hostElement ->
                             host {
+                                execzoneid hostElement.execZone.id
                                 hostid hostElement.id
                                 hostname hostElement.hostname.toString()
                                 cname hostElement.cname
@@ -135,7 +136,7 @@ class HostRestController extends AbstractRestController {
             json {
                 Map hosts = [:]
                 List host = hostsFromZone.collect {
-                    [hostid: it.id,hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, metaInformation: SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)? it.metaInformation : '', serviceUrls: [it.serviceUrls.collect {
+                    [execzoneid: it.execZone.id, hostid: it.id,hostname: it.hostname.toString(), cname: it.cname, hoststate: it.state.toString(), ipadress: it.ipAddress, metaInformation: SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)? it.metaInformation : '', serviceUrls: [it.serviceUrls.collect {
                         it.url
                     }]]
                 }
