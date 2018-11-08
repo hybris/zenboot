@@ -242,7 +242,7 @@ Request method: PUT
 Don't use zenboot in production with Docker, because security!
 
 ## License ##
-Copyright 2013 hybris GmbH
+Copyright 2018 hybris GmbH
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this except in compliance with the License. You may obtain a copy of the License at
 
