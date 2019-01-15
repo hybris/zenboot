@@ -26,6 +26,7 @@ class HostRestController extends AbstractRestController {
      */
     def listhosts = {
         ExecutionZone executionZone
+        List<Long> usersExecutionZones = []
 
         if (params.execId && params.execId.isInteger()) {
             if (ExecutionZone.findById(params.execId as Long)) {
@@ -36,12 +37,20 @@ class HostRestController extends AbstractRestController {
             }
         }
 
-        List<Long> usersExecutionZones = []
         if (!SpringSecurityUtils.ifAllGranted(Role.ROLE_ADMIN)) {
-            Map execZoneMap = accessService.accessCache[springSecurityService.getCurrentUserId()]
-            usersExecutionZones = execZoneMap.findAll{it.value == true}.collect{it.key}
+
+            def currentUserID = springSecurityService.getCurrentUserId()
+
+            if (accessService.accessCache[currentUserID]) {
+                usersExecutionZones = accessService.accessCache[currentUserID].findAll {it.value}
+            }
+            else {
+                accessService.refreshAccessCacheByUser(Person.findById(currentUserID))
+                usersExecutionZones = accessService.accessCache[currentUserID].findAll {it.value}
+            }
+
             if (usersExecutionZones.isEmpty()) {
-                this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You do not have any access to any executionzone.')
+                this.renderRestResult(HttpStatus.UNAUTHORIZED, null, null, 'You do not have access to any executionzone.')
             }
         }
 
@@ -74,7 +83,7 @@ class HostRestController extends AbstractRestController {
                         }
                         else {
                             usersExecutionZones.each {
-                                hostsFromZone.addAll(Host.findAllByStateAndExecZone(hostState, ExecutionZone.findById(it)))
+                                hostsFromZone.addAll(Host.findAllByStateAndExecZone(hostState, ExecutionZone.findById(it.key as Long)))
                             }
                         }
                     }
@@ -97,7 +106,7 @@ class HostRestController extends AbstractRestController {
                 }
                 else {
                     usersExecutionZones.each {
-                        hostsFromZone.addAll(Host.findAllByExecZone(ExecutionZone.findById(it)))
+                        hostsFromZone.addAll(Host.findAllByExecZone(ExecutionZone.findById(it.key as Long)))
                     }
                 }
             }
