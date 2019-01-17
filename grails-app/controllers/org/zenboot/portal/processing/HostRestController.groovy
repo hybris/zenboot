@@ -42,11 +42,10 @@ class HostRestController extends AbstractRestController {
             def currentUserID = springSecurityService.getCurrentUserId()
 
             if (accessService.accessCache[currentUserID]) {
-                usersExecutionZones = accessService.accessCache[currentUserID].findAll {it.value}
-            }
-            else {
+                usersExecutionZones = accessService.accessCache[currentUserID].findAll {it.value}.collect {it.key}
+            } else {
                 accessService.refreshAccessCacheByUser(Person.findById(currentUserID))
-                usersExecutionZones = accessService.accessCache[currentUserID].findAll {it.value}
+                usersExecutionZones = accessService.accessCache[currentUserID].findAll {it.value}.collect {it.key}
             }
 
             if (usersExecutionZones.isEmpty()) {
