@@ -85,18 +85,16 @@ var executeCmd = &cobra.Command{
 				for _, flag := range sliceParams {
 					paramMap := strings.SplitN(flag, "=", 2)
 
-					var bye string
 					if len(paramMap) != 2 {
-						bye = "Please assign a value to each parameter!"
+						lib.HandleError(errors.New("Please assign a value to each parameter!"))
 					} else if len(paramMap[1]) == 0 {
-						bye = "Parameter values must not be empty!"
+						lib.HandleError(errors.New("Parameter values must not be empty!"))
 					} else if strings.HasSuffix(paramMap[0], "_JSON") {
 						var js map[string]interface{}
 						if json.Unmarshal([]byte(paramMap[1]), &js) != nil {
-							bye = "Paramter " + paramMap[0] + " seems to be an JSON object, however its content is not!"
+							lib.HandleError(errors.New("Paramter " + paramMap[0] + " seems to be an JSON object, however its content is not!"))
 						}
 					}
-					lib.HandleError(errors.New(bye))
 
 					if params.ParameterName == paramMap[0] {
 						jsonParameters.Executions[execId].Parameters[paramId].ParameterValue = paramMap[1]
