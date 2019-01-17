@@ -176,7 +176,15 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/host/show':                           ['IS_AUTHENTICATED_REMEMBERED'],
     '/serviceUrl/show':                     ['IS_AUTHENTICATED_REMEMBERED'],
     '/executionZone/ajaxGetReadme':         ['IS_AUTHENTICATED_REMEMBERED'],
+
+	// internal calls
     '/executionZoneRest/**':                ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZoneActionRest/**':          ['IS_AUTHENTICATED_REMEMBERED'],
+    '/serviceUrlRest/**':                   ['IS_AUTHENTICATED_REMEMBERED'],
+    '/hostRest/**':                         ['IS_AUTHENTICATED_REMEMBERED'],
+    '/customerRest/**':                     ['IS_AUTHENTICATED_REMEMBERED'],
+    '/userNotificationRest/**':             ['IS_AUTHENTICATED_REMEMBERED'],
+    '/executionZoneTypeRest/**':            ['IS_AUTHENTICATED_REMEMBERED'],
   
     //default
     '/administration':                      [Role.ROLE_ADMIN],
