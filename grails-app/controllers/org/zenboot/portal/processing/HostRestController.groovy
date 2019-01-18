@@ -82,7 +82,7 @@ class HostRestController extends AbstractRestController {
                         }
                         else {
                             usersExecutionZones.each {
-                                hostsFromZone.addAll(Host.findAllByStateAndExecZone(hostState, ExecutionZone.findById(it.key as Long)))
+                                hostsFromZone.addAll(Host.findAllByStateAndExecZone(hostState, ExecutionZone.findById(it)))
                             }
                         }
                     }
@@ -105,7 +105,7 @@ class HostRestController extends AbstractRestController {
                 }
                 else {
                     usersExecutionZones.each {
-                        hostsFromZone.addAll(Host.findAllByExecZone(ExecutionZone.findById(it.key as Long)))
+                        hostsFromZone.addAll(Host.findAllByExecZone(ExecutionZone.findById(it)))
                     }
                 }
             }
