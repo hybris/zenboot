@@ -88,8 +88,10 @@ var getClient = get_client
 func get_client(ignore []string) *http.Client {
 	var netTransport = &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout: 10 * time.Second,
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
 		}).Dial,
+		IdleConnTimeout:     90 * time.Second,
 		TLSHandshakeTimeout: 10 * time.Second,
 	}
 	for _, i := range ignore {
@@ -99,7 +101,7 @@ func get_client(ignore []string) *http.Client {
 	}
 
 	var client = &http.Client{
-		Timeout:   time.Second * 20,
+		Timeout:   5 * time.Minute,
 		Transport: netTransport,
 	}
 	return client
